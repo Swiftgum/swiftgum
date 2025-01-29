@@ -6,7 +6,7 @@
 	"license": "Apache-2.0",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "docker compose -f docker-compose.dev.yml up",
+		"dev": "npx supabase start && docker compose -f docker-compose.dev.yml up",
 		"prepare": "husky",
 		"format": "biome format",
 		"lint": "biome lint"
@@ -20,6 +20,7 @@
 	"packageManager": "pnpm@9.10.0",
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
-		"husky": "^9.1.7"
+		"husky": "^9.1.7",
+		"supabase": "^2.9.6"
 	}
 }
