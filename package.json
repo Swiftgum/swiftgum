@@ -1,0 +1,17 @@
+{
+  "name": "knowledgex",
+  "version": "0.1.0",
+  "description": "Integrate External Knowledge With Ease",
+  "main": "index.js",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Swiftgum, Inc.",
+  "private": true,
+  "engines": {
+    "pnpm": "^9.0.0",
+    "node": ">= 20"
+  },
+  "packageManager": "pnpm@9.10.0"
+}
