@@ -33,3 +33,9 @@ pnpm lint
 ```bash
 pnpm test
 ```
+
+### Run Development
+
+```bash
+pnpm dev
+```
