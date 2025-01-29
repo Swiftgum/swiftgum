@@ -4,6 +4,11 @@
 
 ## Development
 
+### Prerequisites
+
+- [pnpm](https://pnpm.io/installation)
+- [uv](<[https://docs.astral.sh/uv/installation/](https://docs.astral.sh/uv/getting-started/installation/)>)
+
 ### Install Dependencies
 
 ```bash
