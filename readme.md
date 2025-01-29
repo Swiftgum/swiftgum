@@ -8,6 +8,7 @@
 
 - [pnpm](https://pnpm.io/installation)
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
+- [Docker](https://docs.docker.com/get-docker/)
 
 ### Install Dependencies
 
