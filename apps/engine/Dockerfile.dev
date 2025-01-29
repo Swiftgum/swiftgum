@@ -1,0 +1,26 @@
+# Use Python 3.13
+FROM python:3.13-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install uv
+RUN pip install uv
+
+# Copy pyproject.toml
+COPY pyproject.toml .
+
+# Install dependencies using uv
+RUN uv venv
+RUN uv sync
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Create a non-root user for security
+RUN adduser --disabled-password --gecos '' appuser
+USER appuser
+
+# The actual application code will be mounted as a volume
+CMD ["python", "main.py"]

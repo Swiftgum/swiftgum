@@ -1,0 +1,30 @@
+services:
+  engine:
+    build:
+      context: ./apps/engine
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./apps/engine:/app
+    ports:
+      - "8000:8000" # adjust port as needed
+    environment:
+      - PYTHONPATH=/app
+      - ENVIRONMENT=development
+    command: python main.py # adjust based on your entry point
+    # To change for dev
+    restart: on-failure:1
+  studio:
+    build:
+      context: ./
+      dockerfile: apps/studio/Dockerfile.dev
+    volumes:
+      - ./apps/studio:/app
+      # Exclude node_modules from volume mounting
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      # Enable Next.js specific features
+      - WATCHPACK_POLLING=true
+    restart: on-failure:1
