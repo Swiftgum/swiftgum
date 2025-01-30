@@ -5,7 +5,6 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./apps/engine:/app
-      - /app/.venv
     ports:
       - "8000:8000" # adjust port as needed
     environment:

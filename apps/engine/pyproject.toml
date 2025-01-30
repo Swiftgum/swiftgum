@@ -6,7 +6,8 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.115.7",
-    "uvicorn>=0.34.0",
+    "markitdown>=0.0.1a3",
+    "python-multipart>=0.0.20",
 ]
 
 [dependency-groups]
