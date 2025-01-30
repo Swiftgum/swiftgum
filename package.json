@@ -6,7 +6,7 @@
 	"license": "Apache-2.0",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "npx supabase start && docker compose -f docker-compose.dev.yml up --build",
+		"dev": "npx supabase start && npx supabase db push --local && docker compose -f docker-compose.dev.yml up --build",
 		"prepare": "husky",
 		"format": "biome format",
 		"lint": "biome lint"
