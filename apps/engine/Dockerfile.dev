@@ -10,13 +10,15 @@ RUN pip install uv
 # Copy pyproject.toml
 COPY pyproject.toml .
 
+# Set environment variables
+ENV UV_LINK_MODE=copy
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
 # Install dependencies using uv
 RUN uv venv
 RUN uv sync
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONDONTWRITEBYTECODE=1
 
 # Create a non-root user for security
 RUN adduser --disabled-password --gecos '' appuser
