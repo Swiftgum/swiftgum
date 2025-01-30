@@ -24,5 +24,6 @@
 	"editor.codeActionsOnSave": {
 		"quickfix.biome": "explicit",
 		"source.organizeImports.biome": "explicit"
-	}
+	},
+	"SQL-Formatter-VSCode.dialect": "postgresql"
 }
