@@ -23,9 +23,7 @@ services:
       dockerfile: apps/studio/Dockerfile.dev
     volumes:
       - ./apps/studio:/app
-      # Exclude node_modules from volume mounting
       - /app/node_modules
-      - ./apps/studio/.env.local:/app/.env.local # ✅ Mount the env file
     ports:
       - "3000:3000"
     env_file:

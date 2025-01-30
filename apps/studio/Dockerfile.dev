@@ -15,7 +15,7 @@ COPY pnpm-lock.yaml ./
 RUN pnpm install
 
 # Copy the entire application (including .env files)
-COPY . . 
+COPY . .
 
 # Ensure .env.local is recognized
 ARG NODE_ENV=development

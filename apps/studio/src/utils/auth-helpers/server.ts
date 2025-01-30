@@ -1,10 +1,10 @@
 "use server";
 
+import { getAuthTypes } from "@/utils/auth-helpers/settings";
+import { getURL } from "@/utils/helpers";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getURL, getErrorRedirect, getStatusRedirect } from "utils/helpers";
-import { getAuthTypes } from "utils/auth-helpers/settings";
 
 function isValidEmail(email: string) {
 	const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
