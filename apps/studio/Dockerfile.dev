@@ -7,17 +7,19 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 # Set working directory
 WORKDIR /app
 
-# Install dependencies first (for better caching)
+# Copy the package.json and pnpm-lock.yaml before installing dependencies
 COPY apps/studio/package.json ./
-
-# Copy pnpm-lock.yaml from
 COPY pnpm-lock.yaml ./
 
 # Install dependencies
 RUN pnpm install
 
-# Set environment to development
-ENV NODE_ENV=development
+# Copy the entire application (including .env files)
+COPY . . 
+
+# Ensure .env.local is recognized
+ARG NODE_ENV=development
+ENV NODE_ENV=${NODE_ENV}
 
 # Expose port 3000 (Next.js default)
 EXPOSE 3000

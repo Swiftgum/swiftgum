@@ -25,8 +25,11 @@ services:
       - ./apps/studio:/app
       # Exclude node_modules from volume mounting
       - /app/node_modules
+      - ./apps/studio/.env.local:/app/.env.local # ✅ Mount the env file
     ports:
       - "3000:3000"
+    env_file:
+      - ./apps/studio/.env.local # ✅ This ensures .env.local is loaded
     environment:
       - NODE_ENV=development
       # Enable Next.js specific features
