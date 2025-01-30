@@ -1,21 +1,20 @@
-# Use Node 20 slim as base
-FROM node:20-slim
-
-# Install pnpm
+FROM node:20-slim AS builder
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Set working directory
+# Use Node 20 slim as base
+FROM builder AS workspace
+
 WORKDIR /app
+COPY . .
 
 # Copy the package.json and pnpm-lock.yaml before installing dependencies
-COPY apps/studio/package.json ./
-COPY pnpm-lock.yaml ./
+RUN pnpm --filter studio deploy pruned
 
-# Install dependencies
-RUN pnpm install
+FROM builder
 
-# Copy the entire application (including .env files)
-COPY . .
+WORKDIR /app
+
+COPY --from=workspace /app/pruned .
 
 # Ensure .env.local is recognized
 ARG NODE_ENV=development
