@@ -4,7 +4,7 @@
 #
 
 app = 'knowledgex-engine'
-primary_region = 'iad'
+primary_region = 'sjc'
 
 [build]
 
