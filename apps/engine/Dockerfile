@@ -19,6 +19,8 @@ ENV PYTHONDONTWRITEBYTECODE=1
 RUN uv venv
 RUN uv sync
 
+# Copy the application code
+COPY . .
 
 # Create a non-root user for security
 RUN adduser --disabled-password --gecos '' appuser
