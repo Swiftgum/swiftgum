@@ -5,13 +5,18 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./apps/engine:/app
+      - /app/.venv
     ports:
       - "8000:8000" # adjust port as needed
     environment:
       - PYTHONPATH=/app
       - ENVIRONMENT=development
-    command: python main.py # adjust based on your entry point
-    # To change for dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
     restart: on-failure:1
   studio:
     build:
