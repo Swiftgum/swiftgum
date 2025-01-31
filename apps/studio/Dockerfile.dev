@@ -1,28 +1,28 @@
 FROM node:20-slim AS builder
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Use Node 20 slim as base
-FROM builder AS workspace
-
+# Base stage with shared configuration
+FROM builder AS base
 WORKDIR /app
-COPY . .
+ENV WATCHPACK_POLLING=true
+ENV NODE_ENV=development
 
-# Add cache mount for pnpm store
+# Dependencies stage
+FROM base AS deps
+# Copy only files needed for installation
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/studio/package.json ./apps/studio/
+# Use mount cache for pnpm store
 RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
-    pnpm --filter studio deploy pruned
+    pnpm install --frozen-lockfile
 
-FROM builder
-
+# Development stage
+FROM base
 WORKDIR /app
+# Copy deps from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/studio/node_modules ./apps/studio/node_modules
 
-COPY --from=workspace /app/pruned .
-
-# Ensure .env.local is recognized
-ARG NODE_ENV=development
-ENV NODE_ENV=${NODE_ENV}
-
-# Expose port 3000 (Next.js default)
+# Mount source code at runtime instead of copying
 EXPOSE 3000
-
-# Start the development server with hot reloading
-CMD ["pnpm", "dev"]
+CMD ["pnpm", "--filter", "studio", "dev"]
