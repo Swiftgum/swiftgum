@@ -7,8 +7,9 @@ FROM builder AS workspace
 WORKDIR /app
 COPY . .
 
-# Copy the package.json and pnpm-lock.yaml before installing dependencies
-RUN pnpm --filter studio deploy pruned
+# Add cache mount for pnpm store
+RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
+    pnpm --filter studio deploy pruned
 
 FROM builder
 
