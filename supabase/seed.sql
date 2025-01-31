@@ -42,3 +42,23 @@ SELECT
     '00000000-0000-0000-0000-000000000000',
     'test-api-key'
   );
+
+-- Create a provider for Google and Notion
+INSERT INTO
+  public.providers (identifier, name, description)
+VALUES
+  (
+    'google:drive',
+    'Google Drive',
+    'Google Drive is a file storage and sharing service'
+  );
+
+-- Create a provider for Notion
+INSERT INTO
+  public.providers (identifier, name, description)
+VALUES
+  (
+    'notion:notion',
+    'Notion Database',
+    'Notion Database is a database service'
+  );
