@@ -1,17 +1,18 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { signInWithOAuth } from "@/utils/auth-helpers/client";
 import { createClient } from "@/utils/supabase/client";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { Provider } from "@supabase/supabase-js";
+import type { ReactNode } from "react";
 import { useState } from "react";
+import { Button } from "../ui/button";
 
 type OAuthProviders = {
 	name: Provider;
 	displayName: string;
-	icon: JSX.Element;
+	icon: ReactNode;
 };
 
 export default function OauthSignIn() {
@@ -29,7 +30,6 @@ export default function OauthSignIn() {
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		setIsSubmitting(true); // Disable the button while the request is being handled
-		// console.log('handleSubmit')
 		await signInWithOAuth(e);
 		setIsSubmitting(false);
 	};
