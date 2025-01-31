@@ -11,7 +11,7 @@ services:
       - PYTHONPATH=/app
       - ENVIRONMENT=development
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -28,6 +28,8 @@ services:
       - /app/node_modules
     ports:
       - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - ./apps/studio/.env.local # ✅ This ensures .env.local is loaded
     environment:
