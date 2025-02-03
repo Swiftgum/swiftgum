@@ -1,42 +1,34 @@
+import NotionIcon from "@/components/Icons/notionIcon";
 import { createClient } from "@/utils/supabase/server";
+import {
+	faGoogle,
+	faKey,
+	faLinkedinIn,
+	faMicrosoft,
+	faSlack,
+	faTwitch,
+	faTwitter,
+} from "@fortawesome/free-brands-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { SiKakaotalk } from "react-icons/si";
 import OAuthProvider from "./oauthprovider";
 
 export default async function Providers() {
 	const providers = [
 		{
-			name: "Kakao",
-			logo: "/logos/kakao.png",
-			callbackUrl: "https://example.com/auth/kakao/callback",
+			name: "Microsoft",
+			icon: <FontAwesomeIcon icon={faMicrosoft} className="w-5 h-5" />,
+			callbackUrl: "https://example.com/auth/microsoft/callback",
 		},
 		{
-			name: "KeyCloak",
-			logo: "/logos/keycloak.png",
-			callbackUrl: "https://example.com/auth/keycloak/callback",
-		},
-		{
-			name: "LinkedIn (OIDC)",
-			logo: "/logos/linkedin.png",
-			callbackUrl: "https://example.com/auth/linkedin/callback",
+			name: "Google",
+			icon: <FontAwesomeIcon icon={faGoogle} className="w-5 h-5" />,
+			callbackUrl: "https://example.com/auth/google/callback",
 		},
 		{
 			name: "Notion",
-			logo: "/logos/notion.png",
+			icon: <NotionIcon className="w-5 h-5" />,
 			callbackUrl: "https://example.com/auth/notion/callback",
-		},
-		{
-			name: "Twitch",
-			logo: "/logos/twitch.png",
-			callbackUrl: "https://example.com/auth/twitch/callback",
-		},
-		{
-			name: "Twitter",
-			logo: "/logos/twitter.png",
-			callbackUrl: "https://example.com/auth/twitter/callback",
-		},
-		{
-			name: "Slack (OIDC)",
-			logo: "/logos/slack.png",
-			callbackUrl: "https://example.com/auth/slack/callback",
 		},
 	];
 
@@ -47,7 +39,14 @@ export default async function Providers() {
 	} = await supabase.auth.getUser();
 
 	return (
-		<div>
+		<div className="p-20">
+			<div className="mb-10">
+				<h1 className="text-2xl font-bold text-zinc-700">Auth Providers</h1>
+				<p className="text-gray-600">
+					Authenticate your users through a suite of providers and login methods
+				</p>
+			</div>
+
 			{providers.map((provider) => (
 				<OAuthProvider key={provider.name} {...provider} />
 			))}

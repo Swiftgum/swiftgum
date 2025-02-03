@@ -16,11 +16,9 @@ const menuItems = [
 export default function Layout({ children }: { children: ReactNode }) {
 	return (
 		<>
-			<main>
-				<div className="flex">
-					<SubNavbar />
-					{children}
-				</div>
+			<main className="flex h-screen overflow-hidden">
+				<SubNavbar />
+				<div className="flex-1 overflow-y-auto">{children}</div>
 			</main>
 		</>
 	);
