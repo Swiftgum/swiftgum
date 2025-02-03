@@ -3,7 +3,7 @@ CREATE TABLE public.workspace (
     workspace_id UUID DEFAULT gen_random_uuid () PRIMARY KEY,
     owner_user_id UUID NOT NULL,
     encryption_key_id UUID NOT NULL,
-    encrypted_api_key text NOT NULL,
+    encrypted_api_key BYTEA NOT NULL,
     hashed_api_key text NOT NULL,
     label TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -35,7 +35,7 @@ BEGIN
         'encryption_key@' || NEW.workspace_id,
         'Workspace encryption key'
     );
-    NEW.encrypted_api_key = encode(extensions.pgp_sym_encrypt(api_key, encryption_key), 'hex');
+    NEW.encrypted_api_key = extensions.pgp_sym_encrypt(api_key, encryption_key);
     NEW.hashed_api_key = extensions.crypt(api_key, extensions.gen_salt('bf'));
     RETURN NEW;
 END;
@@ -46,8 +46,8 @@ SET
     search_path = '' AS $$
 BEGIN
     UPDATE public.workspace
-    SET encrypted_api_key = encode(
-            extensions.pgp_sym_encrypt(
+    SET
+        encrypted_api_key = extensions.pgp_sym_encrypt(
                 api_key,
                 (
                     SELECT decrypted_secret
@@ -55,8 +55,6 @@ BEGIN
                     WHERE id = encryption_key_id
                 )
             ),
-            'hex'
-        ),
         hashed_api_key = extensions.crypt(api_key, extensions.gen_salt('bf'))
     WHERE workspace_id = p_workspace_id;
 END;
@@ -83,7 +81,7 @@ CREATE VIEW public.workspace_with_decrypted_api_key AS
 SELECT
     *,
     pgp_sym_decrypt (
-        decode(encrypted_api_key, 'hex'),
+        encrypted_api_key,
         (
             SELECT
                 decrypted_secret

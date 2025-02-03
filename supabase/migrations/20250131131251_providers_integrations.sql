@@ -16,7 +16,7 @@ CREATE TABLE public.integrations (
   provider_id UUID NOT NULL,
   workspace_id UUID NOT NULL,
   enabled BOOLEAN NOT NULL DEFAULT FALSE,
-  credentials JSONB,
+  encrypted_credentials BYTEA,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

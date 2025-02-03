@@ -9,7 +9,9 @@
 		"dev": "npx supabase start && npx supabase db push --local && docker compose -f docker-compose.dev.yml up --build",
 		"prepare": "husky",
 		"format": "biome format",
-		"lint": "biome lint"
+		"lint": "biome lint",
+		"db:gentypes": "npx supabase gen types typescript --local > supabase/types.d.ts && biome format --fix ./supabase/types.d.ts && cp supabase/types.d.ts apps/studio/src/utils/supabase/types.d.ts",
+		"db:checktypes": "pnpm run db:gentypes && git diff --exit-code supabase/types.d.ts"
 	},
 	"author": "Swiftgum, Inc.",
 	"private": true,

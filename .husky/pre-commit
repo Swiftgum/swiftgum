@@ -1,3 +1,4 @@
 pnpm format
 pnpm lint
 (cd apps/engine && uv run ruff check .) || exit 1
+pnpm db:checktypes || exit 1
