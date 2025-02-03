@@ -21,8 +21,9 @@ export default async function SignIn({
 		data: { user },
 	} = await supabase.auth.getUser();
 
+	console.log("SignIn USER", user);
 	if (user) {
-		return redirect("/account");
+		return redirect("/");
 	}
 
 	return (

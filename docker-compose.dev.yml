@@ -32,5 +32,6 @@ services:
       - NODE_ENV=development
       # Enable Next.js specific features
       - WATCHPACK_POLLING=true
-      - SUPABASE_URL=http://host.docker.internal:44321
+    extra_hosts:
+      - "localhost:host-gateway"
     restart: on-failure:1
