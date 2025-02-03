@@ -59,6 +59,6 @@ INSERT INTO
 VALUES
   (
     'notion:notion',
-    'Notion Database',
-    'Notion Database is a database service'
+    'Notion',
+    'Notion is a productivity platform'
   );
