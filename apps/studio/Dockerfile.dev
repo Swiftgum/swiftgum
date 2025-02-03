@@ -1,8 +1,5 @@
-FROM node:20-slim AS builder
+FROM node:20-slim AS base
 RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# Base stage with shared configuration
-FROM builder AS base
 WORKDIR /app
 ENV WATCHPACK_POLLING=true
 ENV NODE_ENV=development
@@ -12,17 +9,16 @@ FROM base AS deps
 # Copy only files needed for installation
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/studio/package.json ./apps/studio/
-# Use mount cache for pnpm store
-RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+# Debug and print the list of installed packages
+RUN pnpm deploy --filter=studio bundle
 
 # Development stage
 FROM base
-WORKDIR /app
-# Copy deps from deps stage
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/studio/node_modules ./apps/studio/node_modules
+
+COPY ./apps/studio .
+COPY --from=deps /app/bundle .
 
 # Mount source code at runtime instead of copying
 EXPOSE 3000
-CMD ["pnpm", "--filter", "studio", "dev"]
+CMD ["pnpm", "dev"]
