@@ -15,16 +15,19 @@ ENV UV_LINK_MODE=copy
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Install dependencies using uv
-RUN uv venv
-RUN uv sync
-
 # Copy the application code
 COPY . .
 
-# Create a non-root user for security
-RUN adduser --disabled-password --gecos '' appuser
+# Create a non-root user for security and set up permissions
+RUN adduser --disabled-password --gecos '' appuser && \
+    mkdir -p /app/.venv && \
+    chown -R appuser:appuser /app
+
 USER appuser
+
+# Install dependencies using uv after switching to appuser
+RUN uv venv && \
+    uv sync
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=5 \
   CMD curl -f http://localhost:8000/health || exit 1
