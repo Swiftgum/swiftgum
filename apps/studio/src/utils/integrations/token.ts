@@ -1,3 +1,7 @@
+/**
+ * Utils to handle integration tokens
+ */
+
 import { createClient } from "@/utils/supabase/server";
 import type { Database } from "@/utils/supabase/types";
 

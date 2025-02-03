@@ -1,3 +1,7 @@
+/**
+ * Utils to handle integration sign in sessions
+ */
+
 import type { Database } from "@/utils/supabase/types";
 import { z } from "zod";
 import { createClient } from "../supabase/server";
