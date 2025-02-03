@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 export default function TestWorkflowLog() {
 	const supabase = createClient();
 	const router = getRedirectMethod() === "client" ? useRouter() : null;
+	const pathname = usePathname(); // ✅ Move this outside the return statement
 	const [user, setUser] = useState(null);
 
 	useEffect(() => {
@@ -22,6 +23,7 @@ export default function TestWorkflowLog() {
 		fetchUser();
 	}, [supabase]);
 
+	console.log("TestWorkflowLog USER", user);
 	return (
 		<div className="mt-8">
 			{user && (
@@ -31,7 +33,8 @@ export default function TestWorkflowLog() {
 						onSubmit={(e) => handleRequest(e, SignOut, router)}
 					>
 						<LogOut />
-						<input type="hidden" name="pathName" value={usePathname()} />
+						<input type="hidden" name="pathName" value={pathname} />{" "}
+						{/* ✅ No more hook order issue */}
 						<Button>Sign out</Button>
 					</form>
 				</div>
