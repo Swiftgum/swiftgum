@@ -115,7 +115,7 @@ export default function OAuthProvider({ name, icon, callbackUrl }: OAuthProvider
 							</div>
 						</div>
 
-						<div className="flex justify-between mt-4">
+						<div className="flex justify-end mt-4 gap-3">
 							<Button variant="outline">Cancel</Button>
 							<Button variant="default" onClick={handleSave} disabled={!enabled}>
 								Save

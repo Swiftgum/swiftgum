@@ -46,7 +46,7 @@ export default function Navlinks({ user }: NavlinksProps) {
 							pathname={pathname}
 						/>
 						<NavItem
-							href="/settings"
+							href="/settings/general"
 							icon={<Settings size={16} />}
 							label="Settings"
 							hovered={hovered}
