@@ -9,7 +9,8 @@ BEGIN
     DELETE FROM public.auth_sessions
     WHERE auth_session_id NOT IN (
         SELECT auth_session_id FROM public.valid_auth_sessions
-    );
+    )
+    AND created_at < NOW() - INTERVAL '1 hour';
 END;
 $$;
 
