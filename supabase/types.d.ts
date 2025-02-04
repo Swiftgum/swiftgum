@@ -565,6 +565,12 @@ export type Database = {
 				Args: Record<PropertyKey, never>;
 				Returns: string;
 			};
+			queue_indexing_task: {
+				Args: {
+					task: Json;
+				};
+				Returns: number;
+			};
 			update_api_key: {
 				Args: {
 					p_workspace_id: string;

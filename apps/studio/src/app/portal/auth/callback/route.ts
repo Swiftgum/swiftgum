@@ -1,3 +1,4 @@
+import { queueForIndexing } from "@/utils/integrations/queue";
 import {
 	type IntegrationCredentials,
 	claimAuthSession,
@@ -72,6 +73,12 @@ export async function GET(request: Request) {
 							scope: session.auth_session.scope,
 						},
 					},
+				});
+
+				// TODO: move this somewhere else.
+				await queueForIndexing({
+					type: "google:drive",
+					accessToken: tokens.access_token,
 				});
 			}
 
