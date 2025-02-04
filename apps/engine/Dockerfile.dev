@@ -1,28 +1,38 @@
-# Use Python 3.13
-FROM python:3.13-slim
+FROM node:20-slim
+RUN npm install -g corepack@latest
+RUN corepack enable && corepack prepare pnpm@10 --activate
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 # Set working directory
 WORKDIR /app
 
-# Install uv
-RUN pip install uv
+COPY ./apps/engine/.python-version .
 
-# Copy pyproject.toml
-COPY pyproject.toml .
+RUN which uv
 
-# Set environment variables
+RUN uv python install
+
+COPY pnpm-lock.yaml ./
+
+# Fetch dependencies using lockfile
+RUN pnpm fetch
+
+COPY ./apps/engine/pyproject.toml .
+
+ENV WATCHPACK_POLLING=true
+ENV NODE_ENV=development
+
 ENV UV_LINK_MODE=copy
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Install dependencies using uv
 RUN uv venv
 RUN uv sync
 
+COPY ./apps/engine/package.json .
+RUN pnpm install --prefer-offline
 
-# Create a non-root user for security
-RUN adduser --disabled-password --gecos '' appuser
-USER appuser
+COPY ./apps/engine .
 
-# The actual application code will be mounted as a volume
-CMD ["uv", "run", "fastapi", "dev", "main.py", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["pnpm", "dev"]

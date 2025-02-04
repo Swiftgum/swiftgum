@@ -1,15 +1,14 @@
 services:
   engine:
     build:
-      context: ./apps/engine
-      dockerfile: Dockerfile.dev
+      context: ./
+      dockerfile: apps/engine/Dockerfile.dev
     volumes:
       - ./apps/engine:/app
+      - /app/node_modules
     ports:
       - "8000:8000" # adjust port as needed
     environment:
-      - PYTHONPATH=/app
-      - ENVIRONMENT=development
       - "POSTGRES_URL=postgresql://postgres:postgres@localhost:44322/postgres"
     extra_hosts:
       - "localhost:host-gateway"
