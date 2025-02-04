@@ -273,6 +273,7 @@ export type Database = {
 			workspace: {
 				Row: {
 					created_at: string;
+					dns_name: string;
 					encrypted_api_key: string;
 					encryption_key_id: string;
 					hashed_api_key: string;
@@ -283,6 +284,7 @@ export type Database = {
 				};
 				Insert: {
 					created_at?: string;
+					dns_name?: string;
 					encrypted_api_key: string;
 					encryption_key_id: string;
 					hashed_api_key: string;
@@ -293,6 +295,7 @@ export type Database = {
 				};
 				Update: {
 					created_at?: string;
+					dns_name?: string;
 					encrypted_api_key?: string;
 					encryption_key_id?: string;
 					hashed_api_key?: string;
@@ -552,6 +555,10 @@ export type Database = {
 					p_workspace_id: string;
 					p_tokenset: Json;
 				};
+				Returns: string;
+			};
+			generate_dns_name: {
+				Args: Record<PropertyKey, never>;
 				Returns: string;
 			};
 			update_api_key: {
