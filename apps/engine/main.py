@@ -1,3 +1,5 @@
+import asyncio
+from contextlib import asynccontextmanager
 import tempfile
 from pathlib import Path
 from typing import Annotated
@@ -7,10 +9,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 from markitdown import MarkItDown
 
+from lib.queue import process_queue
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    task = asyncio.create_task(process_queue("indexing_queue", lambda job: None))
+    yield
+    task.cancel()
+
+
 app = FastAPI(
     title="KnowledgeX Engine",
     description="KnowledgeX Engine API",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 # Configure CORS

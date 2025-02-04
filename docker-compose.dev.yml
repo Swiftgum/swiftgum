@@ -10,6 +10,9 @@ services:
     environment:
       - PYTHONPATH=/app
       - ENVIRONMENT=development
+      - "POSTGRES_URL=postgresql://postgres:postgres@localhost:44322/postgres"
+    extra_hosts:
+      - "localhost:host-gateway"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s
