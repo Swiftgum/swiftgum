@@ -4,8 +4,7 @@ services:
       context: ./
       dockerfile: apps/engine/Dockerfile.dev
     volumes:
-      - ./apps/engine:/app
-      - /app/node_modules
+      - ./apps/engine/src:/app/src
     ports:
       - "8000:8000" # adjust port as needed
     environment:
@@ -24,8 +23,8 @@ services:
       context: ./
       dockerfile: apps/studio/Dockerfile.dev
     volumes:
-      - ./apps/studio:/app
-      - /app/node_modules
+      - ./apps/studio/src:/app/src
+      - ./apps/studio/public:/app/public
     ports:
       - "3000:3000"
     env_file:

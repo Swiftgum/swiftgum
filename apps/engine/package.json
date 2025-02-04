@@ -4,12 +4,14 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "tsx watch src/main.ts"
+		"dev": "tsx watch src/main.ts",
+		"start": "tsx src/main.ts"
 	},
 	"author": "",
 	"license": "ISC",
 	"description": "",
 	"dependencies": {
+		"fastify": "^5.2.1",
 		"tsx": "^4.19.2"
 	},
 	"packageManager": "pnpm@10.2.0+sha512.0d27364e0139c6aadeed65ada153135e0ca96c8da42123bd50047f961339dc7a758fc2e944b428f52be570d1bd3372455c1c65fa2e7aa0bfbf931190f9552001"
