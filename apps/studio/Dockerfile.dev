@@ -1,23 +1,22 @@
-FROM node:20-slim AS base
+FROM node:20-slim
 RUN corepack enable && corepack prepare pnpm@latest --activate
+
 WORKDIR /app
+
 ENV WATCHPACK_POLLING=true
 ENV NODE_ENV=development
 
-# Dependencies stage
-FROM base AS deps
-# Copy only files needed for installation
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/studio/package.json ./apps/studio/
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-# Debug and print the list of installed packages
-RUN pnpm deploy --filter=studio bundle
+# Copy only lockfile first for better caching
+COPY pnpm-lock.yaml ./
 
-# Development stage
-FROM base
+# Fetch dependencies using lockfile
+RUN pnpm fetch
+RUN pnpm fetch --dev
 
 COPY ./apps/studio .
-COPY --from=deps /app/bundle .
+
+# Install dependencies from offline cache
+RUN pnpm install --prefer-offline
 
 # Mount source code at runtime instead of copying
 EXPOSE 3000
