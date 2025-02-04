@@ -525,6 +525,10 @@ export type Database = {
 			};
 		};
 		Functions: {
+			cleanup_expired_sessions: {
+				Args: Record<PropertyKey, never>;
+				Returns: undefined;
+			};
 			create_encryption_key: {
 				Args: Record<PropertyKey, never>;
 				Returns: string;
