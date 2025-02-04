@@ -7,6 +7,7 @@ app = 'knowledgex-engine'
 primary_region = 'sjc'
 
 [build]
+  dockerfile = "apps/engine/Dockerfile"
 
 [http_service]
   internal_port = 8000
