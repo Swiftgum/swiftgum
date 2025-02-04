@@ -4,13 +4,16 @@ RUN corepack enable && corepack prepare pnpm@10 --activate
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
+# Set working directory
+WORKDIR /app
+
 COPY ./apps/engine/.python-version .
 
 RUN which uv
 
 RUN uv python install
 
-COPY ./pnpm-lock.yaml .
+COPY pnpm-lock.yaml ./
 
 # Fetch dependencies using lockfile
 RUN pnpm fetch
@@ -26,8 +29,6 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 RUN uv venv
 RUN uv sync
-
-WORKDIR /app
 
 COPY ./apps/engine/ .
 RUN pnpm install --prefer-offline
