@@ -48,7 +48,7 @@ export default async function Providers() {
 			</div>
 
 			{/* Pass workspace info to GeneralPanel */}
-			<GeneralPanel workspaceId={workspace?.workspace_id} label={workspace?.label} />
+			<GeneralPanel workspaceId={workspace?.workspace_id ?? ""} label={workspace?.label ?? ""} />
 		</div>
 	);
 }

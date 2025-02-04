@@ -1,23 +1,63 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Copy } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { useState } from "react";
+import { toast } from "react-hot-toast";
 
 interface OAuthSettingsPanelProps {
 	label: string;
 	workspaceId: string;
 }
-export default function GeneralPAnel({ label, workspaceId }: OAuthSettingsPanelProps) {
+
+export default function GeneralPanel({ label, workspaceId }: OAuthSettingsPanelProps) {
 	const [projectName, setProjectName] = useState(label);
-	const [originalProjectName] = useState(projectName);
+	const [originalProjectName, setOriginalProjectName] = useState(label);
+	const [isSaving, setIsSaving] = useState(false);
+	const [copyText, setCopyText] = useState("Copy"); // State for copy button text
 
 	const isModified = projectName !== originalProjectName;
 
-	const handleSave = () => {
-		console.log("Saving:", { name, projectName, workspaceId });
+	// Handle Copy to Clipboard
+	const handleCopy = () => {
+		navigator.clipboard.writeText(workspaceId);
+		setCopyText("Copied"); // Change text to Copied!
+
+		setTimeout(() => {
+			setCopyText("Copy"); // Revert back after 2 seconds
+		}, 2000);
+	};
+
+	// Handle Save
+	const handleSave = async () => {
+		setIsSaving(true);
+		try {
+			const response = await fetch("/api/workspace", {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ workspaceId, label: projectName }),
+			});
+
+			if (!response.ok) throw new Error("Failed to update workspace");
+
+			// Show success toast notification
+			toast.success("Successfully saved settings!");
+
+			// Sync UI state on success
+			setOriginalProjectName(projectName);
+		} catch (error) {
+			console.error("Error updating workspace:", error);
+			toast.error("Failed to save settings.");
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
+	// Handle Cancel
+	const handleCancel = () => {
+		setProjectName(originalProjectName);
 	};
 
 	return (
@@ -48,20 +88,21 @@ export default function GeneralPAnel({ label, workspaceId }: OAuthSettingsPanelP
 								<label htmlFor="label" className="block text-sm font-medium text-zinc-700 mb-1">
 									Project ID
 								</label>
-								<div className="relative cursor-pointer">
+								<div className="relative">
 									<Input
 										disabled
 										id="label"
-										value={label}
+										value={workspaceId}
 										readOnly
-										className="bg-gray-100 !cursor-default"
+										className="bg-gray-100 !cursor-default pr-16"
 									/>
 									<button
 										type="button"
-										className="absolute right-3 top-2 text-zinc-500 hover:text-zinc-700"
-										onClick={() => navigator.clipboard.writeText(label)}
+										className="absolute right-2 top-1/2 transform -translate-y-1/2 px-3 py-1 border border-gray-300 rounded-md text-gray-700 bg-gray-50 transition"
+										onClick={handleCopy}
 									>
-										<Copy className="w-5 h-5" />
+										<Copy className="w-4 h-4 inline-block mr-1" />
+										<span className="text-sm">{copyText}</span>
 									</button>
 								</div>
 							</div>
@@ -70,7 +111,8 @@ export default function GeneralPAnel({ label, workspaceId }: OAuthSettingsPanelP
 					<div className="flex justify-end mt-4 gap-3">
 						<Button
 							variant="outline"
-							disabled={!isModified}
+							disabled={!isModified || isSaving}
+							onClick={handleCancel}
 							className={!isModified ? "opacity-50 !cursor-default" : ""}
 						>
 							Cancel
@@ -78,10 +120,10 @@ export default function GeneralPAnel({ label, workspaceId }: OAuthSettingsPanelP
 						<Button
 							variant="default"
 							onClick={handleSave}
-							disabled={!isModified}
+							disabled={!isModified || isSaving}
 							className={!isModified ? "opacity-50 !cursor-default" : ""}
 						>
-							Save
+							{isSaving ? "Saving..." : "Save"}
 						</Button>
 					</div>
 				</CardContent>

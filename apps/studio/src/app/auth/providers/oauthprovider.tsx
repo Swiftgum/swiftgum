@@ -4,25 +4,96 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { ChevronDown, ChevronRight, Copy, Eye } from "lucide-react";
+import { Check, ChevronDown, ChevronRight, Copy, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import type { ReactNode } from "react";
+import { toast } from "react-hot-toast";
 
 interface OAuthProviderProps {
 	name: string;
-	icon: ReactNode;
+	icon: React.ReactNode;
 	callbackUrl: string;
+	integration?: {
+		integration_id: string;
+		enabled: boolean;
+		decrypted_credentials: {
+			client_secret: string;
+			client_id: string;
+		};
+		created_at: string;
+		updated_at: string;
+		workspace_id: string;
+		provider_id: string;
+	} | null; // Now only a single integration or null
+	workspaceId: string;
+	providerId: string;
 }
 
-export default function OAuthProvider({ name, icon, callbackUrl }: OAuthProviderProps) {
-	const [enabled, setEnabled] = useState(false);
-	const [clientId, setClientId] = useState("");
-	const [clientSecret, setClientSecret] = useState("");
+export default function OAuthProvider({
+	name,
+	icon,
+	callbackUrl,
+	integration,
+	workspaceId,
+	providerId,
+}: OAuthProviderProps) {
+	const [enabled, setEnabled] = useState(integration?.enabled || false);
+	const [clientId, setClientId] = useState(integration?.decrypted_credentials.client_secret || "");
+	const [clientSecret, setClientSecret] = useState(
+		integration?.decrypted_credentials.client_id || "",
+	);
 	const [showSecret, setShowSecret] = useState(false);
 	const [expanded, setExpanded] = useState(false);
+	const [copyText, setCopyText] = useState("Copy");
+	const [errors, setErrors] = useState<{ clientId?: string; clientSecret?: string }>({});
+	const [isSaving, setIsSaving] = useState(false);
 
-	const handleSave = () => {
-		console.log("Saving:", { name, enabled, clientId, clientSecret });
+	// Store original values to track changes
+	const [originalState, setOriginalState] = useState({ enabled, clientId, clientSecret });
+	const isModified =
+		enabled !== originalState.enabled ||
+		clientId !== originalState.clientId ||
+		clientSecret !== originalState.clientSecret;
+
+	// Reset to original values
+	const handleCancel = () => {
+		setEnabled(originalState.enabled);
+		setClientId(originalState.clientId);
+		setClientSecret(originalState.clientSecret);
+	};
+
+	// Handle Copy to Clipboard
+	const handleCopy = () => {
+		navigator.clipboard.writeText(callbackUrl);
+		setCopyText("Copied!");
+		setTimeout(() => setCopyText("Copy"), 2000);
+	};
+
+	// Handle Save
+	const handleSave = async () => {
+		setIsSaving(true);
+		toast.success("Successfully saved OAuth credentials!");
+		setOriginalState({ enabled, clientId, clientSecret });
+
+		try {
+			const response = await fetch("/api/integrations", {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ workspaceId, providerId, clientId, clientSecret, enabled }),
+			});
+
+			if (!response.ok) throw new Error("Error saving OAuth credentials");
+
+			// Show success toast notification
+			toast.success("Successfully saved OAuth credentials");
+
+			// Sync UI state on success
+			setOriginalState({ enabled, clientId, clientSecret });
+		} catch (error) {
+			console.error("Error saving OAuth credentials:", error);
+			toast.error("Failed to save OAuth credentials.");
+		} finally {
+			setIsSaving(false);
+		}
 	};
 
 	return (
@@ -45,10 +116,16 @@ export default function OAuthProvider({ name, icon, callbackUrl }: OAuthProvider
 						<Button
 							variant="outline"
 							size="sm"
-							className={`${enabled ? "text-green-600 border-green-600" : "text-zinc-500"}`}
+							className={enabled ? "text-green-600 border-green-600 bg-green-100" : "text-zinc-500"}
 							disabled
 						>
-							{enabled ? "Enabled" : "Disabled"}
+							{enabled ? (
+								<>
+									<Check color="#16a34a" /> Enabled
+								</>
+							) : (
+								"Disabled"
+							)}
 						</Button>
 					</div>
 				</CardHeader>
@@ -70,7 +147,9 @@ export default function OAuthProvider({ name, icon, callbackUrl }: OAuthProvider
 								onChange={(e) => setClientId(e.target.value)}
 								placeholder="Enter OAuth Client ID"
 								disabled={!enabled}
+								className={errors.clientId ? "border-red-500" : ""}
 							/>
+							{errors.clientId && <p className="text-red-500 text-sm mt-1">{errors.clientId}</p>}
 						</div>
 
 						<div>
@@ -78,7 +157,7 @@ export default function OAuthProvider({ name, icon, callbackUrl }: OAuthProvider
 								htmlFor="clientSecret"
 								className="block text-sm font-medium text-zinc-700 mb-1"
 							>
-								OAuth Client Secret
+								Client Secret (for OAuth)
 							</label>
 							<div className="relative">
 								<Input
@@ -88,15 +167,19 @@ export default function OAuthProvider({ name, icon, callbackUrl }: OAuthProvider
 									onChange={(e) => setClientSecret(e.target.value)}
 									placeholder="Enter OAuth Client Secret"
 									disabled={!enabled}
+									className={errors.clientSecret ? "border-red-500" : ""}
 								/>
 								<button
 									type="button"
-									className="absolute right-3 top-2 text-zinc-500 hover:text-zinc-700"
+									className="absolute right-2 top-1/2 transform -translate-y-1/2 px-3 py-1 border border-gray-300 rounded-md text-gray-700 bg-gray-50 transition"
 									onClick={() => setShowSecret(!showSecret)}
 								>
-									<Eye className="w-5 h-5" />
+									{showSecret ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
 								</button>
 							</div>
+							{errors.clientSecret && (
+								<p className="text-red-500 text-sm mt-1">{errors.clientSecret}</p>
+							)}
 						</div>
 
 						<div>
@@ -104,20 +187,29 @@ export default function OAuthProvider({ name, icon, callbackUrl }: OAuthProvider
 								Callback URL (for OAuth)
 							</label>
 							<div className="relative">
-								<Input id="callbackURL" value={callbackUrl} readOnly className="bg-gray-100" />
+								<Input
+									disabled
+									id="label"
+									value={callbackUrl}
+									readOnly
+									className="bg-gray-100 !cursor-default pr-16"
+								/>
 								<button
 									type="button"
-									className="absolute right-3 top-2 text-zinc-500 hover:text-zinc-700"
-									onClick={() => navigator.clipboard.writeText(callbackUrl)}
+									className="absolute right-2 top-1/2 transform -translate-y-1/2 px-3 py-1 border border-gray-300 rounded-md text-gray-700 bg-gray-50 transition"
+									onClick={handleCopy}
 								>
-									<Copy className="w-5 h-5" />
+									<Copy className="w-4 h-4 inline-block mr-1" />
+									<span className="text-sm">{copyText}</span>
 								</button>
 							</div>
 						</div>
 
 						<div className="flex justify-end mt-4 gap-3">
-							<Button variant="outline">Cancel</Button>
-							<Button variant="default" onClick={handleSave} disabled={!enabled}>
+							<Button variant="outline" onClick={handleCancel} disabled={!isModified || isSaving}>
+								Cancel
+							</Button>
+							<Button variant="default" onClick={handleSave} disabled={!isModified || isSaving}>
 								Save
 							</Button>
 						</div>
