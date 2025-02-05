@@ -2,6 +2,7 @@ import fs from "node:fs";
 import { pipeline } from "node:stream/promises";
 import mime from "mime-types";
 import { z } from "zod";
+import { exportFile } from "../export";
 import { runMarkitdown } from "../parser";
 import { tempFileName } from "../tmp";
 import { type Provider, getInternalQueue } from "./abstract";
@@ -13,9 +14,9 @@ const PROVIDER = "google:drive" as const;
 const fetchPage = async (accessToken: string, pageToken?: string) => {
 	const url = new URL("https://www.googleapis.com/drive/v3/files");
 
-	url.searchParams.set("includeItemsFromAllDrives", "true");
-	url.searchParams.set("corpora", "allDrives");
-	url.searchParams.set("supportsAllDrives", "true");
+	// url.searchParams.set("includeItemsFromAllDrives", "true");
+	// url.searchParams.set("corpora", "allDrives");
+	// url.searchParams.set("supportsAllDrives", "true");
 	url.searchParams.set("trashed", "false");
 	url.searchParams.set("orderBy", "recency");
 	url.searchParams.set("pageSize", PAGE_SIZE.toString());
@@ -82,7 +83,7 @@ export const googleDriveProvider: Provider<typeof PROVIDER, GoogleDriveInternalT
 		const files = await fetchAllPages(task.accessToken);
 
 		googleDriveInternalQueue.batchQueue(
-			files.slice(0, 10).map((file) => ({
+			files.map((file) => ({
 				step: "pending",
 				fileId: file.id,
 				accessToken: task.accessToken,
@@ -105,10 +106,7 @@ export const googleDriveProvider: Provider<typeof PROVIDER, GoogleDriveInternalT
 				const data = await response.json();
 
 				if (data.error) {
-					console.error(data.error);
-
 					if (data.error.code > 500) {
-						console.error(data.error);
 						return;
 					}
 
@@ -139,11 +137,11 @@ export const googleDriveProvider: Provider<typeof PROVIDER, GoogleDriveInternalT
 
 					await pipeline(response.body as unknown as NodeJS.ReadableStream, fileStream);
 
-					console.log(`File saved to: ${tempFile.tempFile}`);
-
 					const { textContents } = await runMarkitdown(tempFile.tempFile);
 
-					console.log(textContents);
+					await exportFile(textContents, {
+						fileId: task.fileId,
+					});
 
 					await tempFile.cleanup();
 				}

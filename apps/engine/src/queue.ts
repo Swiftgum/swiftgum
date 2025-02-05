@@ -71,8 +71,6 @@ export const addQueueListener = async (
 				// If a message has been read, we can process a new one immediately.
 				continue;
 			}
-
-			console.info(`No message found in queue ${queueName}, sleeping...`);
 		} catch (error) {
 			errors++;
 			console.error(`Error reading from queue ${queueName}: ${error}`);
