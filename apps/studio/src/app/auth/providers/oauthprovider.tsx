@@ -8,25 +8,26 @@ import { Check, ChevronDown, ChevronRight, Copy, Eye, EyeOff } from "lucide-reac
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 
+interface DecryptedCredentials {
+	type: "oauth2";
+	oauth2: {
+		client_secret: string;
+		client_id: string;
+	};
+}
+
 interface OAuthProviderProps {
 	name: string;
 	icon: React.ReactNode;
 	callbackUrl: string;
 	integration?: {
-		integration_id: string;
-		enabled: boolean;
-		decrypted_credentials: {
-			type: string;
-		} & {
-			[key: string]: {
-				client_secret: string;
-				client_id: string;
-			};
-		};
-		created_at: string;
-		updated_at: string;
-		workspace_id: string;
-		provider_id: string;
+		integration_id: string | null;
+		enabled: boolean | null;
+		decrypted_credentials: DecryptedCredentials | null;
+		created_at: string | null;
+		updated_at: string | null;
+		workspace_id: string | null;
+		provider_id: string | null;
 	} | null;
 	workspaceId: string;
 	providerId: string;
@@ -40,14 +41,11 @@ export default function OAuthProvider({
 	workspaceId,
 	providerId,
 }: OAuthProviderProps) {
-	console.log(integration);
+	const decrypted_credentials = integration?.decrypted_credentials as DecryptedCredentials;
+	const type = decrypted_credentials.type;
 	const [enabled, setEnabled] = useState(integration?.enabled || false);
-	const [clientId, setClientId] = useState(
-		integration?.decrypted_credentials[integration?.decrypted_credentials.type].client_id || "",
-	);
-	const [clientSecret, setClientSecret] = useState(
-		integration?.decrypted_credentials[integration?.decrypted_credentials.type].client_secret || "",
-	);
+	const [clientId, setClientId] = useState(decrypted_credentials[type].client_id || "");
+	const [clientSecret, setClientSecret] = useState(decrypted_credentials[type].client_secret || "");
 	const [showSecret, setShowSecret] = useState(false);
 	const [expanded, setExpanded] = useState(false);
 	const [copyText, setCopyText] = useState("Copy");

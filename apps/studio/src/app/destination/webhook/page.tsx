@@ -1,18 +1,16 @@
-import NotionIcon from "@/components/Icons/notionIcon";
 import { createClient } from "@/utils/supabase/server";
-import {
-	faGoogle,
-	faKey,
-	faLinkedinIn,
-	faMicrosoft,
-	faSlack,
-	faTwitch,
-	faTwitter,
-} from "@fortawesome/free-brands-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import OAuthProvider from "./webhookpanel";
-import OAuthSettingsPanel from "./webhookpanel";
-import GeneralPanel from "./webhookpanel";
+import DestionationPanel from "./destinationpanel";
+
+type Destination = {
+	created_at: string | null;
+	decrypted_destination_params: {
+		type: (string | null) & (JSON | null);
+	} | null;
+	destination_id: string | null;
+	encrypted_destination_params: string | null;
+	updated_at: string | null;
+	workspace_id: string | null;
+};
 
 export default async function Providers() {
 	const supabase = await createClient();
@@ -29,14 +27,22 @@ export default async function Providers() {
 
 	// Fetch workspace info
 	const { data: workspace, error: workspaceError } = await supabase
-		.from("workspace") // Replace with your actual table name
+		.from("workspace")
 		.select("workspace_id, label")
-		.eq("owner_user_id", user.id) // Assuming you have a user_id field in the workspaces table
+		.eq("owner_user_id", user.id)
 		.single();
-
 	if (workspaceError) {
 		console.error("Error fetching workspace:", workspaceError);
 	}
+
+	if (!workspace) return <p>Workspace not found</p>;
+
+	// Fetch workspace info
+	const { data: destinations_with_decrypted_params, error: destinationsWithDecryptedParamsError } =
+		await supabase
+			.from("destinations_with_decrypted_params")
+			.select("*")
+			.eq("workspace_id", workspace.workspace_id);
 
 	return (
 		<div className="p-20">
@@ -48,7 +54,10 @@ export default async function Providers() {
 			</div>
 
 			{/* Pass workspace info to GeneralPanel */}
-			<GeneralPanel workspaceId={workspace?.workspace_id ?? ""} label={workspace?.label ?? ""} />
+			<DestionationPanel
+				workspaceId={workspace?.workspace_id ?? ""}
+				destinations={(destinations_with_decrypted_params as Destination[]) ?? []}
+			/>
 		</div>
 	);
 }

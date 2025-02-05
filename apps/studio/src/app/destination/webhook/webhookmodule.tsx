@@ -7,37 +7,42 @@ import { Copy } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 
+type WebhookParams = {
+	type: string;
+	webhook: {
+		url: string;
+	};
+};
+
 interface OAuthSettingsPanelProps {
-	label: string;
+	webhookParams: WebhookParams;
 	workspaceId: string;
+	destinationId: string;
 }
 
-export default function GeneralPanel({ label, workspaceId }: OAuthSettingsPanelProps) {
-	const [projectName, setProjectName] = useState(label);
-	const [originalProjectName, setOriginalProjectName] = useState(label);
+export default function WebhookModule({
+	webhookParams,
+	workspaceId,
+	destinationId,
+}: OAuthSettingsPanelProps) {
+	const [webhookkURL, setWebhookkURL] = useState(webhookParams.webhook.url);
+	const [originalWebhookURL, setOriginalWebhookURL] = useState(webhookParams.webhook.url);
 	const [isSaving, setIsSaving] = useState(false);
-	const [copyText, setCopyText] = useState("Copy"); // State for copy button text
 
-	const isModified = projectName !== originalProjectName;
-
-	// Handle Copy to Clipboard
-	const handleCopy = () => {
-		navigator.clipboard.writeText(workspaceId);
-		setCopyText("Copied"); // Change text to Copied!
-
-		setTimeout(() => {
-			setCopyText("Copy"); // Revert back after 2 seconds
-		}, 2000);
-	};
+	const isModified = webhookkURL !== originalWebhookURL;
 
 	// Handle Save
 	const handleSave = async () => {
 		setIsSaving(true);
 		try {
-			const response = await fetch("/api/workspace", {
+			const response = await fetch("/api/destinations", {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ workspaceId, label: projectName }),
+				body: JSON.stringify({
+					workspaceId,
+					destinationId,
+					dataToEncrypt: { type: webhookParams.type, webhook: { url: webhookkURL } },
+				}),
 			});
 
 			if (!response.ok) throw new Error("Failed to update workspace");
@@ -46,7 +51,7 @@ export default function GeneralPanel({ label, workspaceId }: OAuthSettingsPanelP
 			toast.success("Successfully saved settings!");
 
 			// Sync UI state on success
-			setOriginalProjectName(projectName);
+			setOriginalWebhookURL(webhookkURL);
 		} catch (error) {
 			console.error("Error updating workspace:", error);
 			toast.error("Failed to save settings.");
@@ -57,7 +62,7 @@ export default function GeneralPanel({ label, workspaceId }: OAuthSettingsPanelP
 
 	// Handle Cancel
 	const handleCancel = () => {
-		setProjectName(originalProjectName);
+		setWebhookkURL(originalWebhookURL);
 	};
 
 	return (
@@ -77,8 +82,8 @@ export default function GeneralPanel({ label, workspaceId }: OAuthSettingsPanelP
 								</label>
 								<Input
 									id="clientId"
-									value={projectName}
-									onChange={(e) => setProjectName(e.target.value)}
+									value={webhookkURL}
+									onChange={(e) => setWebhookkURL(e.target.value)}
 									placeholder="Project name"
 								/>
 							</div>

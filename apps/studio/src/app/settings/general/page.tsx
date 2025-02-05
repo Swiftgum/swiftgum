@@ -29,9 +29,9 @@ export default async function Providers() {
 
 	// Fetch workspace info
 	const { data: workspace, error: workspaceError } = await supabase
-		.from("workspace") // Replace with your actual table name
+		.from("workspace")
 		.select("workspace_id, label")
-		.eq("owner_user_id", user.id) // Assuming you have a user_id field in the workspaces table
+		.eq("owner_user_id", user.id)
 		.single();
 
 	if (workspaceError) {

@@ -7,7 +7,13 @@ import type { ReactNode } from "react";
 import { getURL } from "@/utils/helpers";
 import { redirect } from "next/navigation";
 import OAuthProvider from "./oauthprovider";
-
+interface DecryptedCredentials {
+	type: "oauth2";
+	oauth2: {
+		client_secret: string;
+		client_id: string;
+	};
+}
 export default async function Providers() {
 	const supabase = await createClient();
 
@@ -20,9 +26,9 @@ export default async function Providers() {
 
 	// Fetch workspace info
 	const { data: workspace, error: workspaceError } = await supabase
-		.from("workspace") // Replace with your actual table name
+		.from("workspace")
 		.select("workspace_id")
-		.eq("owner_user_id", user.id) // Assuming you have a user_id field in the workspaces table
+		.eq("owner_user_id", user.id)
 		.single();
 
 	if (!workspace) {
@@ -62,9 +68,25 @@ export default async function Providers() {
 			</div>
 
 			{providers.map((provider) => {
-				const integration = integrations.find(
+				const rawIntegration = integrations.find(
 					(integration) => integration.provider_id === provider.provider_id,
 				);
+
+				// Ensure fields are never null and cast decrypted_credentials correctly
+				const integration = rawIntegration
+					? {
+							integration_id: rawIntegration.integration_id ?? "",
+							enabled: rawIntegration.enabled ?? false,
+							decrypted_credentials: rawIntegration.decrypted_credentials
+								? (rawIntegration.decrypted_credentials as unknown as DecryptedCredentials) // <-- FIX
+								: null,
+							created_at: rawIntegration.created_at ?? "",
+							updated_at: rawIntegration.updated_at ?? "",
+							workspace_id: rawIntegration.workspace_id ?? "",
+							provider_id: rawIntegration.provider_id ?? "",
+						}
+					: null;
+
 				return (
 					<OAuthProvider
 						key={provider.name}
