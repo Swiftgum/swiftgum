@@ -77,6 +77,45 @@ export type Database = {
 					},
 				];
 			};
+			destinations: {
+				Row: {
+					created_at: string;
+					destination_id: string;
+					encrypted_destination_params: string;
+					updated_at: string;
+					workspace_id: string;
+				};
+				Insert: {
+					created_at?: string;
+					destination_id?: string;
+					encrypted_destination_params: string;
+					updated_at?: string;
+					workspace_id: string;
+				};
+				Update: {
+					created_at?: string;
+					destination_id?: string;
+					encrypted_destination_params?: string;
+					updated_at?: string;
+					workspace_id?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "fk_workspace";
+						columns: ["workspace_id"];
+						isOneToOne: false;
+						referencedRelation: "workspace";
+						referencedColumns: ["workspace_id"];
+					},
+					{
+						foreignKeyName: "fk_workspace";
+						columns: ["workspace_id"];
+						isOneToOne: false;
+						referencedRelation: "workspace_with_decrypted_api_key";
+						referencedColumns: ["workspace_id"];
+					},
+				];
+			};
 			end_users: {
 				Row: {
 					created_at: string | null;
@@ -308,6 +347,48 @@ export type Database = {
 			};
 		};
 		Views: {
+			destinations_with_decrypted_params: {
+				Row: {
+					created_at: string | null;
+					decrypted_destination_params: Json | null;
+					destination_id: string | null;
+					encrypted_destination_params: string | null;
+					updated_at: string | null;
+					workspace_id: string | null;
+				};
+				Insert: {
+					created_at?: string | null;
+					decrypted_destination_params?: never;
+					destination_id?: string | null;
+					encrypted_destination_params?: string | null;
+					updated_at?: string | null;
+					workspace_id?: string | null;
+				};
+				Update: {
+					created_at?: string | null;
+					decrypted_destination_params?: never;
+					destination_id?: string | null;
+					encrypted_destination_params?: string | null;
+					updated_at?: string | null;
+					workspace_id?: string | null;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "fk_workspace";
+						columns: ["workspace_id"];
+						isOneToOne: false;
+						referencedRelation: "workspace";
+						referencedColumns: ["workspace_id"];
+					},
+					{
+						foreignKeyName: "fk_workspace";
+						columns: ["workspace_id"];
+						isOneToOne: false;
+						referencedRelation: "workspace_with_decrypted_api_key";
+						referencedColumns: ["workspace_id"];
+					},
+				];
+			};
 			integrations_with_decrypted_credentials: {
 				Row: {
 					created_at: string | null;
@@ -533,6 +614,13 @@ export type Database = {
 				Args: Record<PropertyKey, never>;
 				Returns: string;
 			};
+			decrypt_destination_params: {
+				Args: {
+					p_workspace_id: string;
+					p_encrypted_params: string;
+				};
+				Returns: Json;
+			};
 			decrypt_integration_credentials: {
 				Args: {
 					p_workspace_id: string;
@@ -546,6 +634,13 @@ export type Database = {
 					p_encrypted_tokenset: string;
 				};
 				Returns: Json;
+			};
+			encrypt_destination_params: {
+				Args: {
+					p_workspace_id: string;
+					p_params: Json;
+				};
+				Returns: string;
 			};
 			encrypt_integration_credentials: {
 				Args: {
