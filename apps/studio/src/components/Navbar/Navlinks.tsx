@@ -3,7 +3,7 @@ import { handleRequest } from "@/utils/auth-helpers/client";
 import { SignOut } from "@/utils/auth-helpers/server";
 import { getRedirectMethod } from "@/utils/auth-helpers/settings";
 import type { User } from "@supabase/supabase-js";
-import { House, KeyRound, LoaderPinwheel, LogOut, Settings } from "lucide-react";
+import { Database, House, KeyRound, LoaderPinwheel, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -46,7 +46,14 @@ export default function Navlinks({ user }: NavlinksProps) {
 							pathname={pathname}
 						/>
 						<NavItem
-							href="/settings"
+							href="/destination/webhook"
+							icon={<Database size={16} />}
+							label="Destination"
+							hovered={hovered}
+							pathname={pathname}
+						/>
+						<NavItem
+							href="/settings/general"
 							icon={<Settings size={16} />}
 							label="Settings"
 							hovered={hovered}
