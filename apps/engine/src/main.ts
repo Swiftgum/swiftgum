@@ -28,17 +28,19 @@ const start = async () => {
 			await processIndexingTask(task);
 		});
 
-		void addQueueListener(
-			"internal_queue",
-			async (row) => {
-				if (!row) {
-					return;
-				}
+		for (let i = 0; i < 20; i++) {
+			void addQueueListener(
+				"internal_queue",
+				async (row) => {
+					if (!row) {
+						return;
+					}
 
-				await processInternalTask(row.message);
-			},
-			15,
-		);
+					await processInternalTask(row.message);
+				},
+				15,
+			);
+		}
 
 		console.log("Started");
 	} catch (err) {
