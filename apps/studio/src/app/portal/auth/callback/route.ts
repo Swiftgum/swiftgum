@@ -77,7 +77,7 @@ export async function GET(request: Request) {
 
 				// TODO: move this somewhere else.
 				await queueForIndexing({
-					type: "google:drive",
+					provider: "google:drive",
 					accessToken: tokens.access_token,
 				});
 			}
