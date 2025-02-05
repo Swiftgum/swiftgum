@@ -7,12 +7,17 @@ import { usePathname } from "next/navigation";
 
 const subNavbarSections = [
 	{
-		sectionName: "Configutation",
+		sectionName: "Project Settings",
 		items: [
-			{ name: "Providers", href: "/auth/providers" },
+			{ name: "General", href: "/settings/general" },
 			// { name: "New", href: "/settings/new" },
 		],
 	},
+	// sectionName: "Subscription",
+	// items: [
+	// 	{ name: "Subscription", href: "/settings/subscription" },
+	// 	// { name: "New", href: "/settings/new" },
+	// ],
 ];
 
 export default function SubNavbar() {

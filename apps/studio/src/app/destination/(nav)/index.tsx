@@ -7,9 +7,9 @@ import { usePathname } from "next/navigation";
 
 const subNavbarSections = [
 	{
-		sectionName: "Configutation",
+		sectionName: "Destination Settings",
 		items: [
-			{ name: "Providers", href: "/auth/providers" },
+			{ name: "Webhook", href: "/destination/webhook" },
 			// { name: "New", href: "/settings/new" },
 		],
 	},
