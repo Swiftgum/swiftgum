@@ -1,6 +1,6 @@
 // Import the framework and instantiate it
 import Fastify from "fastify";
-import { processIndexingTask } from "./providers";
+import { processIndexingTask, processInternalTask } from "./providers";
 import { indexingTask } from "./providers/types";
 import { addQueueListener } from "./queue";
 
@@ -18,17 +18,29 @@ const start = async () => {
 	try {
 		await fastify.listen({ host: "0.0.0.0", port: 8000 });
 
-		await addQueueListener("indexing_queue", (row) => {
+		void addQueueListener("indexing_queue", async (row) => {
 			if (!row) {
 				return;
 			}
 
 			const task = indexingTask.parse(row.message);
 
-			console.log(task);
-
-			processIndexingTask(task);
+			await processIndexingTask(task);
 		});
+
+		void addQueueListener(
+			"internal_queue",
+			async (row) => {
+				if (!row) {
+					return;
+				}
+
+				await processInternalTask(row.message);
+			},
+			15,
+		);
+
+		console.log("Started");
 	} catch (err) {
 		fastify.log.error(err);
 		process.exit(1);
