@@ -36,12 +36,24 @@ export async function PUT(req: Request) {
 		.eq("provider_id", providerId)
 		.single();
 
-	// Encrypt credentials before storing (assuming you have an encryption function)
-	const encryptedCredentials = Buffer.from(JSON.stringify({ clientId, clientSecret })).toString(
-		"base64",
+	const { data: encryptedCredentials, error: encryptionError } = await supabase.rpc(
+		"encrypt_integration_credentials",
+		{
+			p_workspace_id: workspaceId,
+			p_credentials: {
+				type: "oauth2",
+				oauth2: {
+					url: "https://accounts.google.com/.well-known/openid-configuration",
+					client_id: clientId,
+					client_secret: clientSecret,
+				},
+			},
+		},
 	);
 
-	// let query: ReturnType<SupabaseClient<Database>['from']>;
+	if (encryptionError)
+		return NextResponse.json({ error: "Failed to encrypt credentials" }, { status: 500 });
+
 	if (existingIntegration) {
 		// Update existing integration
 		const { error } = await supabase

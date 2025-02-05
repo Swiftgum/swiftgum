@@ -10,9 +10,9 @@ import {
 	faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import OAuthProvider from "./generalpanel";
-import OAuthSettingsPanel from "./generalpanel";
-import GeneralPanel from "./generalpanel";
+import OAuthProvider from "./webhookpanel";
+import OAuthSettingsPanel from "./webhookpanel";
+import GeneralPanel from "./webhookpanel";
 
 export default async function Providers() {
 	const supabase = await createClient();
@@ -41,7 +41,10 @@ export default async function Providers() {
 	return (
 		<div className="p-20">
 			<div className="mb-10">
-				<h1 className="text-2xl font-bold text-zinc-700">Project Settings</h1>
+				<h1 className="text-2xl font-bold text-zinc-700">Webhook Destination</h1>
+				<p className="text-gray-600">
+					Configure and manage webhook endpoints for seamless data delivery
+				</p>
 			</div>
 
 			{/* Pass workspace info to GeneralPanel */}

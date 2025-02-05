@@ -29,9 +29,11 @@ export default async function Providers() {
 		throw new Error("No workspace found");
 	}
 
+	console.log(workspace);
 	// Fetch providers
 	const { data: providers, error: providersError } = await supabase.from("providers").select("*");
 
+	console.log(providers);
 	// Fetch integrations associated with the user's workspace
 	const { data: integrations, error: integrationsError } = await supabase
 		.from("integrations_with_decrypted_credentials")
@@ -39,6 +41,7 @@ export default async function Providers() {
 		.eq("workspace_id", workspace.workspace_id); // Assuming workspace_id links to the user's workspace
 
 	if (workspaceError || providersError || integrationsError) {
+		console.log(workspaceError, providersError, integrationsError);
 		throw new Error("Failed to fetch data");
 	}
 

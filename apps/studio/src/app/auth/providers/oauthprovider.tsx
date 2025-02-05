@@ -16,14 +16,18 @@ interface OAuthProviderProps {
 		integration_id: string;
 		enabled: boolean;
 		decrypted_credentials: {
-			client_secret: string;
-			client_id: string;
+			type: string;
+		} & {
+			[key: string]: {
+				client_secret: string;
+				client_id: string;
+			};
 		};
 		created_at: string;
 		updated_at: string;
 		workspace_id: string;
 		provider_id: string;
-	} | null; // Now only a single integration or null
+	} | null;
 	workspaceId: string;
 	providerId: string;
 }
@@ -36,10 +40,13 @@ export default function OAuthProvider({
 	workspaceId,
 	providerId,
 }: OAuthProviderProps) {
+	console.log(integration);
 	const [enabled, setEnabled] = useState(integration?.enabled || false);
-	const [clientId, setClientId] = useState(integration?.decrypted_credentials.client_secret || "");
+	const [clientId, setClientId] = useState(
+		integration?.decrypted_credentials[integration?.decrypted_credentials.type].client_id || "",
+	);
 	const [clientSecret, setClientSecret] = useState(
-		integration?.decrypted_credentials.client_id || "",
+		integration?.decrypted_credentials[integration?.decrypted_credentials.type].client_secret || "",
 	);
 	const [showSecret, setShowSecret] = useState(false);
 	const [expanded, setExpanded] = useState(false);
@@ -71,7 +78,6 @@ export default function OAuthProvider({
 	// Handle Save
 	const handleSave = async () => {
 		setIsSaving(true);
-		toast.success("Successfully saved OAuth credentials!");
 		setOriginalState({ enabled, clientId, clientSecret });
 
 		try {
