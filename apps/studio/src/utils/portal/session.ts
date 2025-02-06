@@ -1,6 +1,5 @@
 import { hash, randomUUID } from "node:crypto";
 import { createClient } from "@/utils/supabase/server";
-import type { CookieListItem } from "next/dist/compiled/@edge-runtime/cookies";
 import { cookies } from "next/headers";
 import type { Database } from "../supabase/types";
 
