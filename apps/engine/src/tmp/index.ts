@@ -12,12 +12,30 @@ export const tempFileName = async (
 	const tempFile = path.join(TEMP_DIR, `${prefix}${randomUUID()}.${extension}`);
 
 	setTimeout(async () => {
-		await fs.unlink(tempFile);
+		try {
+			await fs.unlink(tempFile);
+		} catch (err) {
+			// Check if the file is already deleted
+			if (err instanceof Error && err.message.includes("ENOENT")) {
+				return;
+			}
+
+			throw err;
+		}
 	}, lifetime);
 
 	return {
 		async cleanup() {
-			await fs.unlink(tempFile);
+			try {
+				await fs.unlink(tempFile);
+			} catch (err) {
+				// Check if the file is already deleted
+				if (err instanceof Error && err.message.includes("ENOENT")) {
+					return;
+				}
+
+				throw err;
+			}
 		},
 		tempFile,
 	};

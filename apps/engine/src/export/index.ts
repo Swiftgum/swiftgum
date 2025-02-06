@@ -1,6 +1,9 @@
 import { sql } from "../db";
 
-export const exportFile = async (content: string, metadata: { fileId: string }) => {
+export const exportFile = async (
+	content: string,
+	metadata: { fileId: string; [key: string]: any },
+) => {
 	await sql`
     SELECT * FROM pgmq.send(
       queue_name => 'export_queue',

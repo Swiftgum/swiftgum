@@ -1,6 +1,6 @@
+import type { IndexingTask } from "@knowledgex/interfaces";
 import type { InternalTask } from "./abstract";
 import { googleDriveProvider } from "./google:drive";
-import type { IndexingTask } from "./types";
 
 export const providers = {
 	"google:drive": googleDriveProvider,
@@ -18,7 +18,6 @@ export const processIndexingTask = async (task: IndexingTask) => {
 		throw new Error(`Provider for ${task.provider} not found`);
 	}
 
-	// @ts-expect-error
 	await provider.index(task);
 };
 
@@ -29,6 +28,5 @@ export const processInternalTask = async (task: InternalTask) => {
 
 	const provider = providers[task.provider];
 
-	// @ts-expect-error
 	await provider.internal(task.task);
 };

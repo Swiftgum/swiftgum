@@ -56,15 +56,12 @@ export const addQueueListener = async (
 					);
 				}, timeout * 1000);
 
-				console.log("running handler");
 				await handler(message);
 
 				try {
 					clearTimeout(timeoutHandle);
 					console.log(`Handler for queue ${queueName} ran on time.`);
 				} catch {}
-
-				console.log(message);
 
 				await archiveMessage(queueName, message.msg_id);
 

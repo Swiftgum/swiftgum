@@ -1,5 +1,7 @@
 import fs from "node:fs";
+import type { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
+import { auth, drive_v3 } from "@googleapis/drive";
 import mime from "mime-types";
 import { z } from "zod";
 import { exportFile } from "../export";
@@ -7,68 +9,51 @@ import { runMarkitdown } from "../parser";
 import { tempFileName } from "../tmp";
 import { type Provider, getInternalQueue } from "./abstract";
 
-const HARD_PAGE_LIMIT = 100;
-const PAGE_SIZE = 1000;
 const PROVIDER = "google:drive" as const;
 
-const fetchPage = async (accessToken: string, pageToken?: string) => {
-	const url = new URL("https://www.googleapis.com/drive/v3/files");
-
-	// url.searchParams.set("includeItemsFromAllDrives", "true");
-	// url.searchParams.set("corpora", "allDrives");
-	// url.searchParams.set("supportsAllDrives", "true");
-	url.searchParams.set("trashed", "false");
-	url.searchParams.set("orderBy", "recency");
-	url.searchParams.set("pageSize", PAGE_SIZE.toString());
-
-	if (pageToken) url.searchParams.set("pageToken", pageToken);
-
-	const response = await fetch(url, {
-		headers: {
-			Authorization: `Bearer ${accessToken}`,
-		},
-	});
-
-	const data = await response.json();
-
-	const { nextPageToken, files } = data;
-
-	return { nextPageToken, files } as {
-		nextPageToken?: string;
-		files: {
-			id: string;
-			driveId?: string;
-			teamDriveId?: string;
-			name: string;
-			mimeType: string;
-		}[];
-	};
+const DRIVE_MIME_TYPES = [
+	"application/vnd.google-apps.document",
+	"application/vnd.google-apps.spreadsheet",
+	"application/vnd.google-apps.presentation",
+	"application/vnd.google-apps.drawing",
+];
+const DRIVE_MIME_TYPES_MAPPING = {
+	"application/vnd.google-apps.document":
+		"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+	"application/vnd.google-apps.spreadsheet":
+		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	"application/vnd.google-apps.presentation":
+		"application/vnd.openxmlformats-officedocument.presentationml.presentation",
+	"application/vnd.google-apps.drawing": "image/png",
 };
+const OTHER_SUPPORTED_MIME_TYPES = [
+	"application/pdf",
+	"image/jpeg",
+	"image/png",
+	"image/gif",
+	"image/bmp",
+];
+const ALLOWED_MIME_TYPES = [...DRIVE_MIME_TYPES, ...OTHER_SUPPORTED_MIME_TYPES];
+const MAX_DRIVE_EXPORT_SIZE = 1e7; // 10MB
 
-const fetchAllPages = async (accessToken: string) => {
-	let { files, nextPageToken } = await fetchPage(accessToken);
-	let i = 0;
+const getDrive = ({
+	accessToken,
+}: {
+	accessToken: string;
+}) => {
+	const authClient = new auth.OAuth2();
+	authClient.setCredentials({ access_token: accessToken });
 
-	while (nextPageToken && i < HARD_PAGE_LIMIT) {
-		i++;
-
-		const { files: pageFiles, nextPageToken: nextPage } = await fetchPage(
-			accessToken,
-			nextPageToken,
-		);
-
-		files.push(...pageFiles);
-
-		nextPageToken = nextPage;
-	}
-
-	return files;
+	return new drive_v3.Drive({ auth: authClient });
 };
 
 const googleDrivePendingTask = z.object({
 	step: z.literal("pending"),
 	fileId: z.string(),
 	accessToken: z.string(),
+	mimeType: z.string(),
+	exportLinks: z.record(z.string(), z.string()).optional(),
+	fileSize: z.number().optional(),
 });
 
 const googleDriveInternalTask = z.discriminatedUnion("step", [googleDrivePendingTask]);
@@ -80,73 +65,133 @@ const googleDriveInternalQueue = getInternalQueue(PROVIDER, googleDriveInternalT
 export const googleDriveProvider: Provider<typeof PROVIDER, GoogleDriveInternalTask> = {
 	provider: PROVIDER,
 	index: async (task) => {
-		const files = await fetchAllPages(task.accessToken);
+		const drive = getDrive(task);
+		const files: drive_v3.Schema$File[] = [];
+		let nextPageToken: string | undefined;
+		let i = 0;
 
-		googleDriveInternalQueue.batchQueue(
-			files.map((file) => ({
+		while (i < 10000) {
+			i++;
+
+			const { data } = await drive.files.list({
+				fields: "files(size,exportLinks,id,mimeType),nextPageToken",
+				pageSize: 1000,
+				pageToken: nextPageToken,
+			});
+
+			if (!data.files) {
+				break;
+			}
+
+			files.push(...data.files);
+
+			if (!data.nextPageToken) {
+				break;
+			}
+
+			nextPageToken = data.nextPageToken;
+		}
+
+		const tasks: GoogleDriveInternalTask[] = [];
+
+		for (const file of files) {
+			if (!file.id || !file.mimeType) {
+				continue;
+			}
+
+			if (!ALLOWED_MIME_TYPES.includes(file.mimeType)) {
+				continue;
+			}
+
+			tasks.push({
 				step: "pending",
 				fileId: file.id,
 				accessToken: task.accessToken,
-			})),
-		);
+				exportLinks: file.exportLinks ?? undefined,
+				mimeType: file.mimeType,
+				fileSize: file.size ? Number(file.size) : undefined,
+			});
+		}
+
+		googleDriveInternalQueue.batchQueue(tasks);
 	},
 	internal: async (task) => {
+		const drive = getDrive(task);
+
 		switch (task.step) {
 			case "pending": {
-				const response = await fetch(
-					`https://www.googleapis.com/drive/v3/files/${task.fileId}/download`,
-					{
-						method: "POST",
-						headers: {
-							Authorization: `Bearer ${task.accessToken}`,
+				let readableStream: Readable | undefined;
+				if (
+					DRIVE_MIME_TYPES.includes(task.mimeType) &&
+					task.fileSize &&
+					task.fileSize < MAX_DRIVE_EXPORT_SIZE
+				) {
+					const stream = await drive.files.export(
+						{
+							fileId: task.fileId,
+							alt: "media",
+							mimeType:
+								DRIVE_MIME_TYPES_MAPPING[task.mimeType as keyof typeof DRIVE_MIME_TYPES_MAPPING],
 						},
-					},
-				);
+						{
+							responseType: "stream",
+						},
+					);
 
-				const data = await response.json();
+					readableStream = stream.data;
+				} else if (task.exportLinks) {
+					let targetMimeType = Object.keys(task.exportLinks).find((mimeType) =>
+						ALLOWED_MIME_TYPES.includes(mimeType),
+					);
 
-				if (data.error) {
-					if (data.error.code > 500) {
-						return;
+					if (!targetMimeType && "application/pdf" in task.exportLinks) {
+						targetMimeType = "application/pdf";
 					}
 
-					if (data.error.code > 400) {
-						console.error(data.error);
-						return;
+					console.log("here!");
+
+					if (targetMimeType) {
+						// Pipe fetch to readable stream
+						const response = await fetch(task.exportLinks[targetMimeType]);
+
+						readableStream = response.body as unknown as Readable;
 					}
 				} else {
-					// ... existing code ...
-					const downloadURI = data.response.downloadUri;
-
-					const response = await fetch(downloadURI, {
-						method: "GET",
-						headers: {
-							Authorization: `Bearer ${task.accessToken}`,
+					const stream = await drive.files.get(
+						{
+							fileId: task.fileId,
+							alt: "media",
 						},
-					});
+						{
+							responseType: "stream",
+						},
+					);
 
-					// Get file extension from the response content-type or default to .txt
-					const contentType = response.headers.get("content-type") || "text/plain";
-					const extension = mime.extension(contentType) || "txt";
-
-					// Create temp file with correct extension
-					const tempFile = await tempFileName(extension, "google:drive-");
-
-					// Pipe the response to the file
-					const fileStream = fs.createWriteStream(tempFile.tempFile);
-
-					await pipeline(response.body as unknown as NodeJS.ReadableStream, fileStream);
-
-					const { textContents } = await runMarkitdown(tempFile.tempFile);
-
-					await exportFile(textContents, {
-						fileId: task.fileId,
-					});
-
-					await tempFile.cleanup();
+					readableStream = stream.data;
 				}
 
-				break;
+				if (!readableStream) {
+					throw new Error("No readable stream found");
+				}
+
+				const extension = mime.extension(task.mimeType);
+
+				if (!extension) {
+					throw new Error("No extension found");
+				}
+
+				const { tempFile, cleanup } = await tempFileName(extension);
+
+				await pipeline(readableStream, fs.createWriteStream(tempFile));
+
+				const { textContents } = await runMarkitdown(tempFile);
+
+				exportFile(textContents, {
+					fileId: task.fileId,
+					provider: PROVIDER,
+				});
+
+				await cleanup();
 			}
 		}
 	},

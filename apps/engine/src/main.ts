@@ -38,7 +38,7 @@ const start = async () => {
 
 					await processInternalTask(row.message);
 				},
-				15,
+				30,
 			);
 		}
 

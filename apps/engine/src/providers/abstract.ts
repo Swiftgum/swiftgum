@@ -1,5 +1,5 @@
 import type { IndexingTask, SupportedIndexers } from "@knowledgex/interfaces";
-import { z } from "zod";
+import type { z } from "zod";
 import { sql } from "../db";
 
 export interface Provider<P extends SupportedIndexers, I> {
@@ -46,24 +46,4 @@ export const getInternalQueue = <T extends z.ZodTypeAny>(
 		},
 		batchQueue,
 	};
-};
-
-export const parsingTask = z.object({
-	provider: z.string(),
-	source: z.object({
-		url: z.string(),
-	}),
-});
-
-export type ParsingTask = z.infer<typeof parsingTask>;
-
-export const parsingQueue = {
-	queue: async (task: ParsingTask) => {
-		await sql`
-			SELECT * FROM pgmq.send(
-				queue_name => 'processing_queue',
-				msg => ${JSON.stringify(task)}::jsonb
-			)
-		`;
-	},
 };

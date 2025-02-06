@@ -11,6 +11,7 @@
 	"license": "ISC",
 	"description": "",
 	"dependencies": {
+		"@googleapis/drive": "^8.14.0",
 		"@knowledgex/interfaces": "workspace:^",
 		"fastify": "^5.2.1",
 		"mime-types": "^2.1.35",

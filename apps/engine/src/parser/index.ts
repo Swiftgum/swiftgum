@@ -8,7 +8,9 @@ import { promisify } from "node:util";
 const exec = promisify(execCallback);
 
 export const runMarkitdown = async (file: string) => {
-	const { stdout, stderr } = await exec(`uv run markitdown ${file}`);
+	const { stdout, stderr } = await exec(`markitdown ${file}`, {
+		cwd: process.cwd(),
+	});
 
 	if (stderr.trim().length > 0) {
 		throw new Error(stderr);
