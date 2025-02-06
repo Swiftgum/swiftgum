@@ -2,18 +2,32 @@ import { hash, randomUUID } from "node:crypto";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
+import { z } from "zod";
 import type { Database } from "../supabase/types";
 
 const cookieName = (cookieHash: string) => `kx:ps:${cookieHash}`;
 export const SESSION_ID_PARAM = "sid";
 
+export const portalSessionConfiguration = z.object({
+	display_name: z.string().optional(),
+	return_url: z.string().optional(),
+});
+
+export type PortalSessionConfiguration = z.infer<typeof portalSessionConfiguration>;
+
+export type PortalSession = Database["public"]["Tables"]["portal_sessions"]["Row"] & {
+	configuration: PortalSessionConfiguration;
+};
+
 export const createSession = async ({
 	endUserForeignId,
 	workspaceId,
+	configuration,
 	// TODO: Add session signature
 }: {
 	endUserForeignId: string;
 	workspaceId: string;
+	configuration?: PortalSessionConfiguration;
 }) => {
 	"use server";
 
@@ -59,7 +73,7 @@ export const createSession = async ({
 			end_user_id: endUser.end_user_id,
 			workspace_id: workspace.workspace_id,
 			cookie_hash: cookieHash,
-			configuration: {},
+			configuration: Object.assign({}, configuration),
 		})
 		.select("*")
 		.single();
@@ -77,7 +91,7 @@ export const createSession = async ({
 		sameSite: "strict",
 	});
 
-	return session;
+	return session as unknown as PortalSession;
 };
 
 export const getSession = async ({
@@ -109,7 +123,7 @@ export const getSession = async ({
 		throw new Error(sessionError.message);
 	}
 
-	return session as unknown as Database["public"]["Tables"]["portal_sessions"]["Row"];
+	return session as unknown as PortalSession;
 };
 
 export const getPagePortalSession = async ({
