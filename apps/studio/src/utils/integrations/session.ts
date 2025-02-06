@@ -23,6 +23,7 @@ export type IntegrationCredentials = z.infer<typeof IntegrationCredentials>;
 
 export const GenericAuthSession = z.object({
 	redirect: z.string().optional(),
+	portal_session_id: z.string(),
 	scope: z.string(),
 });
 

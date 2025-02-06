@@ -1,4 +1,5 @@
 import { createAuthSession, getIntegrationCredentials } from "@/utils/integrations/session";
+import { getRoutePortalSession } from "@/utils/portal/session";
 import { type NextRequest, NextResponse } from "next/server";
 import * as client from "openid-client";
 
@@ -7,6 +8,8 @@ export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
 	const { searchParams } = request.nextUrl;
 	const integrationId = searchParams.get("integration_id");
+
+	const { session, url } = await getRoutePortalSession(request);
 
 	const integrationCredentials = await getIntegrationCredentials(integrationId || "");
 
@@ -30,7 +33,8 @@ export async function GET(request: NextRequest) {
 					oauth2: {
 						pkce_code_verifier: codeVerifier,
 					},
-					redirect: "http://localhost:3000/portal",
+					portal_session_id: session.portal_session_id,
+					redirect: url("http://localhost:3000/portal"),
 				},
 			});
 
@@ -47,8 +51,4 @@ export async function GET(request: NextRequest) {
 			return NextResponse.redirect(redirect);
 		}
 	}
-
-	return NextResponse.json({
-		error: "Unsupported integration type",
-	});
 }
