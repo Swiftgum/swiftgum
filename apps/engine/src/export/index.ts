@@ -2,7 +2,7 @@ import { sql } from "../db";
 
 export const exportFile = async (
 	content: string,
-	metadata: { fileId: string; [key: string]: any },
+	metadata: { fileId: string; [key: string]: unknown },
 ) => {
 	await sql`
     SELECT * FROM pgmq.send(
