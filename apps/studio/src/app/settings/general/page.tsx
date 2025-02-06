@@ -1,18 +1,6 @@
-import NotionIcon from "@/components/Icons/notionIcon";
 import { createClient } from "@/utils/supabase/server";
-import {
-	faGoogle,
-	faKey,
-	faLinkedinIn,
-	faMicrosoft,
-	faSlack,
-	faTwitch,
-	faTwitter,
-} from "@fortawesome/free-brands-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import OAuthProvider from "./generalpanel";
-import OAuthSettingsPanel from "./generalpanel";
 import GeneralPanel from "./generalpanel";
+import { redirect } from "next/navigation";
 
 export default async function Providers() {
 	const supabase = await createClient();
@@ -23,8 +11,7 @@ export default async function Providers() {
 		error: userError,
 	} = await supabase.auth.getUser();
 	if (userError || !user) {
-		console.error("Error fetching user:", userError);
-		return <p>Error fetching user</p>;
+		if (!user) redirect("/");
 	}
 
 	// Fetch workspace info
