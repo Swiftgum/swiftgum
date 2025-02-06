@@ -8,30 +8,6 @@ import { getURL } from "@/utils/helpers";
 import { redirect } from "next/navigation";
 import OAuthProvider from "./oauthprovider";
 
-type SearchParams = { [key: string]: string | string[] | undefined };
-
-interface Session {
-	workspace_id: string;
-	end_user_id: string;
-	portal_session_id: string;
-}
-
-interface EndUser {
-	end_user_id: string;
-	foreign_id: string;
-}
-
-interface Provider {
-	provider_id: string;
-	name: string;
-	identifier: string;
-}
-
-interface Integration {
-	integration_id: string;
-	provider_id: string;
-}
-
 export default async function PortalPage({
 	searchParams,
 }: {
@@ -45,7 +21,7 @@ export default async function PortalPage({
 		redirect("/error");
 	}
 
-	const session = sessionData.session as Session;
+	const session = sessionData.session;
 
 	// Fetch end user
 	const { data: endUser, error: endUserError } = await supabase

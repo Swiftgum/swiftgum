@@ -7,13 +7,21 @@ WORKDIR /app
 ENV WATCHPACK_POLLING=true
 ENV NODE_ENV=development
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
 # Copy only lockfile first for better caching
 COPY pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml ./
+COPY .npmrc ./
 
 # Fetch dependencies using lockfile
-RUN pnpm fetch
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch
 
-COPY ./apps/studio/ .
+COPY ./apps/studio ./apps/studio
+COPY ./apps/interfaces ./apps/interfaces
+
+WORKDIR /app/apps/studio
 
 # Install dependencies from offline cache
 RUN pnpm install --prefer-offline

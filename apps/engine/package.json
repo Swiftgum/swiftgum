@@ -1,5 +1,5 @@
 {
-	"name": "engine",
+	"name": "@knowledgex/engine",
 	"version": "1.0.0",
 	"main": "index.js",
 	"scripts": {
@@ -11,6 +11,7 @@
 	"license": "ISC",
 	"description": "",
 	"dependencies": {
+		"@knowledgex/interfaces": "workspace:^",
 		"fastify": "^5.2.1",
 		"mime-types": "^2.1.35",
 		"postgres": "^3.4.5",

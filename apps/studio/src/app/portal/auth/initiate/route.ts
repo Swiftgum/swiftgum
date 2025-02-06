@@ -10,9 +10,15 @@ export async function GET(request: NextRequest) {
 	const { searchParams } = request.nextUrl;
 	const integrationId = searchParams.get("integration_id");
 
+	if (!integrationId) {
+		return NextResponse.json({
+			error: "Missing integration_id parameter",
+		});
+	}
+
 	const { session, url } = await getRoutePortalSession(request);
 
-	const integrationCredentials = await getIntegrationCredentials(integrationId || "");
+	const integrationCredentials = await getIntegrationCredentials(integrationId);
 
 	console.log("integrationCredentials", integrationCredentials);
 	switch (integrationCredentials.type) {
@@ -27,8 +33,8 @@ export async function GET(request: NextRequest) {
 			const codeChallenge = await client.calculatePKCECodeChallenge(codeVerifier);
 
 			const { auth_session_id } = await createAuthSession({
-				end_user_id: "00000000-0000-0000-0000-000000000000",
-				integration_id: integrationId || "",
+				end_user_id: session.end_user_id,
+				integration_id: integrationId,
 				auth_session: {
 					type: "oauth2",
 					scope: "openid email profile https://www.googleapis.com/auth/drive.readonly",

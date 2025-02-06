@@ -207,6 +207,58 @@ export type Database = {
 					},
 				];
 			};
+			portal_sessions: {
+				Row: {
+					configuration: Json;
+					cookie_hash: string;
+					created_at: string;
+					end_user_id: string;
+					expires_at: string;
+					portal_session_id: string;
+					workspace_id: string;
+				};
+				Insert: {
+					configuration: Json;
+					cookie_hash: string;
+					created_at?: string;
+					end_user_id: string;
+					expires_at?: string;
+					portal_session_id?: string;
+					workspace_id: string;
+				};
+				Update: {
+					configuration?: Json;
+					cookie_hash?: string;
+					created_at?: string;
+					end_user_id?: string;
+					expires_at?: string;
+					portal_session_id?: string;
+					workspace_id?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "portal_sessions_end_user_id_fkey";
+						columns: ["end_user_id"];
+						isOneToOne: false;
+						referencedRelation: "end_users";
+						referencedColumns: ["end_user_id"];
+					},
+					{
+						foreignKeyName: "portal_sessions_workspace_id_fkey";
+						columns: ["workspace_id"];
+						isOneToOne: false;
+						referencedRelation: "workspace";
+						referencedColumns: ["workspace_id"];
+					},
+					{
+						foreignKeyName: "portal_sessions_workspace_id_fkey";
+						columns: ["workspace_id"];
+						isOneToOne: false;
+						referencedRelation: "workspace_with_decrypted_api_key";
+						referencedColumns: ["workspace_id"];
+					},
+				];
+			};
 			providers: {
 				Row: {
 					created_at: string;
@@ -568,6 +620,58 @@ export type Database = {
 					},
 				];
 			};
+			valid_portal_sessions: {
+				Row: {
+					configuration: Json | null;
+					cookie_hash: string | null;
+					created_at: string | null;
+					end_user_id: string | null;
+					expires_at: string | null;
+					portal_session_id: string | null;
+					workspace_id: string | null;
+				};
+				Insert: {
+					configuration?: Json | null;
+					cookie_hash?: string | null;
+					created_at?: string | null;
+					end_user_id?: string | null;
+					expires_at?: string | null;
+					portal_session_id?: string | null;
+					workspace_id?: string | null;
+				};
+				Update: {
+					configuration?: Json | null;
+					cookie_hash?: string | null;
+					created_at?: string | null;
+					end_user_id?: string | null;
+					expires_at?: string | null;
+					portal_session_id?: string | null;
+					workspace_id?: string | null;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "portal_sessions_end_user_id_fkey";
+						columns: ["end_user_id"];
+						isOneToOne: false;
+						referencedRelation: "end_users";
+						referencedColumns: ["end_user_id"];
+					},
+					{
+						foreignKeyName: "portal_sessions_workspace_id_fkey";
+						columns: ["workspace_id"];
+						isOneToOne: false;
+						referencedRelation: "workspace";
+						referencedColumns: ["workspace_id"];
+					},
+					{
+						foreignKeyName: "portal_sessions_workspace_id_fkey";
+						columns: ["workspace_id"];
+						isOneToOne: false;
+						referencedRelation: "workspace_with_decrypted_api_key";
+						referencedColumns: ["workspace_id"];
+					},
+				];
+			};
 			workspace_with_decrypted_api_key: {
 				Row: {
 					created_at: string | null;
@@ -606,6 +710,10 @@ export type Database = {
 			};
 		};
 		Functions: {
+			cleanup_expired_portal_sessions: {
+				Args: Record<PropertyKey, never>;
+				Returns: undefined;
+			};
 			cleanup_expired_sessions: {
 				Args: Record<PropertyKey, never>;
 				Returns: undefined;

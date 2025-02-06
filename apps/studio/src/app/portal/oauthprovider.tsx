@@ -21,7 +21,6 @@ interface DecryptedCredentials {
 interface OAuthProviderProps {
 	name: string;
 	icon: React.ReactNode;
-	authUrl: string;
 	integration?: {
 		integration_id: string | null;
 		enabled: boolean | null;

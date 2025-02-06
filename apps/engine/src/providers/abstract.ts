@@ -1,6 +1,6 @@
+import type { IndexingTask, SupportedIndexers } from "@knowledgex/interfaces";
 import { z } from "zod";
 import { sql } from "../db";
-import type { IndexingTask, SupportedIndexers } from "./types";
 
 export interface Provider<P extends SupportedIndexers, I> {
 	provider: P;
