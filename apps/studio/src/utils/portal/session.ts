@@ -14,6 +14,10 @@ export const createSession = async ({
 	endUserForeignId: string;
 	workspaceId: string;
 }) => {
+	"use server";
+
+	const cookieStore = await cookies();
+
 	const supabase = await createClient();
 
 	const { data: workspace, error: workspaceError } = await supabase
@@ -63,17 +67,16 @@ export const createSession = async ({
 		throw new Error(sessionError.message);
 	}
 
-	return {
-		session,
-		cookie: {
-			name: cookieName(session.portal_session_id),
-			value: cookieNonce,
-			expires: new Date(session.expires_at),
-			path: "/",
-			httpOnly: true,
-			sameSite: "strict",
-		} as CookieListItem,
-	};
+	cookieStore.set({
+		name: cookieName(session.portal_session_id),
+		value: cookieNonce,
+		expires: new Date(session.expires_at),
+		path: "/",
+		httpOnly: true,
+		sameSite: "strict",
+	});
+
+	return session;
 };
 
 export const getSession = async ({
