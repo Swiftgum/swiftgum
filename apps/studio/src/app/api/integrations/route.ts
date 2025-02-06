@@ -24,11 +24,12 @@ export async function PUT(req: Request) {
 		data: { user },
 		error: authError,
 	} = await supabase.auth.getUser();
+
 	if (authError || !user) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
 
-	// Check if integration already exists
+	console.log("🔍 Checking existing integration...");
 	const { data: existingIntegration, error: fetchError } = await supabase
 		.from("integrations")
 		.select("integration_id")
@@ -36,6 +37,12 @@ export async function PUT(req: Request) {
 		.eq("provider_id", providerId)
 		.single();
 
+	if (fetchError && fetchError.code !== "PGRST116") {
+		console.error("❌ Fetch error:", fetchError);
+		return NextResponse.json({ error: "Failed to fetch existing integration" }, { status: 500 });
+	}
+
+	console.log("🔒 Encrypting credentials...");
 	const { data: encryptedCredentials, error: encryptionError } = await supabase.rpc(
 		"encrypt_integration_credentials",
 		{
@@ -51,37 +58,68 @@ export async function PUT(req: Request) {
 		},
 	);
 
-	if (encryptionError)
+	if (encryptionError) {
+		console.error("❌ Encryption error:", encryptionError);
 		return NextResponse.json({ error: "Failed to encrypt credentials" }, { status: 500 });
+	}
 
 	if (existingIntegration) {
-		// Update existing integration
-		const { error } = await supabase
+		const { data, error } = await supabase
 			.from("integrations")
 			.update({
 				enabled,
 				encrypted_credentials: encryptedCredentials,
 				updated_at: new Date().toISOString(),
 			})
-			.eq("integration_id", existingIntegration.integration_id);
+			.eq("integration_id", existingIntegration.integration_id)
+			.select();
+
 		if (error) {
+			console.error("❌ Update error:", error);
 			return NextResponse.json({ error: "Failed to save credentials" }, { status: 500 });
 		}
+
+		// ✅ Detect RLS failure (if no rows updated)
+		if (!data || data.length === 0) {
+			console.warn("🚨 RLS blocked update (no matching row or insufficient permissions)");
+			return NextResponse.json(
+				{ error: "Forbidden: You do not have permission to update this integration." },
+				{ status: 403 },
+			);
+		}
+
+		NextResponse.json({ success: true, updated: data });
 	} else {
-		// Insert new integration
-		const { error } = await supabase.from("integrations").insert([
-			{
-				workspace_id: workspaceId,
-				provider_id: providerId,
-				enabled,
-				encrypted_credentials: encryptedCredentials,
-				created_at: new Date().toISOString(),
-				updated_at: new Date().toISOString(),
-			},
-		]);
+		const { data, error } = await supabase
+			.from("integrations")
+			.insert([
+				{
+					workspace_id: workspaceId,
+					provider_id: providerId,
+					enabled,
+					encrypted_credentials: encryptedCredentials,
+					created_at: new Date().toISOString(),
+					updated_at: new Date().toISOString(),
+				},
+			])
+			.select(); // ✅ Ensures affected rows are returned
+
+		console.log("🆕 Insert Response:", data, error);
+
 		if (error) {
+			console.error("❌ Insert error:", error);
 			return NextResponse.json({ error: "Failed to save credentials" }, { status: 500 });
 		}
+
+		// ✅ Detect RLS failure (if no rows inserted)
+		if (!data || data.length === 0) {
+			console.warn("🚨 RLS blocked insert (no permission)");
+			return NextResponse.json(
+				{ error: "Forbidden: You do not have permission to add an integration." },
+				{ status: 403 },
+			);
+		}
+		NextResponse.json({ success: true, inserted: data });
 	}
 
 	return NextResponse.json({ success: true });
