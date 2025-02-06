@@ -45,7 +45,7 @@ export default function OAuthProvider({ name, icon }: OAuthProviderProps) {
 	};
 
 	return (
-		<div className="flex items-center">
+		<div className="flex items-center gap-2">
 			<div className="w-1/2">
 				<form key={name} className="" onSubmit={(e) => handleSubmit(e)}>
 					<input type="hidden" name="provider" value={name} />
