@@ -1,7 +1,7 @@
+import { indexingTask } from "@knowledgex/interfaces";
 // Import the framework and instantiate it
 import Fastify from "fastify";
 import { processIndexingTask, processInternalTask } from "./providers";
-import { indexingTask } from "./providers/types";
 import { addQueueListener } from "./queue";
 
 const fastify = Fastify({
