@@ -1,9 +1,11 @@
 import { hash, randomUUID } from "node:crypto";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
+import type { NextRequest } from "next/server";
 import type { Database } from "../supabase/types";
 
 const cookieName = (cookieHash: string) => `kx:ps:${cookieHash}`;
+export const SESSION_ID_PARAM = "sid";
 
 export const createSession = async ({
 	endUserForeignId,
@@ -108,4 +110,48 @@ export const getSession = async ({
 	}
 
 	return session as unknown as Database["public"]["Tables"]["portal_sessions"]["Row"];
+};
+
+export const getPagePortalSession = async ({
+	searchParams,
+}: {
+	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) => {
+	const params = await searchParams;
+	const sessionId = params[SESSION_ID_PARAM];
+
+	if (!sessionId) {
+		throw new Error("Session ID not found");
+	}
+
+	if (Array.isArray(sessionId)) {
+		throw new Error("Session ID is an array");
+	}
+
+	const session = await getSession({ sessionId });
+
+	return {
+		session,
+		url: (url: string | URL) => {
+			const DUMMY_URL = "dummy://dummy.dummy/";
+
+			const newUrl = new URL(url, DUMMY_URL);
+			newUrl.searchParams.set(SESSION_ID_PARAM, sessionId);
+
+			const newUrlString = newUrl.toString();
+
+			if (newUrlString.startsWith(DUMMY_URL) && url.toString().startsWith("/")) {
+				return newUrlString.replace(DUMMY_URL, "/");
+			}
+
+			return newUrlString.replace(DUMMY_URL, "");
+		},
+	};
+};
+
+export const getRoutePortalSession = async (request: NextRequest) => {
+	const { searchParams } = request.nextUrl;
+	return getPagePortalSession({
+		searchParams: Promise.resolve(Object.fromEntries(searchParams.entries())),
+	});
 };

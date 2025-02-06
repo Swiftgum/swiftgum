@@ -1,4 +1,4 @@
-import { createSession } from "@/utils/portal/session";
+import { SESSION_ID_PARAM, createSession } from "@/utils/portal/session";
 import { NextResponse } from "next/server";
 
 export const GET = async (request: Request) => {
@@ -9,7 +9,7 @@ export const GET = async (request: Request) => {
 
 	const url = new URL("/portal", request.url);
 
-	url.searchParams.set("session_id", session.portal_session_id);
+	url.searchParams.set(SESSION_ID_PARAM, session.portal_session_id);
 
 	return NextResponse.redirect(url);
 };
