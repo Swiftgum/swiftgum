@@ -44,7 +44,6 @@ export default function OAuthProvider({
 	const decrypted_credentials = integration?.decrypted_credentials as DecryptedCredentials;
 	const type = decrypted_credentials?.type;
 	const credentials = type ? decrypted_credentials?.[type] : null;
-	
 	const [enabled, setEnabled] = useState(integration?.enabled || false);
 	const [clientId, setClientId] = useState(credentials?.client_id || "");
 	const [clientSecret, setClientSecret] = useState(credentials?.client_secret || "");

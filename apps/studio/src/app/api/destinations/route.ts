@@ -28,7 +28,7 @@ export async function PUT(req: Request) {
 		{
 			p_workspace_id: workspaceId,
 			p_params: dataToEncrypt,
-		}
+		},
 	);
 
 	if (encryptionError) {
@@ -57,7 +57,10 @@ export async function PUT(req: Request) {
 		// ✅ Catch RLS failure (if no rows were updated)
 		if (!data || data.length === 0) {
 			console.warn("🚨 RLS blocked update (no matching row or insufficient permissions)");
-			return NextResponse.json({ error: "Forbidden: You do not have permission to update this destination." }, { status: 403 });
+			return NextResponse.json(
+				{ error: "Forbidden: You do not have permission to update this destination." },
+				{ status: 403 },
+			);
 		}
 
 		NextResponse.json({ success: true, updated: data });
@@ -83,11 +86,14 @@ export async function PUT(req: Request) {
 		// ✅ Catch RLS failure (if no rows were inserted)
 		if (!data || data.length === 0) {
 			console.warn("🚨 RLS blocked insert (no permission)");
-			return NextResponse.json({ error: "Forbidden: You do not have permission to add a destination." }, { status: 403 });
+			return NextResponse.json(
+				{ error: "Forbidden: You do not have permission to add a destination." },
+				{ status: 403 },
+			);
 		}
 
 		return NextResponse.json({ success: true, inserted: data });
 	}
 
-	return NextResponse.json({ success: true});
+	return NextResponse.json({ success: true });
 }

@@ -15,7 +15,7 @@ export async function PUT(req: Request) {
 					clientSecret: !clientSecret ? "Client Secret is required" : null,
 				},
 			},
-			{ status: 400 }
+			{ status: 400 },
 		);
 	}
 
@@ -55,7 +55,7 @@ export async function PUT(req: Request) {
 					client_secret: clientSecret,
 				},
 			},
-		}
+		},
 	);
 
 	if (encryptionError) {
@@ -63,7 +63,7 @@ export async function PUT(req: Request) {
 		return NextResponse.json({ error: "Failed to encrypt credentials" }, { status: 500 });
 	}
 
-	if (existingIntegration) {;
+	if (existingIntegration) {
 		const { data, error } = await supabase
 			.from("integrations")
 			.update({
@@ -82,7 +82,10 @@ export async function PUT(req: Request) {
 		// ✅ Detect RLS failure (if no rows updated)
 		if (!data || data.length === 0) {
 			console.warn("🚨 RLS blocked update (no matching row or insufficient permissions)");
-			return NextResponse.json({ error: "Forbidden: You do not have permission to update this integration." }, { status: 403 });
+			return NextResponse.json(
+				{ error: "Forbidden: You do not have permission to update this integration." },
+				{ status: 403 },
+			);
 		}
 
 		NextResponse.json({ success: true, updated: data });
@@ -111,7 +114,10 @@ export async function PUT(req: Request) {
 		// ✅ Detect RLS failure (if no rows inserted)
 		if (!data || data.length === 0) {
 			console.warn("🚨 RLS blocked insert (no permission)");
-			return NextResponse.json({ error: "Forbidden: You do not have permission to add an integration." }, { status: 403 });
+			return NextResponse.json(
+				{ error: "Forbidden: You do not have permission to add an integration." },
+				{ status: 403 },
+			);
 		}
 		NextResponse.json({ success: true, inserted: data });
 	}

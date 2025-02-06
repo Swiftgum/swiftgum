@@ -1,7 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
-
 export async function PUT(req: Request) {
 	const supabase = await createClient();
 	const { workspaceId, label } = await req.json();
@@ -26,7 +25,10 @@ export async function PUT(req: Request) {
 		return NextResponse.json({ error: "Failed to update workspace" }, { status: 500 });
 	}
 	if (!data || data.length === 0) {
-		return NextResponse.json({ error: "Update failed: no matching row found or insufficient permissions" }, { status: 403 });
+		return NextResponse.json(
+			{ error: "Update failed: no matching row found or insufficient permissions" },
+			{ status: 403 },
+		);
 	}
 
 	return NextResponse.json({ success: true });
