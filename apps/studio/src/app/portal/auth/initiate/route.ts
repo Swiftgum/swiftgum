@@ -6,6 +6,7 @@ import * as client from "openid-client";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+	console.log("INITIATE");
 	const { searchParams } = request.nextUrl;
 	const integrationId = searchParams.get("integration_id");
 
@@ -13,6 +14,7 @@ export async function GET(request: NextRequest) {
 
 	const integrationCredentials = await getIntegrationCredentials(integrationId || "");
 
+	console.log("integrationCredentials", integrationCredentials);
 	switch (integrationCredentials.type) {
 		case "oauth2": {
 			const config = await client.discovery(

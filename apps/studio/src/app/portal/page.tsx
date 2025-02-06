@@ -1,28 +1,93 @@
+import React, { type ReactNode } from "react";
 import NotionIcon from "@/components/Icons/notionIcon";
 import { createClient } from "@/utils/supabase/server";
 import { faGoogle, faMicrosoft } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import type { ReactNode } from "react";
-
+import { getPagePortalSession } from "@/utils/portal/session";
 import { getURL } from "@/utils/helpers";
 import { redirect } from "next/navigation";
 import OAuthProvider from "./oauthprovider";
-// import OAuthProvider from "./oauthprovider";
 
-export default async function PortalPage() {
+type SearchParams = { [key: string]: string | string[] | undefined };
+
+interface Session {
+	workspace_id: string;
+	end_user_id: string;
+	portal_session_id: string;
+}
+
+interface EndUser {
+	end_user_id: string;
+	foreign_id: string;
+}
+
+interface Provider {
+	provider_id: string;
+	name: string;
+	identifier: string;
+}
+
+interface Integration {
+	integration_id: string;
+	provider_id: string;
+}
+
+export default async function PortalPage({
+	searchParams,
+}: {
+	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
 	const supabase = await createClient();
+	const sessionData = await getPagePortalSession({ searchParams });
 
-	// MOCK DATA
-	// NEED TO REPLACE: we have access to the workspace_id with the signed URL
-	const workspaceId = "00000000-0000-0000-0000-000000000000";
+	if (!sessionData?.session) {
+		console.error("No session found");
+		redirect("/error");
+	}
+
+	const session = sessionData.session as Session;
+
+	// Fetch end user
+	const { data: endUser, error: endUserError } = await supabase
+		.from("end_users")
+		.select("*")
+		.eq("end_user_id", session.end_user_id)
+		.single();
+
+	if (endUserError) {
+		console.error("Failed to fetch end user:", endUserError);
+		redirect("/error");
+	}
+
+	// Token user
+	const { data: tokensEndUser, error: tokenEndUserError } = await supabase
+		.from("tokens")
+		.select("*")
+		.eq("end_user_id", session.end_user_id);
+
+	console.log(tokensEndUser, session.end_user_id);
+	if (tokenEndUserError) {
+		console.error("Failed to fetch tokens for end user:", tokenEndUserError);
+		redirect("/error");
+	}
 
 	// Fetch providers
 	const { data: providers, error: providersError } = await supabase.from("providers").select("*");
-	console.log(providers);
-
 	if (providersError) {
-		console.log(providersError);
-		throw new Error("Failed to fetch data");
+		console.error("Failed to fetch providers:", providersError);
+		redirect("/error");
+	}
+
+	// Fetch integrations
+	const { data: integrations, error: integrationsError } = await supabase
+		.from("integrations")
+		.select("integration_id, provider_id")
+		.eq("workspace_id", session.workspace_id)
+		.eq("enabled", true);
+
+	if (integrationsError) {
+		console.error("Failed to fetch integrations:", integrationsError);
+		redirect("/error");
 	}
 
 	const providerIcons: Record<string, ReactNode> = {
@@ -32,26 +97,35 @@ export default async function PortalPage() {
 	};
 
 	const baseURL = getURL();
+
 	return (
 		<div className="p-20">
 			<div className="mb-10">
 				<h1 className="text-2xl font-bold text-zinc-700">Manage Your Connected Accounts</h1>
 				<p className="text-gray-600">
-					Securely connect your accounts to different services, control access to your data
+					Securely connect your accounts to different services, control access to your data.
 				</p>
+				{endUser && <p className="text-xs italic text-zinc-700">{endUser.foreign_id}</p>}
 			</div>
+
 			<div className="flex flex-col gap-2">
-				{providers.map((provider) => {
-					return (
+				{integrations?.map((integration) => {
+					const provider = providers?.find((p) => p.provider_id === integration.provider_id);
+					const token = tokensEndUser?.find(
+						(tokenEndUser) => tokenEndUser.integration_id === integration.integration_id,
+					);
+					return provider ? (
 						<OAuthProvider
-							key={provider.name}
+							key={provider.provider_id}
 							name={provider.name}
 							providerId={provider.provider_id}
-							workspaceId={workspaceId}
+							workspaceId={session.workspace_id}
 							icon={providerIcons[provider.identifier] || null}
-							callbackUrl={`${baseURL}/portal/auth/callback`}
+							token={token ? token.token_id : ""}
+							integrationId={integration.integration_id}
+							portalSessionId={session.portal_session_id}
 						/>
-					);
+					) : null;
 				})}
 			</div>
 		</div>

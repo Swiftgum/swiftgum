@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { getURL } from "@/utils/helpers";
 import { Check, ChevronDown, ChevronRight, Copy, Eye, EyeOff } from "lucide-react";
+import { redirect } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 
@@ -19,7 +21,7 @@ interface DecryptedCredentials {
 interface OAuthProviderProps {
 	name: string;
 	icon: React.ReactNode;
-	callbackUrl: string;
+	authUrl: string;
 	integration?: {
 		integration_id: string | null;
 		enabled: boolean | null;
@@ -29,55 +31,50 @@ interface OAuthProviderProps {
 		workspace_id: string | null;
 		provider_id: string | null;
 	} | null;
+	token: string;
 	workspaceId: string;
 	providerId: string;
+	integrationId: string;
+	portalSessionId: string;
 }
 
-export default function OAuthProvider({ name, icon }: OAuthProviderProps) {
+export default function OAuthProvider({
+	name,
+	icon,
+	integrationId,
+	portalSessionId,
+	token,
+}: OAuthProviderProps) {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
+	const redirectURL = `/portal/auth/initiate?integration_id=${integrationId}&sid=${portalSessionId}`;
 	const connected = true;
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		setIsSubmitting(true); // Disable the button while the request is being handled
-		//
-		// await signInWithOAuth(e);
-		setIsSubmitting(false);
-	};
 
 	return (
 		<div className="flex items-center gap-2">
 			<div className="w-1/2">
-				<form key={name} className="" onSubmit={(e) => handleSubmit(e)}>
-					<input type="hidden" name="provider" value={name} />
-					<Button
-						// variant="slim"
-						type="submit"
-						className="w-full"
-						onClick={() => {}}
-						// loading={isSubmitting}
-					>
-						<div className="flex justify-center">
-							<div className="mr-4">{icon}</div>
-							<div>{name}</div>
-						</div>
-					</Button>
-				</form>
+				<Button variant={token ? "secondary" : "default"} type="submit" className="w-full" asChild>
+					<a href={redirectURL} className="flex justify-center">
+						<div className="mr-4">{icon}</div>
+						<div> {name}</div>
+					</a>
+				</Button>
 			</div>
 			<div className="flex gap-3 !mt-0">
-				<Button
-					variant="outline"
-					size="sm"
-					className={connected ? "text-green-600 border-green-600 bg-green-100" : "text-zinc-500"}
-					disabled
-				>
-					{connected ? (
-						<>
+				{token ? (
+					<>
+						<Button
+							variant="outline"
+							size="sm"
+							className={
+								connected ? "text-green-600 border-green-600 bg-green-100" : "text-zinc-500"
+							}
+							disabled
+						>
 							<Check color="#16a34a" /> Connected
-						</>
-					) : (
-						"Disabled"
-					)}
-				</Button>
+						</Button>
+					</>
+				) : null}
 			</div>
 		</div>
 	);
