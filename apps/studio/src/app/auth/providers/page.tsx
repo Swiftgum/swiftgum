@@ -22,7 +22,7 @@ export default async function Providers() {
 		error: authError,
 	} = await supabase.auth.getUser();
 
-	if (!user || authError) redirect("/signin");
+	if (!user || authError) redirect("/");
 
 	// Fetch workspace info
 	const { data: workspace, error: workspaceError } = await supabase
@@ -35,11 +35,9 @@ export default async function Providers() {
 		throw new Error("No workspace found");
 	}
 
-	console.log(workspace);
 	// Fetch providers
 	const { data: providers, error: providersError } = await supabase.from("providers").select("*");
 
-	console.log(providers);
 	// Fetch integrations associated with the user's workspace
 	const { data: integrations, error: integrationsError } = await supabase
 		.from("integrations_with_decrypted_credentials")

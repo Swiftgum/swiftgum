@@ -1,7 +1,6 @@
 "use client";
 
 import SubNavbarWrapper from "@/components/ui/subnavbar";
-import { Home, Settings, ShieldCheck, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 

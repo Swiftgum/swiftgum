@@ -1,5 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import DestionationPanel from "./destinationpanel";
+import { redirect } from "next/navigation";
 
 type Destination = {
 	created_at: string | null;
@@ -21,8 +22,7 @@ export default async function Providers() {
 		error: userError,
 	} = await supabase.auth.getUser();
 	if (userError || !user) {
-		console.error("Error fetching user:", userError);
-		return <p>Error fetching user</p>;
+		if (!user) redirect("/");
 	}
 
 	// Fetch workspace info

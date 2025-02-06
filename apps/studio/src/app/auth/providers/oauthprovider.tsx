@@ -42,10 +42,12 @@ export default function OAuthProvider({
 	providerId,
 }: OAuthProviderProps) {
 	const decrypted_credentials = integration?.decrypted_credentials as DecryptedCredentials;
-	const type = decrypted_credentials.type;
+	const type = decrypted_credentials?.type;
+	const credentials = type ? decrypted_credentials?.[type] : null;
+	
 	const [enabled, setEnabled] = useState(integration?.enabled || false);
-	const [clientId, setClientId] = useState(decrypted_credentials[type].client_id || "");
-	const [clientSecret, setClientSecret] = useState(decrypted_credentials[type].client_secret || "");
+	const [clientId, setClientId] = useState(credentials?.client_id || "");
+	const [clientSecret, setClientSecret] = useState(credentials?.client_secret || "");
 	const [showSecret, setShowSecret] = useState(false);
 	const [expanded, setExpanded] = useState(false);
 	const [copyText, setCopyText] = useState("Copy");
