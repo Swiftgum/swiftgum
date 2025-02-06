@@ -1,5 +1,5 @@
 {
-	"name": "studio",
+	"name": "@knowledgex/studio",
 	"version": "0.1.0",
 	"scripts": {
 		"dev": "next dev",
@@ -11,6 +11,7 @@
 		"@fortawesome/fontawesome-svg-core": "^6.7.2",
 		"@fortawesome/free-brands-svg-icons": "^6.7.2",
 		"@fortawesome/react-fontawesome": "^0.2.2",
+		"@knowledgex/interfaces": "workspace:^",
 		"@radix-ui/react-slot": "^1.1.1",
 		"@radix-ui/react-switch": "^1.1.2",
 		"@supabase/ssr": "^0.5.2",
@@ -28,7 +29,7 @@
 		"zod": "^3.24.1"
 	},
 	"devDependencies": {
-		"@types/node": "^20",
+		"@types/node": "^20.17.17",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
 		"postcss": "^8",

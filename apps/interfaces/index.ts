@@ -18,5 +18,3 @@ export const indexingTask = z.discriminatedUnion("provider", [
 export type IndexingTask = z.infer<typeof indexingTask>;
 
 export type SupportedIndexers = IndexingTask["provider"];
-
-export const processingTask = z.object({});

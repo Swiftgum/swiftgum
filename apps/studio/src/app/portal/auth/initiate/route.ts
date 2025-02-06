@@ -9,9 +9,15 @@ export async function GET(request: NextRequest) {
 	const { searchParams } = request.nextUrl;
 	const integrationId = searchParams.get("integration_id");
 
+	if (!integrationId) {
+		return NextResponse.json({
+			error: "Missing integration_id parameter",
+		});
+	}
+
 	const { session, url } = await getRoutePortalSession(request);
 
-	const integrationCredentials = await getIntegrationCredentials(integrationId || "");
+	const integrationCredentials = await getIntegrationCredentials(integrationId);
 
 	switch (integrationCredentials.type) {
 		case "oauth2": {

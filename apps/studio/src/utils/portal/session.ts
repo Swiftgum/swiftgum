@@ -88,7 +88,7 @@ export const createSession = async ({
 		expires: new Date(session.expires_at),
 		path: "/",
 		httpOnly: true,
-		sameSite: "strict",
+		sameSite: "lax",
 	});
 
 	return session as unknown as PortalSession;
