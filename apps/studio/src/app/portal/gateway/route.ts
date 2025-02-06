@@ -5,6 +5,9 @@ export const GET = async (request: Request) => {
 	const session = await createSession({
 		endUserForeignId: "123",
 		workspaceId: "00000000-0000-0000-0000-000000000000",
+		configuration: {
+			display_name: "John Doe",
+		},
 	});
 
 	const url = new URL("/portal", request.url);
