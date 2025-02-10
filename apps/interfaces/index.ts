@@ -1,8 +1,11 @@
 import { z } from "zod";
 
-export const googleDriveIndexingTask = z.object({
+export const genericIndexingTask = z.object({
+	tokenId: z.string(),
+});
+
+export const googleDriveIndexingTask = genericIndexingTask.extend({
 	provider: z.literal("google:drive"),
-	accessToken: z.string(),
 });
 
 /* export const notionIndexingTask = z.object({

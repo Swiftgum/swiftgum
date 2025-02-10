@@ -20,6 +20,12 @@ export type Oauth2IntegrationCredentials = z.infer<typeof Oauth2IntegrationCrede
 export const IntegrationCredentials = z.discriminatedUnion("type", [Oauth2IntegrationCredentials]);
 
 export type IntegrationCredentials = z.infer<typeof IntegrationCredentials>;
+export type DecryptedIntegrationCredentials = Omit<
+	Database["public"]["Views"]["integrations_with_decrypted_credentials"]["Row"],
+	"decrypted_credentials"
+> & {
+	decrypted_credentials: IntegrationCredentials;
+};
 
 export const GenericAuthSession = z.object({
 	redirect: z.string().optional(),

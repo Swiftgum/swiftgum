@@ -32,6 +32,9 @@ importers:
       mime-types:
         specifier: ^2.1.35
         version: 2.1.35
+      openid-client:
+        specifier: ^6.1.7
+        version: 6.1.7
       postgres:
         specifier: ^3.4.5
         version: 3.4.5

@@ -44,6 +44,10 @@ export async function GET(request: Request) {
 		);
 	}
 
+	if (!session.integration_id || !session.end_user_id) {
+		throw new Error("Session is missing integration_id or end_user_id");
+	}
+
 	switch (session.auth_session.type) {
 		case "oauth2":
 			{
@@ -58,9 +62,9 @@ export async function GET(request: Request) {
 					expectedState: session.auth_session_id || "",
 				});
 
-				await saveIntegrationToken({
-					integration_id: session.integration_id || "",
-					end_user_id: session.end_user_id || "",
+				const token = await saveIntegrationToken({
+					integration_id: session.integration_id,
+					end_user_id: session.end_user_id,
 					expires_at: tokens.expires_in
 						? new Date(Date.now() + tokens.expires_in * 1000).toISOString()
 						: undefined,
@@ -70,6 +74,9 @@ export async function GET(request: Request) {
 							access_token: tokens.access_token,
 							refresh_token: tokens.refresh_token || "",
 							expires_in: tokens.expires_in,
+							expires_at: tokens.expires_in
+								? new Date(Date.now() + tokens.expires_in * 1000).toISOString()
+								: undefined,
 							scope: session.auth_session.scope,
 						},
 					},
@@ -78,7 +85,7 @@ export async function GET(request: Request) {
 				// TODO: move this somewhere else.
 				await queueForIndexing({
 					provider: "google:drive",
-					accessToken: tokens.access_token,
+					tokenId: token.token_id,
 				});
 			}
 

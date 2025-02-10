@@ -7,6 +7,7 @@ import { z } from "zod";
 import { exportFile } from "../export";
 import { runMarkitdown } from "../parser";
 import { tempFileName } from "../tmp";
+import { getToken } from "../utils/token";
 import { type Provider, getInternalQueue } from "./abstract";
 
 const PROVIDER = "google:drive" as const;
@@ -50,10 +51,10 @@ const getDrive = ({
 const googleDrivePendingTask = z.object({
 	step: z.literal("pending"),
 	fileId: z.string(),
-	accessToken: z.string(),
 	mimeType: z.string(),
 	exportLinks: z.record(z.string(), z.string()).optional(),
 	fileSize: z.number().optional(),
+	tokenId: z.string(),
 });
 
 const googleDriveInternalTask = z.discriminatedUnion("step", [googleDrivePendingTask]);
@@ -65,7 +66,12 @@ const googleDriveInternalQueue = getInternalQueue(PROVIDER, googleDriveInternalT
 export const googleDriveProvider: Provider<typeof PROVIDER, GoogleDriveInternalTask> = {
 	provider: PROVIDER,
 	index: async (task) => {
-		const drive = getDrive(task);
+		const token = await getToken(task);
+
+		const drive = getDrive({
+			accessToken: token.decrypted_tokenset.oauth2.access_token,
+		});
+
 		const files: drive_v3.Schema$File[] = [];
 		let nextPageToken: string | undefined;
 		let i = 0;
@@ -106,17 +112,21 @@ export const googleDriveProvider: Provider<typeof PROVIDER, GoogleDriveInternalT
 			tasks.push({
 				step: "pending",
 				fileId: file.id,
-				accessToken: task.accessToken,
 				exportLinks: file.exportLinks ?? undefined,
 				mimeType: file.mimeType,
 				fileSize: file.size ? Number(file.size) : undefined,
+				tokenId: task.tokenId,
 			});
 		}
 
 		googleDriveInternalQueue.batchQueue(tasks);
 	},
 	internal: async (task) => {
-		const drive = getDrive(task);
+		const token = await getToken(task);
+
+		const drive = getDrive({
+			accessToken: token.decrypted_tokenset.oauth2.access_token,
+		});
 
 		switch (task.step) {
 			case "pending": {
@@ -147,8 +157,6 @@ export const googleDriveProvider: Provider<typeof PROVIDER, GoogleDriveInternalT
 					if (!targetMimeType && "application/pdf" in task.exportLinks) {
 						targetMimeType = "application/pdf";
 					}
-
-					console.log("here!");
 
 					if (targetMimeType) {
 						// Pipe fetch to readable stream
@@ -189,6 +197,7 @@ export const googleDriveProvider: Provider<typeof PROVIDER, GoogleDriveInternalT
 				exportFile(textContents, {
 					fileId: task.fileId,
 					provider: PROVIDER,
+					tokenId: task.tokenId,
 				});
 
 				await cleanup();

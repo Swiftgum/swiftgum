@@ -13,6 +13,7 @@ export const Oauth2Tokenset = z.object({
 		access_token: z.string(),
 		refresh_token: z.string(),
 		expires_in: z.number().optional(),
+		expires_at: z.string().optional(),
 		scope: z.string(),
 	}),
 });
@@ -22,6 +23,13 @@ export type Oauth2Tokenset = z.infer<typeof Oauth2Tokenset>;
 const TokenSet = z.discriminatedUnion("type", [Oauth2Tokenset]);
 
 export type TokenSet = z.infer<typeof TokenSet>;
+
+export type DecryptedTokenRow = Omit<
+	Database["public"]["Views"]["tokens_with_decrypted_tokenset"]["Row"],
+	"decrypted_tokenset"
+> & {
+	decrypted_tokenset: TokenSet;
+};
 
 /**
  * Save a set of tokens to the database
