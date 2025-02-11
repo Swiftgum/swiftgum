@@ -221,6 +221,7 @@ export const googleDriveProvider: Provider<typeof PROVIDER, GoogleDriveInternalT
 							remoteUrl: task.remoteUrl,
 							provider: PROVIDER,
 							tokenId: task.tokenId,
+							mimeType: task.mimeType,
 						});
 					} catch (err) {
 						console.error(err);

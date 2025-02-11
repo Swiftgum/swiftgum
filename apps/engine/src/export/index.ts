@@ -9,6 +9,7 @@ const exportMetadata = z.object({
 	remoteUrl: z.string(),
 	fileName: z.string(),
 	provider: z.string(),
+	mimeType: z.string(),
 });
 
 export type ExportMetadata = z.infer<typeof exportMetadata>;
