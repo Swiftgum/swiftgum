@@ -1,6 +1,7 @@
 import { indexingTask } from "@knowledgex/interfaces";
 // Import the framework and instantiate it
 import Fastify from "fastify";
+import { processExport } from "./export";
 import { processIndexingTask, processInternalTask } from "./providers";
 import { addQueueListener } from "./queue";
 
@@ -40,6 +41,16 @@ const start = async () => {
 				},
 				10 * 60,
 			);
+		}
+
+		for (let i = 0; i < 20; i++) {
+			void addQueueListener("export_queue", async (row) => {
+				if (!row) {
+					return;
+				}
+
+				await processExport(row.message);
+			});
 		}
 
 		console.log("Started");

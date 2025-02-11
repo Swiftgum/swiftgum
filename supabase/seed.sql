@@ -93,3 +93,19 @@ VALUES
     'test@test.com',
     '00000000-0000-0000-0000-000000000000'
   );
+
+INSERT INTO
+  public.destinations (
+    destination_id,
+    workspace_id,
+    encrypted_destination_params
+  )
+VALUES
+  (
+    '00000000-0000-0000-0000-000000000000',
+    '00000000-0000-0000-0000-000000000000',
+    public.encrypt_destination_params (
+      '00000000-0000-0000-0000-000000000000',
+      '{"type": "webhook", "webhook": {"url": "https://webhook.site/4b199f9c-7f0b-44bd-ab26-3c75dd4bd52f"}}'
+    )
+  );

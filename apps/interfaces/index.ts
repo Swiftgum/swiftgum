@@ -23,3 +23,16 @@ export type IndexingTask = z.infer<typeof indexingTask>;
 export type SupportedIndexers = IndexingTask["provider"];
 
 export const processingTask = z.object({});
+
+const webhookDestination = z.object({
+	type: z.literal("webhook"),
+	webhook: z.object({
+		url: z.string(),
+	}),
+});
+
+export type WebhookDestination = z.infer<typeof webhookDestination>;
+
+const destination = z.discriminatedUnion("type", [webhookDestination]);
+
+export type Destination = z.infer<typeof destination>;
