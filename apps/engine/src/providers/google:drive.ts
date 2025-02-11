@@ -29,10 +29,10 @@ const DRIVE_MIME_TYPES_MAPPING = {
 };
 const OTHER_SUPPORTED_MIME_TYPES = [
 	"application/pdf",
-	"image/jpeg",
-	"image/png",
-	"image/gif",
-	"image/bmp",
+	//"image/jpeg",
+	//"image/png",
+	//"image/gif",
+	//"image/bmp",
 ];
 const ALLOWED_MIME_TYPES = [...DRIVE_MIME_TYPES, ...OTHER_SUPPORTED_MIME_TYPES];
 const MAX_DRIVE_EXPORT_SIZE = 1e7; // 10MB
@@ -55,6 +55,8 @@ const googleDrivePendingTask = z.object({
 	exportLinks: z.record(z.string(), z.string()).optional(),
 	fileSize: z.number().optional(),
 	tokenId: z.string(),
+	fileName: z.string(),
+	remoteUrl: z.string(),
 });
 
 const googleDriveInternalTask = z.discriminatedUnion("step", [googleDrivePendingTask]);
@@ -80,7 +82,7 @@ export const googleDriveProvider: Provider<typeof PROVIDER, GoogleDriveInternalT
 			i++;
 
 			const { data } = await drive.files.list({
-				fields: "files(size,exportLinks,id,mimeType),nextPageToken",
+				fields: "files(size,exportLinks,id,mimeType,name,webViewLink),nextPageToken",
 				pageSize: 1000,
 				pageToken: nextPageToken,
 			});
@@ -116,6 +118,8 @@ export const googleDriveProvider: Provider<typeof PROVIDER, GoogleDriveInternalT
 				mimeType: file.mimeType,
 				fileSize: file.size ? Number(file.size) : undefined,
 				tokenId: task.tokenId,
+				fileName: file.name ?? "",
+				remoteUrl: file.webViewLink ?? "",
 			});
 		}
 
@@ -130,77 +134,105 @@ export const googleDriveProvider: Provider<typeof PROVIDER, GoogleDriveInternalT
 
 		switch (task.step) {
 			case "pending": {
-				let readableStream: Readable | undefined;
-				if (
-					DRIVE_MIME_TYPES.includes(task.mimeType) &&
-					task.fileSize &&
-					task.fileSize < MAX_DRIVE_EXPORT_SIZE
-				) {
-					const stream = await drive.files.export(
-						{
-							fileId: task.fileId,
-							alt: "media",
-							mimeType:
-								DRIVE_MIME_TYPES_MAPPING[task.mimeType as keyof typeof DRIVE_MIME_TYPES_MAPPING],
-						},
-						{
-							responseType: "stream",
-						},
-					);
+				console.log("starting task", new Date().toISOString());
+				try {
+					let readableStream: Readable | undefined;
+					if (
+						DRIVE_MIME_TYPES.includes(task.mimeType) &&
+						task.fileSize &&
+						task.fileSize < MAX_DRIVE_EXPORT_SIZE
+					) {
+						const stream = await drive.files.export(
+							{
+								fileId: task.fileId,
+								alt: "media",
+								mimeType:
+									DRIVE_MIME_TYPES_MAPPING[task.mimeType as keyof typeof DRIVE_MIME_TYPES_MAPPING],
+							},
+							{
+								responseType: "stream",
+							},
+						);
 
-					readableStream = stream.data;
-				} else if (task.exportLinks) {
-					let targetMimeType = Object.keys(task.exportLinks).find((mimeType) =>
-						ALLOWED_MIME_TYPES.includes(mimeType),
-					);
+						readableStream = stream.data;
+					} else if (task.exportLinks) {
+						let targetMimeType = Object.keys(task.exportLinks).find((mimeType) =>
+							ALLOWED_MIME_TYPES.includes(mimeType),
+						);
 
-					if (!targetMimeType && "application/pdf" in task.exportLinks) {
-						targetMimeType = "application/pdf";
+						if (!targetMimeType && "application/pdf" in task.exportLinks) {
+							targetMimeType = "application/pdf";
+						}
+
+						if (targetMimeType) {
+							// Pipe fetch to readable stream
+							const response = await fetch(task.exportLinks[targetMimeType], {
+								headers: {
+									Authorization: `Bearer ${token.decrypted_tokenset.oauth2.access_token}`,
+								},
+							});
+
+							readableStream = response.body as unknown as Readable;
+						}
+					} else {
+						const stream = await drive.files.get(
+							{
+								fileId: task.fileId,
+								alt: "media",
+							},
+							{
+								responseType: "stream",
+							},
+						);
+
+						readableStream = stream.data;
 					}
 
-					if (targetMimeType) {
-						// Pipe fetch to readable stream
-						const response = await fetch(task.exportLinks[targetMimeType]);
+					console.log("readable stream obtained");
 
-						readableStream = response.body as unknown as Readable;
+					if (!readableStream) {
+						throw new Error("No readable stream found");
 					}
-				} else {
-					const stream = await drive.files.get(
-						{
+
+					const extension = mime.extension(task.mimeType);
+
+					if (!extension) {
+						throw new Error("No extension found");
+					}
+
+					console.log("extension found");
+
+					const { tempFile, cleanup } = await tempFileName({ extension });
+
+					console.log("temp file created");
+
+					try {
+						await pipeline(readableStream, fs.createWriteStream(tempFile));
+
+						console.log("pipeline completed");
+
+						const { textContents } = await runMarkitdown(tempFile);
+
+						console.log("markdown completed");
+
+						exportFile(textContents, {
 							fileId: task.fileId,
-							alt: "media",
-						},
-						{
-							responseType: "stream",
-						},
-					);
+							fileName: task.fileName,
+							remoteUrl: task.remoteUrl,
+							provider: PROVIDER,
+							tokenId: task.tokenId,
+						});
+					} catch (err) {
+						console.error(err);
+						throw err;
+					} finally {
+						await cleanup();
+					}
 
-					readableStream = stream.data;
+					console.log("task completed", new Date().toISOString());
+				} catch (error) {
+					console.error(error);
 				}
-
-				if (!readableStream) {
-					throw new Error("No readable stream found");
-				}
-
-				const extension = mime.extension(task.mimeType);
-
-				if (!extension) {
-					throw new Error("No extension found");
-				}
-
-				const { tempFile, cleanup } = await tempFileName(extension);
-
-				await pipeline(readableStream, fs.createWriteStream(tempFile));
-
-				const { textContents } = await runMarkitdown(tempFile);
-
-				exportFile(textContents, {
-					fileId: task.fileId,
-					provider: PROVIDER,
-					tokenId: task.tokenId,
-				});
-
-				await cleanup();
 			}
 		}
 	},

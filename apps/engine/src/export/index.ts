@@ -1,16 +1,28 @@
+import { z } from "zod";
 import { sql } from "../db";
 
-export const exportFile = async (
-	content: string,
-	metadata: { fileId: string; [key: string]: unknown },
-) => {
+const exportMetadata = z.object({
+	tokenId: z.string(),
+	fileId: z.string(),
+	remoteUrl: z.string(),
+	fileName: z.string(),
+	provider: z.string(),
+});
+
+export type ExportMetadata = z.infer<typeof exportMetadata>;
+
+export const exportFile = async (content: string, metadata: ExportMetadata) => {
 	await sql`
-    SELECT * FROM pgmq.send(
-      queue_name => 'export_queue',
-      msg => ${JSON.stringify({
-				metadata,
-				content: content,
-			})}
-    )
-  `;
+    SELECT * FROM pgmq.send_batch(
+					queue_name => 'export_queue',
+					msgs => ARRAY[
+						${sql.array([
+							JSON.stringify({
+								content,
+								metadata,
+							}),
+						])}::jsonb[]
+					]
+				)
+		`;
 };

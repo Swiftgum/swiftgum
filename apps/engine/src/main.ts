@@ -9,7 +9,7 @@ const fastify = Fastify({
 });
 
 // Declare a route
-fastify.get("/health", async function handler(request, reply) {
+fastify.get("/health", async function handler() {
 	return { status: "healthy" };
 });
 
@@ -38,7 +38,7 @@ const start = async () => {
 
 					await processInternalTask(row.message);
 				},
-				30,
+				10 * 60,
 			);
 		}
 

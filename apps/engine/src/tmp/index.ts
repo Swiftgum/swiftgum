@@ -2,13 +2,32 @@ import { randomUUID } from "node:crypto";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 
-const TEMP_DIR = "/tmp";
+const TEMP_DIR = "/tmp/engine";
 
-export const tempFileName = async (
-	extension: string,
+const ensureTempDirectory = async () => {
+	await fs.mkdir(TEMP_DIR, { recursive: true });
+};
+
+const clearTempDirectory = async () => {
+	await ensureTempDirectory();
+
+	const files = await fs.readdir(TEMP_DIR);
+	for (const file of files) {
+		await fs.unlink(path.join(TEMP_DIR, file));
+	}
+};
+
+clearTempDirectory();
+
+export const tempFileName = async ({
+	extension,
 	prefix = "tmp-",
-	lifetime: number = 5 * 60 * 1000,
-) => {
+	lifetime = 5 * 60 * 1000,
+}: {
+	extension: string;
+	prefix?: string;
+	lifetime?: number;
+}) => {
 	const tempFile = path.join(TEMP_DIR, `${prefix}${randomUUID()}.${extension}`);
 
 	setTimeout(async () => {
