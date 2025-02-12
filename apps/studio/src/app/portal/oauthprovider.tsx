@@ -1,4 +1,9 @@
-import type { Database } from "@/utils/supabase/types";
+import type {
+	Integration,
+	PortalSession,
+	Provider,
+	Token,
+} from "@knowledgex/shared/types/overload";
 import clsx from "clsx";
 import { Check } from "lucide-react";
 
@@ -8,10 +13,10 @@ export default function OAuthProvider({
 	integration,
 	token,
 }: {
-	provider: Database["public"]["Tables"]["providers"]["Row"];
-	portalSession: Database["public"]["Tables"]["portal_sessions"]["Row"];
-	integration: Database["public"]["Tables"]["integrations"]["Row"];
-	token?: Database["public"]["Tables"]["tokens"]["Row"];
+	provider: Provider;
+	portalSession: PortalSession;
+	integration: Integration;
+	token?: Token;
 }) {
 	const redirectURL = `/portal/auth/initiate?integration_id=${integration.integration_id}&sid=${portalSession.portal_session_id}`;
 

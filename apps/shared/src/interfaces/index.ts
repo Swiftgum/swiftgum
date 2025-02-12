@@ -6,3 +6,4 @@ export * from "./integration";
 export * from "./session";
 export * from "./token";
 export * from "./portalSession";
+export * from "./provider";
