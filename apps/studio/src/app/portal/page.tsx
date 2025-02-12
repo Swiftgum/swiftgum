@@ -165,15 +165,11 @@ export default async function PortalPage({
 									</AccordionItem>
 								)}
 								{userActiveIntegrations.length > 0 && (
-									<AccordionItem value="active" className="border-b-0">
+									<AccordionItem value="active" className="border-b-0 group">
 										<AccordionTrigger>
 											<div className="flex items-center gap-2">
-												<span className="flex items-center gap-2 pl-2 pr-3 py-0.5 font-bold bg-green-500 text-white rounded-full">
-													<Check className="w-5 h-5" />
-													<span className="block">{userActiveIntegrations.length}</span>
-												</span>
-												Active Integration{userActiveIntegrations.length > 1 ? "s" : ""}
-												<div className="flex items-center gap-2">
+												Active Integrations{userActiveIntegrations.length > 1 ? "s" : ""}
+												<div className="flex items-center gap-2 group-data-[state=open]:opacity-0">
 													{userActiveIntegrations.map((integration) => {
 														const provider = providers?.find(
 															(p) => p.provider_id === integration.provider_id,
