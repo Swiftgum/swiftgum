@@ -30,7 +30,7 @@ COPY .npmrc ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch
 
 
-COPY ./apps/interfaces ./apps/interfaces
+COPY ./apps/shared ./apps/shared
 COPY ./apps/engine ./apps/engine
 
 WORKDIR /app/apps/engine

@@ -12,7 +12,7 @@
 	"description": "",
 	"dependencies": {
 		"@googleapis/drive": "^8.14.0",
-		"@knowledgex/interfaces": "workspace:^",
+		"@knowledgex/shared": "workspace:^",
 		"fastify": "^5.2.1",
 		"mime-types": "^2.1.35",
 		"openid-client": "^6.1.7",

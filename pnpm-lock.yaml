@@ -23,9 +23,9 @@ importers:
       '@googleapis/drive':
         specifier: ^8.14.0
         version: 8.14.0
-      '@knowledgex/interfaces':
+      '@knowledgex/shared':
         specifier: workspace:^
-        version: link:../interfaces
+        version: link:../shared
       fastify:
         specifier: ^5.2.1
         version: 5.2.1
@@ -49,7 +49,7 @@ importers:
         specifier: ^2.1.4
         version: 2.1.4
 
-  apps/interfaces:
+  apps/shared:
     dependencies:
       zod:
         specifier: ^3.24.1
@@ -66,9 +66,9 @@ importers:
       '@fortawesome/react-fontawesome':
         specifier: ^0.2.2
         version: 0.2.2(@fortawesome/fontawesome-svg-core@6.7.2)(react@19.0.0)
-      '@knowledgex/interfaces':
+      '@knowledgex/shared':
         specifier: workspace:^
-        version: link:../interfaces
+        version: link:../shared
       '@radix-ui/react-accordion':
         specifier: ^1.2.3
         version: 1.2.3(@types/react-dom@19.0.3(@types/react@19.0.8))(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)

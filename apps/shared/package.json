@@ -1,0 +1,14 @@
+{
+	"name": "@knowledgex/shared",
+	"private": "true",
+	"main": "./index.ts",
+	"exports": {
+		"./interfaces": "./src/interfaces/index.ts",
+		"./types/database": "./src/types/database.d.ts",
+		"./types/overload": "./src/types/overload.d.ts",
+		".": "./index.ts"
+	},
+	"dependencies": {
+		"zod": "^3.24.1"
+	}
+}

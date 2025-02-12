@@ -215,13 +215,16 @@ export const googleDriveProvider: Provider<typeof PROVIDER, GoogleDriveInternalT
 
 						console.log("markdown completed");
 
-						exportFile(textContents, {
-							fileId: task.fileId,
-							fileName: task.fileName,
-							remoteUrl: task.remoteUrl,
-							provider: PROVIDER,
-							tokenId: task.tokenId,
-							mimeType: task.mimeType,
+						exportFile({
+							content: textContents,
+							metadata: {
+								fileId: task.fileId,
+								fileName: task.fileName,
+								remoteUrl: task.remoteUrl,
+								provider: PROVIDER,
+								tokenId: task.tokenId,
+								mimeType: task.mimeType,
+							},
 						});
 					} catch (err) {
 						console.error(err);

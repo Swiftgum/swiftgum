@@ -1,4 +1,4 @@
-import { type IndexingTask, indexingTask } from "@knowledgex/interfaces";
+import { type IndexingTask, indexingTask } from "@knowledgex/shared";
 import { createClient } from "../supabase/server";
 
 export const queueForIndexing = async (task: IndexingTask) => {

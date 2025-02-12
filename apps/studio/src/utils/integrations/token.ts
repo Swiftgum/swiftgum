@@ -3,33 +3,8 @@
  */
 
 import { createClient } from "@/utils/supabase/server";
-import type { Database } from "@/utils/supabase/types";
-
-import { z } from "zod";
-
-export const Oauth2Tokenset = z.object({
-	type: z.literal("oauth2"),
-	oauth2: z.object({
-		access_token: z.string(),
-		refresh_token: z.string(),
-		expires_in: z.number().optional(),
-		expires_at: z.string().optional(),
-		scope: z.string(),
-	}),
-});
-
-export type Oauth2Tokenset = z.infer<typeof Oauth2Tokenset>;
-
-const TokenSet = z.discriminatedUnion("type", [Oauth2Tokenset]);
-
-export type TokenSet = z.infer<typeof TokenSet>;
-
-export type DecryptedTokenRow = Omit<
-	Database["public"]["Views"]["tokens_with_decrypted_tokenset"]["Row"],
-	"decrypted_tokenset"
-> & {
-	decrypted_tokenset: TokenSet;
-};
+import { type TokenSet, tokenSet } from "@knowledgex/shared/interfaces";
+import type { Database } from "@knowledgex/shared/types/database";
 
 /**
  * Save a set of tokens to the database
@@ -40,7 +15,7 @@ export const saveIntegrationToken = async ({
 }: Omit<Database["public"]["Tables"]["tokens"]["Insert"], "encrypted_tokenset" | "workspace_id"> & {
 	tokenset: TokenSet;
 }) => {
-	const parsedTokenSet = TokenSet.parse(tokenset);
+	const parsedTokenSet = tokenSet.parse(tokenset);
 
 	const supabase = await createClient();
 

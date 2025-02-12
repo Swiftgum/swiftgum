@@ -19,7 +19,7 @@ COPY .npmrc ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch
 
 COPY ./apps/studio ./apps/studio
-COPY ./apps/interfaces ./apps/interfaces
+COPY ./apps/shared ./apps/shared
 
 WORKDIR /app/apps/studio
 

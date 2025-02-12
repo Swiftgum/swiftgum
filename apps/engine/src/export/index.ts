@@ -1,30 +1,16 @@
-import type { Destination } from "@knowledgex/interfaces";
-import { z } from "zod";
-import type { Database } from "../../../studio/src/utils/supabase/types";
+import { type ExportTask, exportTask } from "@knowledgex/shared/interfaces";
+import type { DecryptedDestination } from "@knowledgex/shared/types/overload";
 import { sql } from "../db";
 
-const exportMetadata = z.object({
-	tokenId: z.string(),
-	fileId: z.string(),
-	remoteUrl: z.string(),
-	fileName: z.string(),
-	provider: z.string(),
-	mimeType: z.string(),
-});
+export const exportFile = async (task: ExportTask) => {
+	// Safeguard
+	exportTask.parse(task);
 
-export type ExportMetadata = z.infer<typeof exportMetadata>;
-
-export const exportFile = async (content: string, metadata: ExportMetadata) => {
 	await sql`
     SELECT * FROM pgmq.send_batch(
 					queue_name => 'export_queue',
 					msgs => ARRAY[
-						${sql.array([
-							JSON.stringify({
-								content,
-								metadata,
-							}),
-						])}::jsonb[]
+						${sql.array([JSON.stringify(task)])}::jsonb[]
 					]
 				)
 		`;
@@ -40,22 +26,14 @@ export const getDestinations = async ({
 		WHERE tokens.token_id = ${tokenId}
 	`;
 
-	return destinations as unknown as (Omit<
-		Database["public"]["Views"]["destinations_with_decrypted_params"]["Row"],
-		"decrypted_destination_params"
-	> & {
-		decrypted_destination_params: Destination;
-	})[];
+	return destinations as unknown as DecryptedDestination[];
 };
 
-export const processExport = async ({
-	content,
-	metadata,
-}: {
-	content: string;
-	metadata: ExportMetadata;
-}) => {
+export const processExport = async ({ content, metadata }: ExportTask) => {
 	const destinations = await getDestinations({ tokenId: metadata.tokenId });
+
+	// Safeguard
+	exportTask.parse({ content, metadata });
 
 	for (const destination of destinations) {
 		switch (destination.decrypted_destination_params.type) {

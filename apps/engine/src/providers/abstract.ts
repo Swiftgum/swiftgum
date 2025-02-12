@@ -1,4 +1,4 @@
-import type { IndexingTask, SupportedIndexers } from "@knowledgex/interfaces";
+import type { IndexingTask, SupportedIndexers } from "@knowledgex/shared/interfaces";
 import type { z } from "zod";
 import { sql } from "../db";
 

@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
-import type { Database } from "./types";
+import type { Database } from "@knowledgex/shared/types/database";
 
 export async function updateSession(request: NextRequest) {
 	if (

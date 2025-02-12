@@ -1,4 +1,4 @@
-import { indexingTask } from "@knowledgex/interfaces";
+import { indexingTask } from "@knowledgex/shared";
 // Import the framework and instantiate it
 import Fastify from "fastify";
 import { processExport } from "./export";

@@ -1,36 +1,15 @@
 import { hash, randomUUID } from "node:crypto";
 import { createClient } from "@/utils/supabase/server";
+import {
+	type PortalSessionConfiguration,
+	portalSessionConfiguration,
+} from "@knowledgex/shared/interfaces";
+import type { PortalSession } from "@knowledgex/shared/types/overload";
 import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
-import { z } from "zod";
-import type { Database } from "../supabase/types";
 
 const cookieName = (cookieHash: string) => `kx:ps:${cookieHash}`;
 export const SESSION_ID_PARAM = "sid";
-
-export const portalSessionConfiguration = z.object({
-	userDisplay: z.string(),
-	returnUrl: z.string(),
-	appName: z.string(),
-	backgroundColor: z
-		.string()
-		.optional()
-		.refine(
-			(color) => {
-				if (!color) return true;
-				return /^#([0-9a-fA-F]{6})$/.test(color);
-			},
-			{
-				message: "Invalid color",
-			},
-		),
-});
-
-export type PortalSessionConfiguration = z.infer<typeof portalSessionConfiguration>;
-
-export type PortalSession = Database["public"]["Tables"]["portal_sessions"]["Row"] & {
-	configuration: PortalSessionConfiguration;
-};
 
 export const createSession = async ({
 	endUserForeignId,

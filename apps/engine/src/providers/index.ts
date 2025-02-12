@@ -1,4 +1,4 @@
-import type { IndexingTask } from "@knowledgex/interfaces";
+import type { IndexingTask } from "@knowledgex/shared";
 import type { InternalTask } from "./abstract";
 import { googleDriveProvider } from "./google:drive";
 
