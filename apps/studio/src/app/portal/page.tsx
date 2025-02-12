@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { getPagePortalSession } from "@/utils/portal/session";
 import { createClient } from "@/utils/supabase/server";
 import type { Provider } from "@knowledgex/shared/types/overload";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { redirect } from "next/navigation";
 import React from "react";
 import OAuthProvider from "./oauthprovider";
@@ -167,7 +167,11 @@ export default async function PortalPage({
 								{userActiveIntegrations.length > 0 && (
 									<AccordionItem value="active" className="border-b-0 group">
 										<AccordionTrigger>
-											<div className="flex items-center gap-2">
+											<div className="flex items-center gap-3">
+												<span className="relative">
+													<span className="w-2 h-2 rounded-full bg-green-500 animate-ping absolute block" />
+													<span className="block w-2 h-2 rounded-full bg-green-500" />
+												</span>
 												Active Integrations{userActiveIntegrations.length > 1 ? "s" : ""}
 												<div className="flex items-center gap-2 group-data-[state=open]:opacity-0">
 													{userActiveIntegrations.map((integration) => {
