@@ -43,27 +43,6 @@ SELECT
     'test-api-key'
   );
 
--- Create a provider for Google and Notion
-INSERT INTO
-  public.providers (provider_id, identifier, name, description)
-VALUES
-  (
-    '00000000-0000-0000-0000-000000000000',
-    'google:drive',
-    'Google Drive',
-    'Google Drive is a file storage and sharing service'
-  );
-
--- Create a provider for Notion
-INSERT INTO
-  public.providers (identifier, name, description)
-VALUES
-  (
-    'notion:notion',
-    'Notion',
-    'Notion is a productivity platform'
-  );
-
 INSERT INTO
   public.integrations (
     integration_id,
@@ -75,7 +54,7 @@ INSERT INTO
 VALUES
   (
     '00000000-0000-0000-0000-000000000000', -- integration_id
-    '00000000-0000-0000-0000-000000000000', -- provider_id (google:drive)
+    'b8a8c442-e6f2-402f-80ac-d2c71a6602d2', -- provider_id (google:drive)
     '00000000-0000-0000-0000-000000000000', -- workspace_id
     TRUE,
     public.encrypt_integration_credentials (

@@ -9,8 +9,21 @@ const cookieName = (cookieHash: string) => `kx:ps:${cookieHash}`;
 export const SESSION_ID_PARAM = "sid";
 
 export const portalSessionConfiguration = z.object({
-	display_name: z.string().optional(),
-	return_url: z.string().optional(),
+	userDisplay: z.string(),
+	returnUrl: z.string(),
+	appName: z.string(),
+	backgroundColor: z
+		.string()
+		.optional()
+		.refine(
+			(color) => {
+				if (!color) return true;
+				return /^#([0-9a-fA-F]{6})$/.test(color);
+			},
+			{
+				message: "Invalid color",
+			},
+		),
 });
 
 export type PortalSessionConfiguration = z.infer<typeof portalSessionConfiguration>;
@@ -27,7 +40,7 @@ export const createSession = async ({
 }: {
 	endUserForeignId: string;
 	workspaceId: string;
-	configuration?: PortalSessionConfiguration;
+	configuration: PortalSessionConfiguration;
 }) => {
 	"use server";
 
@@ -67,13 +80,15 @@ export const createSession = async ({
 	const cookieNonce = randomUUID();
 	const cookieHash = hash("sha256", cookieNonce);
 
+	portalSessionConfiguration.parse(configuration);
+
 	const { data: session, error: sessionError } = await supabase
 		.from("portal_sessions")
 		.insert({
 			end_user_id: endUser.end_user_id,
 			workspace_id: workspace.workspace_id,
 			cookie_hash: cookieHash,
-			configuration: Object.assign({}, configuration),
+			configuration: configuration,
 		})
 		.select("*")
 		.single();
@@ -122,6 +137,8 @@ export const getSession = async ({
 	if (sessionError) {
 		throw new Error(sessionError.message);
 	}
+
+	portalSessionConfiguration.parse(session.configuration);
 
 	return session as unknown as PortalSession;
 };

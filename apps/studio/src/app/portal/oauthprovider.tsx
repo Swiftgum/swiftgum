@@ -1,80 +1,42 @@
-"use client";
-
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { getURL } from "@/utils/helpers";
-import { Check, ChevronDown, ChevronRight, Copy, Eye, EyeOff } from "lucide-react";
-import { redirect } from "next/navigation";
-import { useState } from "react";
-import { toast } from "react-hot-toast";
-
-interface DecryptedCredentials {
-	type: "oauth2";
-	oauth2: {
-		client_secret: string;
-		client_id: string;
-	};
-}
-
-interface OAuthProviderProps {
-	name: string;
-	icon: React.ReactNode;
-	integration?: {
-		integration_id: string | null;
-		enabled: boolean | null;
-		decrypted_credentials: DecryptedCredentials | null;
-		created_at: string | null;
-		updated_at: string | null;
-		workspace_id: string | null;
-		provider_id: string | null;
-	} | null;
-	token: string;
-	workspaceId: string;
-	providerId: string;
-	integrationId: string;
-	portalSessionId: string;
-}
+import type { Database } from "@/utils/supabase/types";
+import clsx from "clsx";
+import { Check } from "lucide-react";
 
 export default function OAuthProvider({
-	name,
-	icon,
-	integrationId,
-	portalSessionId,
+	provider,
+	portalSession,
+	integration,
 	token,
-}: OAuthProviderProps) {
-	const [isSubmitting, setIsSubmitting] = useState(false);
-
-	const redirectURL = `/portal/auth/initiate?integration_id=${integrationId}&sid=${portalSessionId}`;
-	const connected = true;
+}: {
+	provider: Database["public"]["Tables"]["providers"]["Row"];
+	portalSession: Database["public"]["Tables"]["portal_sessions"]["Row"];
+	integration: Database["public"]["Tables"]["integrations"]["Row"];
+	token?: Database["public"]["Tables"]["tokens"]["Row"];
+}) {
+	const redirectURL = `/portal/auth/initiate?integration_id=${integration.integration_id}&sid=${portalSession.portal_session_id}`;
 
 	return (
-		<div className="flex items-center gap-2">
-			<div className="w-1/2">
-				<Button variant={token ? "secondary" : "default"} type="submit" className="w-full" asChild>
-					<a href={redirectURL} className="flex justify-center">
-						<div className="mr-4">{icon}</div>
-						<div> {name}</div>
-					</a>
-				</Button>
+		<a
+			href={redirectURL}
+			className={clsx(
+				"relative flex justify-center flex-col gap-4 items-center p-4 pb-3 border rounded-lg aspect-square transition-all overflow-hidden bg-clip-border shadow-sm focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+				token ? "border-green-500" : "hover:bg-gray-100",
+			)}
+		>
+			{token && (
+				<span className="absolute top-0 right-0 rounded-bl-lg text-green-500 p-1.5">
+					<Check className="w-4 h-4 " />
+				</span>
+			)}
+			<div className="flex grow w-full justify-center items-center relative overflow-hidden px-2">
+				<img
+					className="max-h-full w-20"
+					// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+					src={(provider.metadata as any).logo as string}
+					alt={provider.name}
+				/>
 			</div>
-			<div className="flex gap-3 !mt-0">
-				{token ? (
-					<>
-						<Button
-							variant="outline"
-							size="sm"
-							className={
-								connected ? "text-green-600 border-green-600 bg-green-100" : "text-zinc-500"
-							}
-							disabled
-						>
-							<Check color="#16a34a" /> Connected
-						</Button>
-					</>
-				) : null}
-			</div>
-		</div>
+			<span className="font-medium text-sm text-center leading-snug">{provider.name}</span>
+		</a>
 	);
 }
