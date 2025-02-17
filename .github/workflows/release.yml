@@ -6,12 +6,14 @@ on:
       - main
     paths:
       - "supabase/migrations/**"
+      - "apps/studio/**"
 
 jobs:
   sync-database:
     name: Sync Database
     runs-on: ubuntu-latest
     environment: production
+    if: contains(github.event.head_commit.modified, 'supabase/migrations/')
 
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -35,8 +37,7 @@ jobs:
 
   build-studio:
     name: Build Studio App
-    if: always()
-    needs: sync-database
+    needs: [sync-database]
     runs-on: ubuntu-latest
 
     steps:
