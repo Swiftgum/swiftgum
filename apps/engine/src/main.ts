@@ -19,7 +19,7 @@ const start = async () => {
 	try {
 		await fastify.listen({ host: "0.0.0.0", port: 8000 });
 
-		void addQueueListener("indexing_queue", async (row) => {
+		/** void addQueueListener("indexing_queue", async (row) => {
 			if (!row) {
 				return;
 			}
@@ -51,7 +51,7 @@ const start = async () => {
 
 				await processExport(row.message);
 			});
-		}
+		} **/
 
 		console.log("Started");
 	} catch (err) {
