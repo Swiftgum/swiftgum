@@ -1,5 +1,5 @@
 import NotionIcon from "@/components/Icons/notionIcon";
-import { createClient } from "@/utils/supabase/server";
+import { createClient, createServerOnlyClient } from "@/utils/supabase/server";
 import { faGoogle, faMicrosoft } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { ReactNode } from "react";
@@ -16,6 +16,7 @@ interface DecryptedCredentials {
 }
 export default async function Providers() {
 	const supabase = await createClient();
+	const supabaseServer = await createServerOnlyClient();
 
 	const {
 		data: { user },
@@ -31,7 +32,7 @@ export default async function Providers() {
 		.eq("owner_user_id", user.id)
 		.single();
 
-	if (!workspace) {
+	if (!workspace || workspaceError) {
 		throw new Error("No workspace found");
 	}
 
@@ -39,7 +40,8 @@ export default async function Providers() {
 	const { data: providers, error: providersError } = await supabase.from("providers").select("*");
 
 	// Fetch integrations associated with the user's workspace
-	const { data: integrations, error: integrationsError } = await supabase
+	const { data: integrations, error: integrationsError } = await supabaseServer
+		.schema("private")
 		.from("integrations_with_decrypted_credentials")
 		.select("*")
 		.eq("workspace_id", workspace.workspace_id); // Assuming workspace_id links to the user's workspace

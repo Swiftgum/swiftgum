@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { getPagePortalSession } from "@/utils/portal/session";
-import { createClient } from "@/utils/supabase/server";
+import { createServerOnlyClient } from "@/utils/supabase/server";
 import type { Provider } from "@knowledgex/shared/types/overload";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -42,7 +42,7 @@ export default async function PortalPage({
 }: {
 	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-	const supabase = await createClient();
+	const supabase = await createServerOnlyClient();
 	const sessionData = await getPagePortalSession({ searchParams });
 
 	if (!sessionData?.session) {
@@ -66,6 +66,7 @@ export default async function PortalPage({
 
 	// Token user
 	const { data: tokensEndUser, error: tokenEndUserError } = await supabase
+		.schema("private")
 		.from("tokens")
 		.select("*")
 		.eq("end_user_id", session.end_user_id);
@@ -115,7 +116,7 @@ export default async function PortalPage({
 						</a>
 					</Button>
 				</div>
-				<div className="grow shrink-0 lg:overflow-y-scroll lg:shadow-xl shadow-black/10 col-span-2 xl:col-span-1 flex flex-col">
+				<div className="grow shrink-0 lg:overflow-y-scroll lg:shadow-xl shadow-black/10 col-span-2 xl:col-span-1 flex flex-col lg:outline outline-[1px] outline-black/5">
 					<div className="max-w-screen-sm flex flex-col justify-between px-6 md:px-12 py-6 md:py-12 gap-6 md:gap-12 min-h-full grow shrink-0">
 						<div>
 							<span className="text-gray-800 text-sm border border-gray-600 rounded-full px-3 py-1.5 font-medium animate-in slide-in-from-top inline-block">

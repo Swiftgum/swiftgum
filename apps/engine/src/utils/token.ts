@@ -1,6 +1,6 @@
+import type { TokenSet } from "@knowledgex/shared/interfaces";
+import type { DecryptedIntegration, DecryptedToken } from "@knowledgex/shared/types/overload";
 import * as client from "openid-client";
-import type { DecryptedIntegrationCredentials } from "../../../studio/src/utils/integrations/session";
-import type { DecryptedTokenRow, TokenSet } from "../../../studio/src/utils/integrations/token";
 import { sql } from "../db";
 
 /**
@@ -18,7 +18,7 @@ export const getTokenFromDB = async ({ tokenId }: { tokenId: string }) => {
 		throw new Error("Token not found");
 	}
 
-	return token[0] as DecryptedTokenRow;
+	return token[0] as DecryptedToken;
 };
 
 export const getIntegrationFromDB = async ({ integrationId }: { integrationId: string }) => {
@@ -31,13 +31,13 @@ export const getIntegrationFromDB = async ({ integrationId }: { integrationId: s
 		throw new Error("Integration not found");
 	}
 
-	return integration[0] as DecryptedIntegrationCredentials;
+	return integration[0] as DecryptedIntegration;
 };
 
 const refreshTokenInDB = async ({
 	token,
 }: {
-	token: DecryptedTokenRow;
+	token: DecryptedToken;
 }) => {
 	const clientConfig = await getIntegrationFromDB({ integrationId: token.integration_id });
 
@@ -87,7 +87,7 @@ const refreshTokenInDB = async ({
 			throw new Error("Failed to update token");
 		}
 
-		return updatedToken[0] as DecryptedTokenRow;
+		return updatedToken[0] as DecryptedToken;
 	}
 
 	return token;

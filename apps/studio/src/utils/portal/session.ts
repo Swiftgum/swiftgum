@@ -1,5 +1,5 @@
 import { hash, randomUUID } from "node:crypto";
-import { createClient } from "@/utils/supabase/server";
+import { createServerOnlyClient } from "@/utils/supabase/server";
 import {
 	type PortalSessionConfiguration,
 	portalSessionConfiguration,
@@ -25,7 +25,7 @@ export const createSession = async ({
 
 	const cookieStore = await cookies();
 
-	const supabase = await createClient();
+	const supabase = await createServerOnlyClient();
 
 	const { data: workspace, error: workspaceError } = await supabase
 		.from("workspace")
@@ -62,6 +62,7 @@ export const createSession = async ({
 	portalSessionConfiguration.parse(configuration);
 
 	const { data: session, error: sessionError } = await supabase
+		.schema("private")
 		.from("portal_sessions")
 		.insert({
 			end_user_id: endUser.end_user_id,
@@ -104,9 +105,10 @@ export const getSession = async ({
 		throw new Error("Session not found");
 	}
 
-	const supabase = await createClient();
+	const supabase = await createServerOnlyClient();
 
 	const { data: session, error: sessionError } = await supabase
+		.schema("private")
 		.from("valid_portal_sessions")
 		.select("*")
 		.eq("portal_session_id", sessionId)
@@ -127,6 +129,8 @@ export const getPagePortalSession = async ({
 }: {
 	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) => {
+	"use server";
+
 	const params = await searchParams;
 	const sessionId = params[SESSION_ID_PARAM];
 
@@ -160,6 +164,7 @@ export const getPagePortalSession = async ({
 };
 
 export const getRoutePortalSession = async (request: NextRequest) => {
+	"use server";
 	const { searchParams } = request.nextUrl;
 	return getPagePortalSession({
 		searchParams: Promise.resolve(Object.fromEntries(searchParams.entries())),

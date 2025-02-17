@@ -1,8 +1,33 @@
 "use server";
+/**
+ * EXTREMELY IMPORTANT, do not remove the "use server" directive.
+ * This file contains privileged server-only code.
+ *
+ * Removing this directive may leak sensitive information to the client.
+ */
 
 import type { Database } from "@knowledgex/shared/types/database";
+import type { Database as ServerDatabase } from "@knowledgex/shared/types/database-server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+
+export async function createServerOnlyClient() {
+	if (!process.env.SUPABASE_SERVICE_ROLE_KEY || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+		throw new Error("Missing Supabase service role key");
+	}
+
+	return createServerClient<ServerDatabase>(
+		process.env.NEXT_PUBLIC_SUPABASE_URL,
+		process.env.SUPABASE_SERVICE_ROLE_KEY,
+		{
+			cookies: {
+				getAll() {
+					return null;
+				},
+			},
+		},
+	);
+}
 
 export async function createClient() {
 	const cookieStore = await cookies();

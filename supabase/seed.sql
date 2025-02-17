@@ -38,7 +38,7 @@ VALUES
 
 -- Set the API key for the workspace
 SELECT
-  public.update_api_key (
+  private.update_api_key (
     '00000000-0000-0000-0000-000000000000',
     'test-api-key'
   );

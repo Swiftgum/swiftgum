@@ -3,6 +3,7 @@ import type {
 	IntegrationCredentials,
 	PortalSessionConfiguration,
 	ProviderMetadata,
+	TokenSet,
 } from "../interfaces";
 import type { Database } from "./database";
 
@@ -31,3 +32,7 @@ export type Provider = Database["public"]["Tables"]["providers"]["Row"] & {
 export type Integration = Database["public"]["Tables"]["integrations"]["Row"];
 
 export type Token = Database["public"]["Tables"]["tokens"]["Row"];
+
+export type DecryptedToken = Omit<Token, "decrypted_tokenset"> & {
+	decrypted_tokenset: TokenSet;
+};

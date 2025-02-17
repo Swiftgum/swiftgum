@@ -1,6 +1,6 @@
-import { createClient } from "@/utils/supabase/server";
-import DestionationPanel from "./destinationpanel";
+import { createClient, createServerOnlyClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import DestionationPanel from "./destinationpanel";
 
 type Destination = {
 	created_at: string | null;
@@ -15,6 +15,7 @@ type Destination = {
 
 export default async function Providers() {
 	const supabase = await createClient();
+	const supabaseServer = await createServerOnlyClient();
 
 	// Get authenticated user
 	const {
@@ -39,7 +40,8 @@ export default async function Providers() {
 
 	// Fetch workspace info
 	const { data: destinations_with_decrypted_params, error: destinationsWithDecryptedParamsError } =
-		await supabase
+		await supabaseServer
+			.schema("private")
 			.from("destinations_with_decrypted_params")
 			.select("*")
 			.eq("workspace_id", workspace.workspace_id);

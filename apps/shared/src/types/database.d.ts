@@ -26,7 +26,7 @@ export type Database = {
 			[_ in never]: never;
 		};
 	};
-	public: {
+	private: {
 		Tables: {
 			auth_sessions: {
 				Row: {
@@ -55,155 +55,11 @@ export type Database = {
 				};
 				Relationships: [
 					{
-						foreignKeyName: "fk_auth_sessions_end_user_id";
-						columns: ["end_user_id"];
-						isOneToOne: false;
-						referencedRelation: "end_users";
-						referencedColumns: ["end_user_id"];
-					},
-					{
-						foreignKeyName: "fk_auth_sessions_integration_id";
-						columns: ["integration_id"];
-						isOneToOne: false;
-						referencedRelation: "integrations";
-						referencedColumns: ["integration_id"];
-					},
-					{
 						foreignKeyName: "fk_auth_sessions_integration_id";
 						columns: ["integration_id"];
 						isOneToOne: false;
 						referencedRelation: "integrations_with_decrypted_credentials";
 						referencedColumns: ["integration_id"];
-					},
-				];
-			};
-			destinations: {
-				Row: {
-					created_at: string;
-					destination_id: string;
-					encrypted_destination_params: string;
-					updated_at: string;
-					workspace_id: string;
-				};
-				Insert: {
-					created_at?: string;
-					destination_id?: string;
-					encrypted_destination_params: string;
-					updated_at?: string;
-					workspace_id: string;
-				};
-				Update: {
-					created_at?: string;
-					destination_id?: string;
-					encrypted_destination_params?: string;
-					updated_at?: string;
-					workspace_id?: string;
-				};
-				Relationships: [
-					{
-						foreignKeyName: "fk_workspace";
-						columns: ["workspace_id"];
-						isOneToOne: false;
-						referencedRelation: "workspace";
-						referencedColumns: ["workspace_id"];
-					},
-					{
-						foreignKeyName: "fk_workspace";
-						columns: ["workspace_id"];
-						isOneToOne: false;
-						referencedRelation: "workspace_with_decrypted_api_key";
-						referencedColumns: ["workspace_id"];
-					},
-				];
-			};
-			end_users: {
-				Row: {
-					created_at: string | null;
-					end_user_id: string;
-					foreign_id: string;
-					updated_at: string | null;
-					workspace_id: string;
-				};
-				Insert: {
-					created_at?: string | null;
-					end_user_id?: string;
-					foreign_id: string;
-					updated_at?: string | null;
-					workspace_id: string;
-				};
-				Update: {
-					created_at?: string | null;
-					end_user_id?: string;
-					foreign_id?: string;
-					updated_at?: string | null;
-					workspace_id?: string;
-				};
-				Relationships: [
-					{
-						foreignKeyName: "fk_end_users_workspace_id";
-						columns: ["workspace_id"];
-						isOneToOne: false;
-						referencedRelation: "workspace";
-						referencedColumns: ["workspace_id"];
-					},
-					{
-						foreignKeyName: "fk_end_users_workspace_id";
-						columns: ["workspace_id"];
-						isOneToOne: false;
-						referencedRelation: "workspace_with_decrypted_api_key";
-						referencedColumns: ["workspace_id"];
-					},
-				];
-			};
-			integrations: {
-				Row: {
-					created_at: string;
-					enabled: boolean;
-					encrypted_credentials: string | null;
-					integration_id: string;
-					provider_id: string;
-					updated_at: string;
-					workspace_id: string;
-				};
-				Insert: {
-					created_at?: string;
-					enabled?: boolean;
-					encrypted_credentials?: string | null;
-					integration_id?: string;
-					provider_id: string;
-					updated_at?: string;
-					workspace_id: string;
-				};
-				Update: {
-					created_at?: string;
-					enabled?: boolean;
-					encrypted_credentials?: string | null;
-					integration_id?: string;
-					provider_id?: string;
-					updated_at?: string;
-					workspace_id?: string;
-				};
-				Relationships: [
-					{
-						foreignKeyName: "fk_integrations_provider";
-						columns: ["provider_id"];
-						isOneToOne: false;
-						referencedRelation: "providers";
-						referencedColumns: ["provider_id"];
-					},
-					{
-						foreignKeyName: "fk_integrations_workspace";
-						columns: ["workspace_id"];
-						isOneToOne: false;
-						referencedRelation: "workspace";
-						referencedColumns: ["workspace_id"];
-					},
-					{
-						foreignKeyName: "fk_integrations_workspace";
-						columns: ["workspace_id"];
-						isOneToOne: false;
-						referencedRelation: "workspace_with_decrypted_api_key";
-						referencedColumns: ["workspace_id"];
 					},
 				];
 			};
@@ -237,20 +93,6 @@ export type Database = {
 				};
 				Relationships: [
 					{
-						foreignKeyName: "portal_sessions_end_user_id_fkey";
-						columns: ["end_user_id"];
-						isOneToOne: false;
-						referencedRelation: "end_users";
-						referencedColumns: ["end_user_id"];
-					},
-					{
-						foreignKeyName: "portal_sessions_workspace_id_fkey";
-						columns: ["workspace_id"];
-						isOneToOne: false;
-						referencedRelation: "workspace";
-						referencedColumns: ["workspace_id"];
-					},
-					{
 						foreignKeyName: "portal_sessions_workspace_id_fkey";
 						columns: ["workspace_id"];
 						isOneToOne: false;
@@ -258,36 +100,6 @@ export type Database = {
 						referencedColumns: ["workspace_id"];
 					},
 				];
-			};
-			providers: {
-				Row: {
-					created_at: string;
-					description: string | null;
-					identifier: string;
-					metadata: Json;
-					name: string;
-					provider_id: string;
-					updated_at: string;
-				};
-				Insert: {
-					created_at?: string;
-					description?: string | null;
-					identifier: string;
-					metadata?: Json;
-					name: string;
-					provider_id?: string;
-					updated_at?: string;
-				};
-				Update: {
-					created_at?: string;
-					description?: string | null;
-					identifier?: string;
-					metadata?: Json;
-					name?: string;
-					provider_id?: string;
-					updated_at?: string;
-				};
-				Relationships: [];
 			};
 			tokens: {
 				Row: {
@@ -325,20 +137,6 @@ export type Database = {
 				};
 				Relationships: [
 					{
-						foreignKeyName: "fk_end_user";
-						columns: ["end_user_id"];
-						isOneToOne: false;
-						referencedRelation: "end_users";
-						referencedColumns: ["end_user_id"];
-					},
-					{
-						foreignKeyName: "fk_integration";
-						columns: ["integration_id"];
-						isOneToOne: false;
-						referencedRelation: "integrations";
-						referencedColumns: ["integration_id"];
-					},
-					{
 						foreignKeyName: "fk_integration";
 						columns: ["integration_id"];
 						isOneToOne: false;
@@ -349,53 +147,10 @@ export type Database = {
 						foreignKeyName: "fk_workspace";
 						columns: ["workspace_id"];
 						isOneToOne: false;
-						referencedRelation: "workspace";
-						referencedColumns: ["workspace_id"];
-					},
-					{
-						foreignKeyName: "fk_workspace";
-						columns: ["workspace_id"];
-						isOneToOne: false;
 						referencedRelation: "workspace_with_decrypted_api_key";
 						referencedColumns: ["workspace_id"];
 					},
 				];
-			};
-			workspace: {
-				Row: {
-					created_at: string;
-					dns_name: string;
-					encrypted_api_key: string;
-					encryption_key_id: string;
-					hashed_api_key: string;
-					label: string | null;
-					owner_user_id: string;
-					updated_at: string;
-					workspace_id: string;
-				};
-				Insert: {
-					created_at?: string;
-					dns_name?: string;
-					encrypted_api_key: string;
-					encryption_key_id: string;
-					hashed_api_key: string;
-					label?: string | null;
-					owner_user_id: string;
-					updated_at?: string;
-					workspace_id?: string;
-				};
-				Update: {
-					created_at?: string;
-					dns_name?: string;
-					encrypted_api_key?: string;
-					encryption_key_id?: string;
-					hashed_api_key?: string;
-					label?: string | null;
-					owner_user_id?: string;
-					updated_at?: string;
-					workspace_id?: string;
-				};
-				Relationships: [];
 			};
 		};
 		Views: {
@@ -425,13 +180,6 @@ export type Database = {
 					workspace_id?: string | null;
 				};
 				Relationships: [
-					{
-						foreignKeyName: "fk_workspace";
-						columns: ["workspace_id"];
-						isOneToOne: false;
-						referencedRelation: "workspace";
-						referencedColumns: ["workspace_id"];
-					},
 					{
 						foreignKeyName: "fk_workspace";
 						columns: ["workspace_id"];
@@ -473,20 +221,6 @@ export type Database = {
 					workspace_id?: string | null;
 				};
 				Relationships: [
-					{
-						foreignKeyName: "fk_integrations_provider";
-						columns: ["provider_id"];
-						isOneToOne: false;
-						referencedRelation: "providers";
-						referencedColumns: ["provider_id"];
-					},
-					{
-						foreignKeyName: "fk_integrations_workspace";
-						columns: ["workspace_id"];
-						isOneToOne: false;
-						referencedRelation: "workspace";
-						referencedColumns: ["workspace_id"];
-					},
 					{
 						foreignKeyName: "fk_integrations_workspace";
 						columns: ["workspace_id"];
@@ -535,32 +269,11 @@ export type Database = {
 				};
 				Relationships: [
 					{
-						foreignKeyName: "fk_end_user";
-						columns: ["end_user_id"];
-						isOneToOne: false;
-						referencedRelation: "end_users";
-						referencedColumns: ["end_user_id"];
-					},
-					{
-						foreignKeyName: "fk_integration";
-						columns: ["integration_id"];
-						isOneToOne: false;
-						referencedRelation: "integrations";
-						referencedColumns: ["integration_id"];
-					},
-					{
 						foreignKeyName: "fk_integration";
 						columns: ["integration_id"];
 						isOneToOne: false;
 						referencedRelation: "integrations_with_decrypted_credentials";
 						referencedColumns: ["integration_id"];
-					},
-					{
-						foreignKeyName: "fk_workspace";
-						columns: ["workspace_id"];
-						isOneToOne: false;
-						referencedRelation: "workspace";
-						referencedColumns: ["workspace_id"];
 					},
 					{
 						foreignKeyName: "fk_workspace";
@@ -597,20 +310,6 @@ export type Database = {
 					integration_id?: string | null;
 				};
 				Relationships: [
-					{
-						foreignKeyName: "fk_auth_sessions_end_user_id";
-						columns: ["end_user_id"];
-						isOneToOne: false;
-						referencedRelation: "end_users";
-						referencedColumns: ["end_user_id"];
-					},
-					{
-						foreignKeyName: "fk_auth_sessions_integration_id";
-						columns: ["integration_id"];
-						isOneToOne: false;
-						referencedRelation: "integrations";
-						referencedColumns: ["integration_id"];
-					},
 					{
 						foreignKeyName: "fk_auth_sessions_integration_id";
 						columns: ["integration_id"];
@@ -649,20 +348,6 @@ export type Database = {
 					workspace_id?: string | null;
 				};
 				Relationships: [
-					{
-						foreignKeyName: "portal_sessions_end_user_id_fkey";
-						columns: ["end_user_id"];
-						isOneToOne: false;
-						referencedRelation: "end_users";
-						referencedColumns: ["end_user_id"];
-					},
-					{
-						foreignKeyName: "portal_sessions_workspace_id_fkey";
-						columns: ["workspace_id"];
-						isOneToOne: false;
-						referencedRelation: "workspace";
-						referencedColumns: ["workspace_id"];
-					},
 					{
 						foreignKeyName: "portal_sessions_workspace_id_fkey";
 						columns: ["workspace_id"];
@@ -710,18 +395,6 @@ export type Database = {
 			};
 		};
 		Functions: {
-			cleanup_expired_portal_sessions: {
-				Args: Record<PropertyKey, never>;
-				Returns: undefined;
-			};
-			cleanup_expired_sessions: {
-				Args: Record<PropertyKey, never>;
-				Returns: undefined;
-			};
-			create_encryption_key: {
-				Args: Record<PropertyKey, never>;
-				Returns: string;
-			};
 			decrypt_destination_params: {
 				Args: {
 					p_workspace_id: string;
@@ -743,29 +416,11 @@ export type Database = {
 				};
 				Returns: Json;
 			};
-			encrypt_destination_params: {
-				Args: {
-					p_workspace_id: string;
-					p_params: Json;
-				};
-				Returns: string;
-			};
-			encrypt_integration_credentials: {
-				Args: {
-					p_workspace_id: string;
-					p_credentials: Json;
-				};
-				Returns: string;
-			};
 			encrypt_tokenset: {
 				Args: {
 					p_workspace_id: string;
 					p_tokenset: Json;
 				};
-				Returns: string;
-			};
-			generate_dns_name: {
-				Args: Record<PropertyKey, never>;
 				Returns: string;
 			};
 			queue_indexing_task: {
@@ -780,6 +435,226 @@ export type Database = {
 					api_key: string;
 				};
 				Returns: undefined;
+			};
+		};
+		Enums: {
+			[_ in never]: never;
+		};
+		CompositeTypes: {
+			[_ in never]: never;
+		};
+	};
+	public: {
+		Tables: {
+			destinations: {
+				Row: {
+					created_at: string;
+					destination_id: string;
+					encrypted_destination_params: string;
+					updated_at: string;
+					workspace_id: string;
+				};
+				Insert: {
+					created_at?: string;
+					destination_id?: string;
+					encrypted_destination_params: string;
+					updated_at?: string;
+					workspace_id: string;
+				};
+				Update: {
+					created_at?: string;
+					destination_id?: string;
+					encrypted_destination_params?: string;
+					updated_at?: string;
+					workspace_id?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "fk_workspace";
+						columns: ["workspace_id"];
+						isOneToOne: false;
+						referencedRelation: "workspace";
+						referencedColumns: ["workspace_id"];
+					},
+				];
+			};
+			end_users: {
+				Row: {
+					created_at: string | null;
+					end_user_id: string;
+					foreign_id: string;
+					updated_at: string | null;
+					workspace_id: string;
+				};
+				Insert: {
+					created_at?: string | null;
+					end_user_id?: string;
+					foreign_id: string;
+					updated_at?: string | null;
+					workspace_id: string;
+				};
+				Update: {
+					created_at?: string | null;
+					end_user_id?: string;
+					foreign_id?: string;
+					updated_at?: string | null;
+					workspace_id?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "fk_end_users_workspace_id";
+						columns: ["workspace_id"];
+						isOneToOne: false;
+						referencedRelation: "workspace";
+						referencedColumns: ["workspace_id"];
+					},
+				];
+			};
+			integrations: {
+				Row: {
+					created_at: string;
+					enabled: boolean;
+					encrypted_credentials: string | null;
+					integration_id: string;
+					provider_id: string;
+					updated_at: string;
+					workspace_id: string;
+				};
+				Insert: {
+					created_at?: string;
+					enabled?: boolean;
+					encrypted_credentials?: string | null;
+					integration_id?: string;
+					provider_id: string;
+					updated_at?: string;
+					workspace_id: string;
+				};
+				Update: {
+					created_at?: string;
+					enabled?: boolean;
+					encrypted_credentials?: string | null;
+					integration_id?: string;
+					provider_id?: string;
+					updated_at?: string;
+					workspace_id?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "fk_integrations_provider";
+						columns: ["provider_id"];
+						isOneToOne: false;
+						referencedRelation: "providers";
+						referencedColumns: ["provider_id"];
+					},
+					{
+						foreignKeyName: "fk_integrations_workspace";
+						columns: ["workspace_id"];
+						isOneToOne: false;
+						referencedRelation: "workspace";
+						referencedColumns: ["workspace_id"];
+					},
+				];
+			};
+			providers: {
+				Row: {
+					created_at: string;
+					description: string | null;
+					identifier: string;
+					metadata: Json;
+					name: string;
+					provider_id: string;
+					updated_at: string;
+				};
+				Insert: {
+					created_at?: string;
+					description?: string | null;
+					identifier: string;
+					metadata?: Json;
+					name: string;
+					provider_id?: string;
+					updated_at?: string;
+				};
+				Update: {
+					created_at?: string;
+					description?: string | null;
+					identifier?: string;
+					metadata?: Json;
+					name?: string;
+					provider_id?: string;
+					updated_at?: string;
+				};
+				Relationships: [];
+			};
+			workspace: {
+				Row: {
+					created_at: string;
+					dns_name: string;
+					encrypted_api_key: string;
+					encryption_key_id: string;
+					hashed_api_key: string;
+					label: string | null;
+					owner_user_id: string;
+					updated_at: string;
+					workspace_id: string;
+				};
+				Insert: {
+					created_at?: string;
+					dns_name?: string;
+					encrypted_api_key: string;
+					encryption_key_id: string;
+					hashed_api_key: string;
+					label?: string | null;
+					owner_user_id: string;
+					updated_at?: string;
+					workspace_id?: string;
+				};
+				Update: {
+					created_at?: string;
+					dns_name?: string;
+					encrypted_api_key?: string;
+					encryption_key_id?: string;
+					hashed_api_key?: string;
+					label?: string | null;
+					owner_user_id?: string;
+					updated_at?: string;
+					workspace_id?: string;
+				};
+				Relationships: [];
+			};
+		};
+		Views: {
+			[_ in never]: never;
+		};
+		Functions: {
+			cleanup_expired_portal_sessions: {
+				Args: Record<PropertyKey, never>;
+				Returns: undefined;
+			};
+			cleanup_expired_sessions: {
+				Args: Record<PropertyKey, never>;
+				Returns: undefined;
+			};
+			create_encryption_key: {
+				Args: Record<PropertyKey, never>;
+				Returns: string;
+			};
+			encrypt_destination_params: {
+				Args: {
+					p_workspace_id: string;
+					p_params: Json;
+				};
+				Returns: string;
+			};
+			encrypt_integration_credentials: {
+				Args: {
+					p_workspace_id: string;
+					p_credentials: Json;
+				};
+				Returns: string;
+			};
+			generate_dns_name: {
+				Args: Record<PropertyKey, never>;
+				Returns: string;
 			};
 		};
 		Enums: {
