@@ -30,3 +30,23 @@ jobs:
 
       - name: Push database changes
         run: supabase db push
+
+  build-studio:
+    name: Build Studio App
+    needs: sync-database
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build Studio
+        working-directory: apps/studio
+        run: pnpm build
