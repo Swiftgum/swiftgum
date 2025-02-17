@@ -9,6 +9,10 @@ export const getURL = (path = "") => {
 				: // If neither is set, default to localhost for local development.
 					"http://localhost:3000/";
 
+	if (typeof window !== "undefined") {
+		url = window.location.origin;
+	}
+
 	// Trim the URL and remove trailing slash if exists.
 	url = url.replace(/\/+$/, "");
 	// Make sure to include `https://` when not localhost.
