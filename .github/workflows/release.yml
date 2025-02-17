@@ -10,7 +10,6 @@ jobs:
     name: Sync Database
     runs-on: ubuntu-latest
     environment: production
-    if: contains(github.event.head_commit.modified, 'supabase/migrations/')
 
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
