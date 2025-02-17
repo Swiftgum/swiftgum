@@ -1,17 +1,7 @@
 import { createClient, createServerOnlyClient } from "@/utils/supabase/server";
+import type { DecryptedDestination } from "@knowledgex/shared/types/overload";
 import { redirect } from "next/navigation";
 import DestionationPanel from "./destinationpanel";
-
-type Destination = {
-	created_at: string | null;
-	decrypted_destination_params: {
-		type: (string | null) & (JSON | null);
-	} | null;
-	destination_id: string | null;
-	encrypted_destination_params: string | null;
-	updated_at: string | null;
-	workspace_id: string | null;
-};
 
 export default async function Providers() {
 	const supabase = await createClient();
@@ -32,6 +22,7 @@ export default async function Providers() {
 		.select("workspace_id, label")
 		.eq("owner_user_id", user.id)
 		.single();
+
 	if (workspaceError) {
 		console.error("Error fetching workspace:", workspaceError);
 	}
@@ -58,7 +49,9 @@ export default async function Providers() {
 			{/* Pass workspace info to GeneralPanel */}
 			<DestionationPanel
 				workspaceId={workspace?.workspace_id ?? ""}
-				destinations={(destinations_with_decrypted_params as Destination[]) ?? []}
+				destinations={
+					(destinations_with_decrypted_params as unknown as DecryptedDestination[]) ?? []
+				}
 			/>
 		</div>
 	);

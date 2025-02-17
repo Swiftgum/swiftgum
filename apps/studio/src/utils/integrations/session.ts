@@ -1,14 +1,17 @@
+"use server";
+
 /**
  * Utils to handle integration sign in sessions
  */
 import { AuthSession, integrationCredentials } from "@knowledgex/shared/interfaces";
-import type { Database } from "@knowledgex/shared/types/database";
-import { createClient } from "../supabase/server";
+import type { Database } from "@knowledgex/shared/types/database-server";
+import { createServerOnlyClient } from "../supabase/server";
 
 export const getIntegrationCredentials = async (integrationId: string) => {
-	const supabase = await createClient();
+	const supabase = await createServerOnlyClient();
 
 	const { data, error } = await supabase
+		.schema("private")
 		.from("integrations_with_decrypted_credentials")
 		.select("*")
 		.eq("integration_id", integrationId)
@@ -21,16 +24,17 @@ export const getIntegrationCredentials = async (integrationId: string) => {
 };
 
 export const createAuthSession = async (
-	authSession: Database["public"]["Tables"]["auth_sessions"]["Insert"] & {
+	authSession: Database["private"]["Tables"]["auth_sessions"]["Insert"] & {
 		auth_session: AuthSession;
 	},
 ) => {
 	// Verify with zod
 	const parsedAuthSession = AuthSession.parse(authSession.auth_session);
 
-	const supabase = await createClient();
+	const supabase = await createServerOnlyClient();
 
 	const { data, error } = await supabase
+		.schema("private")
 		.from("auth_sessions")
 		.insert({
 			...authSession,
@@ -45,9 +49,10 @@ export const createAuthSession = async (
 };
 
 export const claimAuthSession = async (authSessionId: string) => {
-	const supabase = await createClient();
+	const supabase = await createServerOnlyClient();
 
 	const { data, error } = await supabase
+		.schema("private")
 		.from("valid_auth_sessions")
 		.update({ claimed_at: "now()" })
 		.eq("auth_session_id", authSessionId)
@@ -64,9 +69,10 @@ export const claimAuthSession = async (authSessionId: string) => {
 };
 
 export const __dangerous__ghostClaimSession = async (authSessionId: string) => {
-	const supabase = await createClient();
+	const supabase = await createServerOnlyClient();
 
 	const { data, error } = await supabase
+		.schema("private")
 		.from("auth_sessions")
 		.select("*")
 		.eq("auth_session_id", authSessionId)

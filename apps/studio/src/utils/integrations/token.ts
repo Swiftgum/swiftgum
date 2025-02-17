@@ -4,7 +4,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { type TokenSet, tokenSet } from "@knowledgex/shared/interfaces";
-import type { Database } from "@knowledgex/shared/types/database";
+import type { Database } from "@knowledgex/shared/types/database-server";
 
 /**
  * Save a set of tokens to the database
@@ -12,7 +12,10 @@ import type { Database } from "@knowledgex/shared/types/database";
 export const saveIntegrationToken = async ({
 	tokenset,
 	...token
-}: Omit<Database["public"]["Tables"]["tokens"]["Insert"], "encrypted_tokenset" | "workspace_id"> & {
+}: Omit<
+	Database["private"]["Tables"]["tokens"]["Insert"],
+	"encrypted_tokenset" | "workspace_id"
+> & {
 	tokenset: TokenSet;
 }) => {
 	const parsedTokenSet = tokenSet.parse(tokenset);
@@ -28,7 +31,7 @@ export const saveIntegrationToken = async ({
 	if (integrationError) throw integrationError;
 	if (!integration) throw new Error("Integration not found");
 
-	const encryptedTokenSet = await supabase.rpc("encrypt_tokenset", {
+	const encryptedTokenSet = await supabase.schema("private").rpc("encrypt_tokenset", {
 		p_workspace_id: integration.workspace_id,
 		p_tokenset: parsedTokenSet,
 	});
@@ -36,6 +39,7 @@ export const saveIntegrationToken = async ({
 	if (encryptedTokenSet.error) throw encryptedTokenSet.error;
 
 	const { data, error } = await supabase
+		.schema("private")
 		.from("tokens")
 		.insert({
 			...token,

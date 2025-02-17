@@ -1,12 +1,12 @@
 import { type IndexingTask, indexingTask } from "@knowledgex/shared";
-import { createClient } from "../supabase/server";
+import { createServerOnlyClient } from "../supabase/server";
 
 export const queueForIndexing = async (task: IndexingTask) => {
 	indexingTask.parse(task);
 
-	const client = await createClient();
+	const client = await createServerOnlyClient();
 
-	const { data, error } = await client.rpc("queue_indexing_task", {
+	const { data, error } = await client.schema("private").rpc("queue_indexing_task", {
 		task,
 	});
 

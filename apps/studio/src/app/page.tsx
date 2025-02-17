@@ -1,5 +1,4 @@
 import OauthSignIn from "@/components/AuthForms/OauthSignIn";
-import TestWorkflowLog from "@/components/TestWorkflowLog/TestWorkflowLog";
 import { createClient } from "@/utils/supabase/server";
 import Image from "next/image";
 
@@ -14,7 +13,6 @@ export default async function Home() {
 			<main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
 				{user ? (
 					<div>
-						<TestWorkflowLog />
 						<p className="text-center text-2xl font-bold">
 							User: <span className="font-mono">{user.email}</span>
 						</p>

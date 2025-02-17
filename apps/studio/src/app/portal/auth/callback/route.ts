@@ -1,10 +1,7 @@
 import { queueForIndexing } from "@/utils/integrations/queue";
-import {
-	type IntegrationCredentials,
-	claimAuthSession,
-	getIntegrationCredentials,
-} from "@/utils/integrations/session";
+import { claimAuthSession, getIntegrationCredentials } from "@/utils/integrations/session";
 import { saveIntegrationToken } from "@/utils/integrations/token";
+import type { IntegrationCredentials } from "@knowledgex/shared/interfaces";
 import { NextResponse } from "next/server";
 import * as client from "openid-client";
 

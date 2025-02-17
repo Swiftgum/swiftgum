@@ -1,17 +1,7 @@
 "use client";
+import type { DecryptedDestination } from "@knowledgex/shared/types/overload";
 
 import WebhookModule from "./webhookmodule";
-
-type Destination = {
-	created_at: string | null;
-	decrypted_destination_params: {
-		type: (string | null) & (JSON | null);
-	} | null;
-	destination_id: string | null;
-	encrypted_destination_params: string | null;
-	updated_at: string | null;
-	workspace_id: string | null;
-};
 
 type WebhookParams = {
 	type: string;
@@ -21,7 +11,7 @@ type WebhookParams = {
 };
 
 interface OAuthSettingsPanelProps {
-	destinations: Destination[];
+	destinations: DecryptedDestination[];
 	workspaceId: string;
 }
 
