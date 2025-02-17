@@ -1,5 +1,4 @@
 import { indexingTask } from "@knowledgex/shared";
-// Import the framework and instantiate it
 import Fastify from "fastify";
 import { processExport } from "./export";
 import { processIndexingTask, processInternalTask } from "./providers";
@@ -19,7 +18,7 @@ const start = async () => {
 	try {
 		await fastify.listen({ host: "0.0.0.0", port: 8000 });
 
-		/** void addQueueListener("indexing_queue", async (row) => {
+		void addQueueListener("indexing_queue", async (row) => {
 			if (!row) {
 				return;
 			}
@@ -51,7 +50,7 @@ const start = async () => {
 
 				await processExport(row.message);
 			});
-		} **/
+		}
 
 		console.log("Started");
 	} catch (err) {
