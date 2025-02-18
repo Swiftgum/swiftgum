@@ -1,14 +1,14 @@
 export const getURL = (path = "") => {
-	const BASE_URL =
+	let baseURL =
 		process.env.NEXT_PUBLIC_SITE_URL ||
 		process.env.NEXT_PUBLIC_VERCEL_URL ||
 		"http://localhost:3000";
 
-	if (typeof window !== "undefined") {
-		return window.location.origin;
+	if (!baseURL.includes("://")) {
+		baseURL = `https://${baseURL}`;
 	}
 
-	return new URL(path, BASE_URL).toString();
+	return new URL(path, baseURL).toString();
 };
 
 const toastKeyMap: { [key: string]: string[] } = {
