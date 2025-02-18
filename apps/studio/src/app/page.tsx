@@ -20,6 +20,16 @@ export default async function Home() {
 					</div>
 				) : (
 					<div>
+						<pre>
+							{JSON.stringify(
+								{
+									...process.env,
+									url: getURL("/admin"),
+								},
+								null,
+								2,
+							)}
+						</pre>
 						<OauthSignIn />
 						<p className="text-center text-2xl font-bold">
 							Welcome to <span className="font-mono">Supabase + Next.js</span>
