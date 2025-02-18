@@ -1,7 +1,6 @@
 "use client";
 
 import { signInWithOAuth } from "@/utils/auth-helpers/client";
-import { getURL } from "@/utils/helpers";
 import { createClient } from "@/utils/supabase/client";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -37,15 +36,6 @@ export default function OauthSignIn() {
 
 	return (
 		<div className="mt-8">
-			<button
-				type="button"
-				onClick={() => {
-					console.log(process.env.NEXT_PUBLIC_VERCEL_URL);
-					alert(getURL("/portal"));
-				}}
-			>
-				Click me
-			</button>
 			{oAuthProviders.map((provider) => (
 				<form key={provider.name} className="pb-2" onSubmit={(e) => handleSubmit(e)}>
 					<input type="hidden" name="provider" value={provider.name} />
