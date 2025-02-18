@@ -1,18 +1,20 @@
-import { SESSION_ID_PARAM, claimSession, createSession } from "@/utils/portal/session";
-import { NextResponse } from "next/server";
+import { GATEWAY_PAYLOAD_PARAM, SESSION_ID_PARAM, claimSession } from "@/utils/portal/session";
+import { type NextRequest, NextResponse } from "next/server";
 
-export const GET = async (request: Request) => {
-	const session = await createSession({
-		endUserForeignId: "123",
-		workspaceId: "00000000-0000-0000-0000-000000000000",
-		configuration: {
-			userDisplay: "John Doe",
-			returnUrl: "https://example.com",
-			appName: "Dust",
-		},
+export const GET = async (request: NextRequest) => {
+	const { searchParams } = request.nextUrl;
+
+	const sessionId = searchParams.get(SESSION_ID_PARAM);
+	const payload = searchParams.get(GATEWAY_PAYLOAD_PARAM);
+
+	if (!sessionId || !payload) {
+		throw new Error("Invalid request");
+	}
+
+	await claimSession({
+		sessionId,
+		signedPayload: payload,
 	});
-
-	await claimSession({ sessionId: session.portal_session_id });
 
 	const forwardedProtocol = request.headers.get("x-forwarded-proto");
 	const forwardedHost = request.headers.get("x-forwarded-host");
@@ -22,7 +24,7 @@ export const GET = async (request: Request) => {
 		forwardedProtocol ? `${forwardedProtocol}://${forwardedHost}` : request.url,
 	);
 
-	url.searchParams.set(SESSION_ID_PARAM, session.portal_session_id);
+	url.searchParams.set(SESSION_ID_PARAM, sessionId);
 
 	return NextResponse.redirect(url);
 };

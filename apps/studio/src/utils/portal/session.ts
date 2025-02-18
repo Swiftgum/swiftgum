@@ -1,4 +1,4 @@
-import { hash, randomUUID } from "node:crypto";
+import { getURL } from "@/utils/helpers";
 import { createServerOnlyClient } from "@/utils/supabase/server";
 import {
 	type PortalSessionConfiguration,
@@ -10,6 +10,7 @@ import type { NextRequest } from "next/server";
 
 const cookieName = (cookieHash: string) => `kx:ps:${cookieHash}`;
 export const SESSION_ID_PARAM = "sid";
+export const GATEWAY_PAYLOAD_PARAM = "pld";
 
 export const createSession = async ({
 	endUserForeignId,
@@ -74,59 +75,86 @@ export const createSession = async ({
 	return session as unknown as PortalSession;
 };
 
-export const claimSession = async ({
-	sessionId,
+export const signSession = async ({
+	session,
+	workspaceId,
 }: {
-	sessionId: string;
+	session: PortalSession;
+	workspaceId: string;
 }) => {
 	"use server";
 
-	const cookieStore = await cookies();
 	const supabase = await createServerOnlyClient();
 
-	const { data: existingSession } = await supabase
+	const { data: payload, error: signedUrlError } = await supabase
 		.schema("private")
-		.from("unclaimed_portal_sessions")
-		.select("*")
-		.eq("portal_session_id", sessionId)
-		.single();
+		.rpc("sign_portal_session", {
+			p_portal_session_id: session.portal_session_id,
+			p_workspace_id: workspaceId,
+		});
 
-	console.log("oldess", sessionId);
-	console.log("existingSession", existingSession, sessionId);
-
-	if (!existingSession) {
-		throw new Error("Session not found");
+	if (signedUrlError) {
+		throw new Error(signedUrlError.message);
 	}
 
-	const cookieNonce = randomUUID();
-	const cookieHash = hash("sha256", cookieNonce);
+	const url = new URL(getURL("/portal/gateway"));
+	url.searchParams.set(SESSION_ID_PARAM, session.portal_session_id);
+	url.searchParams.set(GATEWAY_PAYLOAD_PARAM, payload);
 
-	const { data: session, error: sessionError } = await supabase
+	return url.toString();
+};
+
+/**
+ * Claim a session from a signed payload. The cookie will be set automatically.
+ *
+ * @throws {Error} If the session is not found or the cookie hash is invalid.
+ */
+export const claimSession = async ({
+	sessionId,
+	signedPayload,
+}: {
+	sessionId: string;
+	signedPayload: string;
+}) => {
+	"use server";
+
+	const supabase = await createServerOnlyClient();
+
+	const { data: claimInformation, error: claimedSessionError } = await supabase
 		.schema("private")
-		.from("portal_sessions")
-		// This will automatically set the claimed column to true and invalidate the session for claiming again
-		.update({ cookie_hash: cookieHash })
-		.eq("portal_session_id", sessionId)
-		.is("cookie_hash", null)
-		.select("*")
-		.single();
+		.rpc("claim_portal_session", {
+			p_portal_session_id: sessionId,
+			p_signed_payload: signedPayload,
+		});
 
-	if (sessionError) {
-		throw new Error(sessionError.message);
+	if (claimedSessionError || !claimInformation) {
+		throw new Error(claimedSessionError.message);
 	}
 
+	if (!claimInformation.cookie_nonce || !claimInformation.expires_at) {
+		throw new Error("Invalid claim information");
+	}
+
+	const cookieStore = await cookies();
 	cookieStore.set({
 		name: cookieName(sessionId),
-		value: cookieNonce,
-		expires: new Date(session.expires_at),
+		value: claimInformation.cookie_nonce,
+		expires: new Date(claimInformation.expires_at),
 		path: "/",
 		httpOnly: true,
 		sameSite: "lax",
 	});
 
-	return session as unknown as PortalSession;
+	return {
+		success: true,
+	};
 };
 
+/**
+ * Retrieve a session, validating both the session id and the cookie hash. The cookie hash is automatically retrieved from the cookie store.
+ *
+ * @throws {Error} If the session is not found or the cookie hash is invalid.
+ */
 export const getSession = async ({
 	sessionId,
 }: {
@@ -147,11 +175,10 @@ export const getSession = async ({
 
 	const { data: session, error: sessionError } = await supabase
 		.schema("private")
-		.from("valid_portal_sessions")
-		.select("*")
-		.eq("portal_session_id", sessionId)
-		.eq("cookie_hash", hash("sha256", cookieNonce.value))
-		.single();
+		.rpc("get_portal_session", {
+			p_portal_session_id: sessionId,
+			p_cookie_nonce: cookieNonce.value,
+		});
 
 	if (sessionError) {
 		throw new Error(sessionError.message);
@@ -161,6 +188,10 @@ export const getSession = async ({
 
 	return session as unknown as PortalSession;
 };
+
+/**
+ * Utility function to get the portal session from the page.
+ */
 
 export const getPagePortalSession = async ({
 	searchParams,

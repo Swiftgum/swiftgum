@@ -417,6 +417,13 @@ export type Database = {
 			};
 		};
 		Functions: {
+			claim_portal_session: {
+				Args: {
+					p_signed_payload: string;
+					p_portal_session_id: string;
+				};
+				Returns: Database["private"]["CompositeTypes"]["portal_session_claim"];
+			};
 			decrypt_destination_params: {
 				Args: {
 					p_workspace_id: string;
@@ -445,11 +452,34 @@ export type Database = {
 				};
 				Returns: string;
 			};
+			get_portal_session: {
+				Args: {
+					p_portal_session_id: string;
+					p_cookie_nonce: string;
+				};
+				Returns: {
+					claimed: boolean | null;
+					configuration: Json;
+					cookie_hash: string | null;
+					created_at: string;
+					end_user_id: string;
+					expires_at: string;
+					portal_session_id: string;
+					workspace_id: string;
+				};
+			};
 			queue_indexing_task: {
 				Args: {
 					task: Json;
 				};
 				Returns: number;
+			};
+			sign_portal_session: {
+				Args: {
+					p_portal_session_id: string;
+					p_workspace_id: string;
+				};
+				Returns: string;
 			};
 			update_api_key: {
 				Args: {
@@ -463,7 +493,10 @@ export type Database = {
 			[_ in never]: never;
 		};
 		CompositeTypes: {
-			[_ in never]: never;
+			portal_session_claim: {
+				cookie_nonce: string | null;
+				expires_at: string | null;
+			};
 		};
 	};
 	public: {
