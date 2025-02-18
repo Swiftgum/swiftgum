@@ -10,7 +10,7 @@
 		"prepare": "husky",
 		"format": "biome format",
 		"lint": "biome lint",
-		"db:gentypes": "npx supabase gen types typescript --local > supabase/types.d.ts && biome format --fix ./supabase/types.d.ts && cp supabase/types.d.ts apps/shared/src/types/database.d.ts && npx supabase gen types typescript --local --schema public,private > supabase/types-server.d.ts && biome format --fix ./supabase/types-server.d.ts && cp supabase/types-server.d.ts apps/shared/src/types/database-server.d.ts",
+		"db:gentypes": "npx supabase gen types typescript --local --schema public > supabase/types.d.ts && biome format --fix ./supabase/types.d.ts && cp supabase/types.d.ts apps/shared/src/types/database.d.ts && npx supabase gen types typescript --local --schema public,private > supabase/types-server.d.ts && biome format --fix ./supabase/types-server.d.ts && cp supabase/types-server.d.ts apps/shared/src/types/database-server.d.ts",
 		"db:checktypes": "pnpm run db:gentypes && git diff --exit-code supabase/types.d.ts && git diff --exit-code supabase/types-server.d.ts"
 	},
 	"author": "Swiftgum, Inc.",

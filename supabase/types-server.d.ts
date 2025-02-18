@@ -468,6 +468,22 @@ export type Database = {
 					workspace_id: string;
 				};
 			};
+			get_workspace_by_api_key: {
+				Args: {
+					p_api_key: string;
+				};
+				Returns: {
+					created_at: string;
+					dns_name: string;
+					encrypted_api_key: string;
+					encryption_key_id: string;
+					hashed_api_key: string;
+					label: string | null;
+					owner_user_id: string;
+					updated_at: string;
+					workspace_id: string;
+				};
+			};
 			queue_indexing_task: {
 				Args: {
 					task: Json;
