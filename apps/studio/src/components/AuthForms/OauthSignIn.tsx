@@ -37,7 +37,13 @@ export default function OauthSignIn() {
 
 	return (
 		<div className="mt-8">
-			<button type="button" onClick={() => alert(getURL("/portal"))}>
+			<button
+				type="button"
+				onClick={() => {
+					console.log(process.env);
+					alert(getURL("/portal"));
+				}}
+			>
 				Click me
 			</button>
 			{oAuthProviders.map((provider) => (
