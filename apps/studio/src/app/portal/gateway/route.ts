@@ -1,4 +1,4 @@
-import { SESSION_ID_PARAM, createSession } from "@/utils/portal/session";
+import { SESSION_ID_PARAM, claimSession, createSession } from "@/utils/portal/session";
 import { NextResponse } from "next/server";
 
 export const GET = async (request: Request) => {
@@ -12,6 +12,8 @@ export const GET = async (request: Request) => {
 		},
 	});
 
+	await claimSession({ sessionId: session.portal_session_id });
+
 	const forwardedProtocol = request.headers.get("x-forwarded-proto");
 	const forwardedHost = request.headers.get("x-forwarded-host");
 
@@ -19,8 +21,6 @@ export const GET = async (request: Request) => {
 		"/portal",
 		forwardedProtocol ? `${forwardedProtocol}://${forwardedHost}` : request.url,
 	);
-
-	console.log(url.toString());
 
 	url.searchParams.set(SESSION_ID_PARAM, session.portal_session_id);
 

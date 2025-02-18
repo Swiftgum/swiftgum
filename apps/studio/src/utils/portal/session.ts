@@ -15,15 +15,12 @@ export const createSession = async ({
 	endUserForeignId,
 	workspaceId,
 	configuration,
-	// TODO: Add session signature
 }: {
 	endUserForeignId: string;
 	workspaceId: string;
 	configuration: PortalSessionConfiguration;
 }) => {
 	"use server";
-
-	const cookieStore = await cookies();
 
 	const supabase = await createServerOnlyClient();
 
@@ -56,9 +53,6 @@ export const createSession = async ({
 		throw new Error(endUserError.message);
 	}
 
-	const cookieNonce = randomUUID();
-	const cookieHash = hash("sha256", cookieNonce);
-
 	portalSessionConfiguration.parse(configuration);
 
 	const { data: session, error: sessionError } = await supabase
@@ -67,7 +61,7 @@ export const createSession = async ({
 		.insert({
 			end_user_id: endUser.end_user_id,
 			workspace_id: workspace.workspace_id,
-			cookie_hash: cookieHash,
+			cookie_hash: null,
 			configuration: configuration,
 		})
 		.select("*")
@@ -77,8 +71,52 @@ export const createSession = async ({
 		throw new Error(sessionError.message);
 	}
 
+	return session as unknown as PortalSession;
+};
+
+export const claimSession = async ({
+	sessionId,
+}: {
+	sessionId: string;
+}) => {
+	"use server";
+
+	const cookieStore = await cookies();
+	const supabase = await createServerOnlyClient();
+
+	const { data: existingSession } = await supabase
+		.schema("private")
+		.from("unclaimed_portal_sessions")
+		.select("*")
+		.eq("portal_session_id", sessionId)
+		.single();
+
+	console.log("oldess", sessionId);
+	console.log("existingSession", existingSession, sessionId);
+
+	if (!existingSession) {
+		throw new Error("Session not found");
+	}
+
+	const cookieNonce = randomUUID();
+	const cookieHash = hash("sha256", cookieNonce);
+
+	const { data: session, error: sessionError } = await supabase
+		.schema("private")
+		.from("portal_sessions")
+		// This will automatically set the claimed column to true and invalidate the session for claiming again
+		.update({ cookie_hash: cookieHash })
+		.eq("portal_session_id", sessionId)
+		.is("cookie_hash", null)
+		.select("*")
+		.single();
+
+	if (sessionError) {
+		throw new Error(sessionError.message);
+	}
+
 	cookieStore.set({
-		name: cookieName(session.portal_session_id),
+		name: cookieName(sessionId),
 		value: cookieNonce,
 		expires: new Date(session.expires_at),
 		path: "/",

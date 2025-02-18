@@ -19,3 +19,10 @@ export const portalSessionConfiguration = z.object({
 });
 
 export type PortalSessionConfiguration = z.infer<typeof portalSessionConfiguration>;
+
+export const portalSession = z.object({
+	uniqueUserId: z.string(),
+	configuration: portalSessionConfiguration,
+});
+
+export type PortalSession = z.infer<typeof portalSession>;

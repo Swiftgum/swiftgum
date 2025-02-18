@@ -10,7 +10,7 @@ const AUTO_REFRESH_THRESHOLD = 10 * 60 * 1000; // 10 minutes
 
 export const getTokenFromDB = async ({ tokenId }: { tokenId: string }) => {
 	const token = await sql`
-    SELECT * FROM tokens_with_decrypted_tokenset
+    SELECT * FROM private.tokens_with_decrypted_tokenset
     WHERE token_id = ${tokenId}
   `;
 
@@ -23,7 +23,7 @@ export const getTokenFromDB = async ({ tokenId }: { tokenId: string }) => {
 
 export const getIntegrationFromDB = async ({ integrationId }: { integrationId: string }) => {
 	const integration = await sql`
-    SELECT * FROM integrations_with_decrypted_credentials
+    SELECT * FROM private.integrations_with_decrypted_credentials
     WHERE integration_id = ${integrationId}
   `;
 
@@ -62,7 +62,7 @@ const refreshTokenInDB = async ({
 		} satisfies TokenSet;
 
 		const encryptedToken = await sql`
-      SELECT * FROM encrypt_tokenset(
+      SELECT * FROM private.encrypt_tokenset(
         p_workspace_id => ${clientConfig.workspace_id},
         p_tokenset => ${sql.json(newTokenSet)}
       )
@@ -77,7 +77,7 @@ const refreshTokenInDB = async ({
 			: new Date();
 
 		const updatedToken = await sql`
-      UPDATE tokens
+      UPDATE private.tokens
       SET encrypted_tokenset = ${encryptedToken[0].encrypt_tokenset}, refreshed_at = (now() at time zone 'utc'), expires_at = ${expiresAt}
       WHERE token_id = ${token.token_id}
       RETURNING *

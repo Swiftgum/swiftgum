@@ -65,8 +65,9 @@ export type Database = {
 			};
 			portal_sessions: {
 				Row: {
+					claimed: boolean | null;
 					configuration: Json;
-					cookie_hash: string;
+					cookie_hash: string | null;
 					created_at: string;
 					end_user_id: string;
 					expires_at: string;
@@ -74,8 +75,9 @@ export type Database = {
 					workspace_id: string;
 				};
 				Insert: {
+					claimed?: boolean | null;
 					configuration: Json;
-					cookie_hash: string;
+					cookie_hash?: string | null;
 					created_at?: string;
 					end_user_id: string;
 					expires_at?: string;
@@ -83,8 +85,9 @@ export type Database = {
 					workspace_id: string;
 				};
 				Update: {
+					claimed?: boolean | null;
 					configuration?: Json;
-					cookie_hash?: string;
+					cookie_hash?: string | null;
 					created_at?: string;
 					end_user_id?: string;
 					expires_at?: string;
@@ -284,6 +287,47 @@ export type Database = {
 					},
 				];
 			};
+			unclaimed_portal_sessions: {
+				Row: {
+					claimed: boolean | null;
+					configuration: Json | null;
+					cookie_hash: string | null;
+					created_at: string | null;
+					end_user_id: string | null;
+					expires_at: string | null;
+					portal_session_id: string | null;
+					workspace_id: string | null;
+				};
+				Insert: {
+					claimed?: boolean | null;
+					configuration?: Json | null;
+					cookie_hash?: string | null;
+					created_at?: string | null;
+					end_user_id?: string | null;
+					expires_at?: string | null;
+					portal_session_id?: string | null;
+					workspace_id?: string | null;
+				};
+				Update: {
+					claimed?: boolean | null;
+					configuration?: Json | null;
+					cookie_hash?: string | null;
+					created_at?: string | null;
+					end_user_id?: string | null;
+					expires_at?: string | null;
+					portal_session_id?: string | null;
+					workspace_id?: string | null;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "portal_sessions_workspace_id_fkey";
+						columns: ["workspace_id"];
+						isOneToOne: false;
+						referencedRelation: "workspace_with_decrypted_api_key";
+						referencedColumns: ["workspace_id"];
+					},
+				];
+			};
 			valid_auth_sessions: {
 				Row: {
 					auth_session: Json | null;
@@ -321,6 +365,7 @@ export type Database = {
 			};
 			valid_portal_sessions: {
 				Row: {
+					claimed: boolean | null;
 					configuration: Json | null;
 					cookie_hash: string | null;
 					created_at: string | null;
@@ -330,6 +375,7 @@ export type Database = {
 					workspace_id: string | null;
 				};
 				Insert: {
+					claimed?: boolean | null;
 					configuration?: Json | null;
 					cookie_hash?: string | null;
 					created_at?: string | null;
@@ -339,6 +385,7 @@ export type Database = {
 					workspace_id?: string | null;
 				};
 				Update: {
+					claimed?: boolean | null;
 					configuration?: Json | null;
 					cookie_hash?: string | null;
 					created_at?: string | null;

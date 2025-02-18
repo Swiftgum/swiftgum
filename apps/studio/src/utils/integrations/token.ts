@@ -2,7 +2,7 @@
  * Utils to handle integration tokens
  */
 
-import { createClient } from "@/utils/supabase/server";
+import { createServerOnlyClient } from "@/utils/supabase/server";
 import { type TokenSet, tokenSet } from "@knowledgex/shared/interfaces";
 import type { Database } from "@knowledgex/shared/types/database-server";
 
@@ -20,7 +20,7 @@ export const saveIntegrationToken = async ({
 }) => {
 	const parsedTokenSet = tokenSet.parse(tokenset);
 
-	const supabase = await createClient();
+	const supabase = await createServerOnlyClient();
 
 	const { data: integration, error: integrationError } = await supabase
 		.from("integrations")
