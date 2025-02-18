@@ -1,7 +1,6 @@
 "use client";
 
 import { signInWithOAuth } from "@/utils/auth-helpers/client";
-import { createClient } from "@/utils/supabase/client";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { Provider } from "@supabase/supabase-js";
@@ -16,8 +15,6 @@ type OAuthProviders = {
 };
 
 export default function OauthSignIn() {
-	const supabase = createClient();
-
 	const oAuthProviders: OAuthProviders[] = [
 		{
 			name: "google",
@@ -30,21 +27,23 @@ export default function OauthSignIn() {
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		setIsSubmitting(true); // Disable the button while the request is being handled
+
 		await signInWithOAuth(e);
+
 		setIsSubmitting(false);
 	};
 
 	return (
-		<div className="mt-8">
+		<>
 			{oAuthProviders.map((provider) => (
-				<form key={provider.name} className="pb-2" onSubmit={(e) => handleSubmit(e)}>
+				<form key={provider.name} onSubmit={(e) => handleSubmit(e)}>
 					<input type="hidden" name="provider" value={provider.name} />
 					<Button
-						// variant="slim"
+						size="lg"
 						type="submit"
 						className="w-full"
 						onClick={() => {}}
-						// loading={isSubmitting}
+						disabled={isSubmitting}
 					>
 						<div className="flex justify-center">
 							<div className="mr-4">{provider.icon}</div>
@@ -53,6 +52,6 @@ export default function OauthSignIn() {
 					</Button>
 				</form>
 			))}
-		</div>
+		</>
 	);
 }
