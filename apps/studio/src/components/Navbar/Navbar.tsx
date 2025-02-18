@@ -13,7 +13,7 @@ export default async function Navbar() {
 	return (
 		<>
 			<div className="w-16 flex-0" />
-			<Navlinks user={user} />
+			<Navlinks />
 		</>
 	);
 }

@@ -1,17 +1,13 @@
 "use client";
 
 import SubNavbarWrapper from "@/components/ui/subnavbar";
-import { Home, Settings, ShieldCheck, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const subNavbarSections = [
 	{
 		sectionName: "Destination Settings",
-		items: [
-			{ name: "Webhook", href: "/destination/webhook" },
-			// { name: "New", href: "/settings/new" },
-		],
+		items: [{ name: "Webhook", href: "/admin/destination/webhook" }],
 	},
 ];
 

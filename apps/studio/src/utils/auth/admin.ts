@@ -1,13 +1,16 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
-export default async function AdminPage() {
+export const adminRoute = async () => {
 	const supabase = await createClient();
+
 	const {
 		data: { user },
 	} = await supabase.auth.getUser();
 
-	if (!user) redirect("/");
+	if (!user) {
+		redirect("/admin/login");
+	}
 
-	return <div />;
-}
+	return user;
+};

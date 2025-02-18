@@ -29,7 +29,7 @@ export async function SignOut(formData: FormData) {
 		);
 	}
 
-	return "/";
+	return "/admin/login";
 }
 
 export async function signInWithEmail(formData: FormData) {
