@@ -1,7 +1,8 @@
 const BASE_URL =
-	(process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
-		? process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
-		: process.env.NEXT_PUBLIC_VERCEL_URL) || "http://localhost:3000";
+	(process.env.NEXT_PUBLIC_VERCEL_ENV === "production" &&
+		`https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`) ||
+	(process.env.NEXT_PUBLIC_VERCEL_URL && `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`) ||
+	"http://localhost:3000";
 
 export const getURL = (path = "") => {
 	return new URL(path, BASE_URL).toString();
