@@ -8,7 +8,7 @@ const subNavbarSections = [
 	{
 		sectionName: "Project Settings",
 		items: [
-			{ name: "General", href: "/settings/general" },
+			{ name: "General", href: "/admin/settings/general" },
 			// { name: "New", href: "/settings/new" },
 		],
 	},
