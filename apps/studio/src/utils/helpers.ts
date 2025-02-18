@@ -1,14 +1,7 @@
+export const BASE_URL = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+
 export const getURL = (path = "") => {
-	let baseURL =
-		(process.env.VERCEL_ENV === "production" && process.env.VERCEL_PROJECT_PRODUCTION_URL) ||
-		process.env.NEXT_PUBLIC_VERCEL_URL ||
-		"http://localhost:3000";
-
-	if (!baseURL.includes("://")) {
-		baseURL = `https://${baseURL}`;
-	}
-
-	return new URL(path, baseURL).toString();
+	return new URL(path, BASE_URL).toString();
 };
 
 const toastKeyMap: { [key: string]: string[] } = {

@@ -40,7 +40,7 @@ export default function OauthSignIn() {
 			<button
 				type="button"
 				onClick={() => {
-					console.log(process.env);
+					console.log(process.env.NEXT_PUBLIC_VERCEL_URL);
 					alert(getURL("/portal"));
 				}}
 			>
