@@ -22,7 +22,7 @@ export const getDestinations = async ({
 	tokenId: string;
 }) => {
 	const destinations = await sql`
-		SELECT destinations.* FROM destinations_with_decrypted_params as destinations JOIN tokens ON tokens.workspace_id = destinations.workspace_id
+		SELECT destinations.* FROM private.destinations_with_decrypted_params as destinations JOIN private.tokens ON tokens.workspace_id = destinations.workspace_id
 		WHERE tokens.token_id = ${tokenId}
 	`;
 
