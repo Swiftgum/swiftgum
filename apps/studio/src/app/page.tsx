@@ -1,4 +1,5 @@
 import OauthSignIn from "@/components/AuthForms/OauthSignIn";
+import { getURL } from "@/utils/helpers";
 import { createClient } from "@/utils/supabase/server";
 import Image from "next/image";
 
@@ -19,6 +20,7 @@ export default async function Home() {
 					</div>
 				) : (
 					<div>
+						{getURL("/api/portal/session")}
 						<OauthSignIn />
 						<p className="text-center text-2xl font-bold">
 							Welcome to <span className="font-mono">Supabase + Next.js</span>

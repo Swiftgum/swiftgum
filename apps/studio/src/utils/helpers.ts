@@ -1,27 +1,14 @@
 export const getURL = (path = "") => {
-	// Check if NEXT_PUBLIC_SITE_URL is set and non-empty. Set this to your site URL in production env.
-	let url =
-		process?.env?.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL.trim() !== ""
-			? process.env.NEXT_PUBLIC_SITE_URL
-			: // If not set, check for NEXT_PUBLIC_VERCEL_URL, which is automatically set by Vercel.
-				process?.env?.NEXT_PUBLIC_VERCEL_URL && process.env.NEXT_PUBLIC_VERCEL_URL.trim() !== ""
-				? process.env.NEXT_PUBLIC_VERCEL_URL
-				: // If neither is set, default to localhost for local development.
-					"http://localhost:3000/";
+	const BASE_URL =
+		process.env.NEXT_PUBLIC_SITE_URL ||
+		process.env.NEXT_PUBLIC_VERCEL_URL ||
+		"http://localhost:3000";
 
 	if (typeof window !== "undefined") {
-		url = window.location.origin;
+		return window.location.origin;
 	}
 
-	// Trim the URL and remove trailing slash if exists.
-	url = url.replace(/\/+$/, "");
-	// Make sure to include `https://` when not localhost.
-	const urlWithProtocol = url.includes("http") ? url : `https://${url}`;
-	// Ensure path starts wit hout a slash to avoid double slashes in the final URL.
-	const trimmedPath = path.replace(/^\/+/, "");
-
-	// Concatenate the URL and the path.
-	return trimmedPath ? `${urlWithProtocol}/${trimmedPath}` : urlWithProtocol;
+	return new URL(path, BASE_URL).toString();
 };
 
 const toastKeyMap: { [key: string]: string[] } = {
