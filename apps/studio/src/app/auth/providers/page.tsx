@@ -94,7 +94,7 @@ export default async function Providers() {
 						providerId={provider.provider_id}
 						workspaceId={workspace.workspace_id}
 						icon={providerIcons[provider.identifier] || null}
-						callbackUrl={`${baseURL}/portal/auth/callback`}
+						callbackUrl={`${getURL("/portal/auth/callback")}`}
 						integration={integration}
 					/>
 				);
