@@ -1,3 +1,4 @@
+import { getURL } from "@/utils/helpers";
 import { createAuthSession, getIntegrationCredentials } from "@/utils/integrations/session";
 import { getRoutePortalSession } from "@/utils/portal/session";
 import { type NextRequest, NextResponse } from "next/server";
@@ -42,14 +43,14 @@ export async function GET(request: NextRequest) {
 						pkce_code_verifier: codeVerifier,
 					},
 					portal_session_id: session.portal_session_id,
-					redirect: url("http://localhost:3000/portal"),
+					redirect: url(getURL("/portal")),
 				},
 			});
 
 			const redirect = client.buildAuthorizationUrl(config, {
 				code_challenge: codeChallenge,
 				scope: "openid email profile https://www.googleapis.com/auth/drive.readonly",
-				redirect_uri: "http://localhost:3000/portal/auth/callback",
+				redirect_uri: getURL("/portal/auth/callback"),
 				state: auth_session_id,
 				code_challenge_method: "S256",
 				access_type: "offline",

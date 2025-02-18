@@ -20,22 +20,6 @@ export default async function Home() {
 					</div>
 				) : (
 					<div>
-						{getURL("/api/portal/session")}
-						<pre>
-							{JSON.stringify(
-								{
-									ENV: process.env,
-									NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
-									NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
-									NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL:
-										process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL,
-									VERCEL_PROJECT_PRODUCTION_URL: process.env.VERCEL_PROJECT_PRODUCTION_URL,
-									URL: getURL("/"),
-								},
-								null,
-								2,
-							)}
-						</pre>
 						<OauthSignIn />
 						<p className="text-center text-2xl font-bold">
 							Welcome to <span className="font-mono">Supabase + Next.js</span>
