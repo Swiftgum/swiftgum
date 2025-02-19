@@ -1,0 +1,33 @@
+---
+description: High-level overview of the system
+globs: 
+---
+# What is KnowledgeX
+
+KnowledgeX provides a data connection layer between end-user data and third party apps.
+
+Third party apps such as Dust or OpenAI use KnowledgeX to easily connect their end-users data for use in their pipelines.
+
+## How it works?
+
+KnowledgeX is a developer tool. It must be integrated by a developer (let's call it external developer) into another codebase, similarly to Stripe.
+
+The external developer can then present their end users with options to manage their connected data (eg. Google Drive, Notion, Mails, etc.). When the users want to manage this data, they click on a button and are redirected to the KnowledgeX platform.
+
+KnowledgeX manages on its own the integrations, tokens, etc. of the end-users. Once the end-users have connected their accounts or made changes, KnowledgeX will process their data (indexing, processing) and export this data to a webhook, database table, or anything as specified by the external developer.
+
+## Example flow
+
+Here is an example flow for how it works.
+
+1. External developer integrates KnowledgeX SDK in their project, creating a page/route that creates a session for a given foreign user id.
+2. The end user is presented with a link that takes them to the KnowledgeX portal (with their given session). This happens in /apps/studio
+3. The end user manages knowledge, integrations, etc.
+4. In the background, KnowledgeX starts indexing (in /apps/studio). This pushes task to a shared PGMQ task queue. Then, the engine (in /apps/engine) starts processing with the token. It indexes files, processes them to markdown, and pushes them to the export queue.
+5. The export queue is processed by the engine and notifies the destination initially parameterized by the external developer.
+
+## What does the external developer need to do?
+
+1. The external developer needs to implement the KnowledgeX SDK.
+2. The external developer needs to register his own Oauth/Integrations to each possible provider and enter the corresponding tokens and secrets on his admin page.
+3. The external developer needs to specify the destination for the traffic flow.
