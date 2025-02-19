@@ -1,11 +1,12 @@
 import type {
+	AuthSession as AuthSessionPayload,
 	Destination,
 	IntegrationCredentials,
 	PortalSessionConfiguration,
 	ProviderMetadata,
 	TokenSet,
 } from "../interfaces";
-import type { Database } from "./database";
+import type { Database } from "./database-server";
 
 export type DecryptedDestination = Omit<
 	Database["public"]["Views"]["destinations_with_decrypted_params"]["Row"],
@@ -35,4 +36,11 @@ export type Token = Database["public"]["Tables"]["tokens"]["Row"];
 
 export type DecryptedToken = Omit<Token, "decrypted_tokenset"> & {
 	decrypted_tokenset: TokenSet;
+};
+
+export type AuthSession = Omit<
+	Database["private"]["Tables"]["auth_sessions"]["Row"],
+	"auth_session"
+> & {
+	auth_session: AuthSessionPayload;
 };

@@ -1,4 +1,5 @@
 import { getURL } from "@/utils/helpers";
+import { log } from "@/utils/log";
 import { createServerOnlyClient } from "@/utils/supabase/server";
 import {
 	type PortalSessionConfiguration,
@@ -8,7 +9,7 @@ import type { PortalSession } from "@knowledgex/shared/types/overload";
 import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 
-const cookieName = (cookieHash: string) => `kx:ps:${cookieHash}`;
+const cookieName = (sessionId: string) => `kx:ps:${sessionId}`;
 export const SESSION_ID_PARAM = "sid";
 export const GATEWAY_PAYLOAD_PARAM = "pld";
 
@@ -72,6 +73,23 @@ export const createSession = async ({
 		throw new Error(sessionError.message);
 	}
 
+	void log({
+		workspace_id: workspace.workspace_id,
+		end_user_id: endUser.end_user_id,
+		level: "info",
+		type: "portal-session",
+		name: "created",
+		metadata: {
+			configuration,
+			expiresAt: session.expires_at,
+		},
+		id: {
+			portal_session: session.portal_session_id,
+			end_user: endUser.end_user_id,
+		},
+		private: false,
+	});
+
 	return session as unknown as PortalSession;
 };
 
@@ -100,6 +118,18 @@ export const signSession = async ({
 	const url = new URL(getURL("/portal/gateway"));
 	url.searchParams.set(SESSION_ID_PARAM, session.portal_session_id);
 	url.searchParams.set(GATEWAY_PAYLOAD_PARAM, payload);
+
+	void log({
+		workspace_id: session.workspace_id,
+		end_user_id: session.end_user_id,
+		level: "verbose",
+		type: "portal-session",
+		name: "signed",
+		id: {
+			portal_session: session.portal_session_id,
+			end_user: session.end_user_id,
+		},
+	});
 
 	return url.toString();
 };
@@ -134,6 +164,30 @@ export const claimSession = async ({
 	if (!claimInformation.cookie_nonce || !claimInformation.expires_at) {
 		throw new Error("Invalid claim information");
 	}
+
+	const { data: session, error: sessionError } = await supabase
+		.schema("private")
+		.from("portal_sessions")
+		.select("*")
+		.eq("portal_session_id", sessionId)
+		.single();
+
+	if (sessionError) {
+		throw new Error(sessionError.message);
+	}
+
+	void log({
+		workspace_id: session.workspace_id,
+		end_user_id: session.end_user_id,
+		level: "info",
+		type: "portal-session",
+		name: "claimed",
+		id: {
+			portal_session: session.portal_session_id,
+			end_user: session.end_user_id,
+		},
+		private: false,
+	});
 
 	const cookieStore = await cookies();
 	cookieStore.set({
@@ -183,6 +237,19 @@ export const getSession = async ({
 	if (sessionError) {
 		throw new Error(sessionError.message);
 	}
+
+	void log({
+		workspace_id: session.workspace_id,
+		end_user_id: session.end_user_id,
+		level: "verbose",
+		type: "portal-session",
+		name: "retrieved",
+		id: {
+			portal_session: session.portal_session_id,
+			end_user: session.end_user_id,
+		},
+		private: false,
+	});
 
 	portalSessionConfiguration.parse(session.configuration);
 

@@ -1,5 +1,8 @@
+import type { GenericQueueTask } from "@knowledgex/shared/interfaces";
+import { type QueueName, mergeResourceUris } from "@knowledgex/shared/log";
 import type postgres from "postgres";
 import { sql } from "./db";
+import { log } from "./utils/log";
 
 const getNextMessage = async (queueName: string, timeout = 60) => {
 	const result = await sql`
@@ -10,7 +13,10 @@ const getNextMessage = async (queueName: string, timeout = 60) => {
     )
   `;
 
-	return result[0];
+	return result[0] as {
+		msg_id: string;
+		message: GenericQueueTask;
+	};
 };
 
 const archiveMessage = async (queueName: string, messageId: string) => {
@@ -28,16 +34,18 @@ const archiveMessage = async (queueName: string, messageId: string) => {
  * @param timeout - The timeout for the message to be processed in seconds
  */
 export const addQueueListener = async (
-	queueName: string,
+	queueName: QueueName,
 	handler: (row?: postgres.Row) => unknown,
 	timeout = 120,
 	maxErrors = 5 * 60,
 ) => {
+	const realQueueName = `${queueName.replace("queue:", "")}_queue`;
+
 	// Safeguard if the queue does not exist, or the database is unreachable on startup.
 	try {
-		await getNextMessage(queueName, 0);
+		await getNextMessage(realQueueName, 0);
 	} catch (error) {
-		console.error(`Error reading from queue ${queueName}: ${error}`);
+		console.error(`Error reading from queue ${realQueueName}: ${error}`);
 		return; // TODO: throw error?
 		// throw error;
 	}
@@ -46,36 +54,85 @@ export const addQueueListener = async (
 
 	while (errors < maxErrors) {
 		try {
-			const message = await getNextMessage(queueName, timeout);
+			const message = await getNextMessage(realQueueName, timeout);
 			errors = 0;
 
 			if (message) {
 				const timeoutHandle = setTimeout(() => {
-					console.warn(
-						`Handler for queue ${queueName} took more than ${timeout} seconds, the message has been requeued prematurely.`,
-					);
+					log({
+						level: "warning",
+						type: queueName,
+						name: "timeout",
+					});
 				}, timeout * 1000);
 
-				await handler(message);
+				void log({
+					level: "verbose",
+					type: queueName,
+					name: "started",
+					workspace_id: message.message.workspaceId,
+					id: mergeResourceUris(message.message.parentTaskIds || "", {
+						task: message.message.taskId,
+					}),
+					metadata: {},
+					private: false,
+				});
 
 				try {
-					clearTimeout(timeoutHandle);
-					console.log(`Handler for queue ${queueName} ran on time.`);
-				} catch {}
+					await handler(message);
 
-				await archiveMessage(queueName, message.msg_id);
+					void log({
+						level: "verbose",
+						type: queueName,
+						name: "completed",
+						workspace_id: message.message.workspaceId,
+						id: mergeResourceUris(message.message.parentTaskIds || "", {
+							task: message.message.taskId,
+						}),
+						metadata: {},
+						private: false,
+					});
+
+					try {
+						clearTimeout(timeoutHandle);
+						console.log(`Handler for queue ${realQueueName} ran on time.`);
+					} catch {}
+
+					await archiveMessage(realQueueName, message.msg_id);
+				} catch (error) {
+					console.error(error);
+
+					void log({
+						level: "error",
+						type: queueName,
+						name: "failed",
+						workspace_id: message.message.workspaceId,
+						id: mergeResourceUris(message.message.parentTaskIds || "", {
+							task: message.message.taskId,
+						}),
+						metadata: {},
+						private: false,
+					});
+				}
 
 				// If a message has been read, we can process a new one immediately.
 				continue;
 			}
 		} catch (error) {
-			errors++;
-			console.error(`Error reading from queue ${queueName}: ${error}`);
 			console.error(error);
+
+			errors++;
+
+			void log({
+				level: "error",
+				type: queueName,
+				name: "failed",
+				metadata: {},
+			});
 		}
 
 		await new Promise((resolve) => setTimeout(resolve, 1000));
 	}
 
-	throw new Error(`Max errors reached for queue ${queueName}`);
+	throw new Error(`Max errors reached for queue ${realQueueName}`);
 };

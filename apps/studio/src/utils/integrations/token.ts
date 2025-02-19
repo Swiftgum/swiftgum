@@ -2,6 +2,7 @@
  * Utils to handle integration tokens
  */
 
+import { log } from "@/utils/log";
 import { createServerOnlyClient } from "@/utils/supabase/server";
 import { type TokenSet, tokenSet } from "@knowledgex/shared/interfaces";
 import type { Database } from "@knowledgex/shared/types/database-server";
@@ -50,6 +51,24 @@ export const saveIntegrationToken = async ({
 		.single();
 
 	if (error) throw error;
+
+	void log({
+		workspace_id: integration.workspace_id,
+		end_user_id: token.end_user_id,
+		level: "info",
+		type: "token",
+		name: "created",
+		metadata: {
+			token_id: data.token_id,
+			integration_id: token.integration_id,
+		},
+		id: {
+			integration: token.integration_id,
+			token: data.token_id,
+			end_user: token.end_user_id,
+		},
+		private: false,
+	});
 
 	return data;
 };

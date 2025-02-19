@@ -1,32 +1,24 @@
-import type { IndexingTask } from "@knowledgex/shared";
-import type { InternalTask } from "./abstract";
-import { googleDriveProvider } from "./google:drive";
+import type { IndexingTaskSchema, InternalTaskSchema } from "@knowledgex/shared/interfaces";
+import { googleDriveProvider } from "./google:drive/index";
 
-export const providers = {
-	"google:drive": googleDriveProvider,
-	"notion:notion": false,
-} as const;
+export const providers = [googleDriveProvider] as const;
 
-export const processIndexingTask = async (task: IndexingTask) => {
-	if (!(task.provider in providers)) {
-		throw new Error(`Provider for ${task.provider} not found`);
-	}
+const getProvider = (task: IndexingTaskSchema | InternalTaskSchema) => {
+	const targetProvider = providers.find((provider) => provider.owns(task));
 
-	const provider = providers[task.provider];
+	if (!targetProvider) throw new Error(`Provider not found for task ${task.task.provider}`);
 
-	if (!provider) {
-		throw new Error(`Provider for ${task.provider} not found`);
-	}
-
-	await provider.index(task);
+	return targetProvider;
 };
 
-export const processInternalTask = async (task: InternalTask) => {
-	if (!(task.provider in providers)) {
-		throw new Error(`Provider for ${task.provider} not found`);
-	}
+export const processIndexingTask = async (task: IndexingTaskSchema) => {
+	const targetProvider = getProvider(task);
 
-	const provider = providers[task.provider];
+	await targetProvider.indexing(task);
+};
 
-	await provider.internal(task.task);
+export const processInternalTask = async (task: InternalTaskSchema) => {
+	const targetProvider = getProvider(task);
+
+	await targetProvider.internal(task);
 };

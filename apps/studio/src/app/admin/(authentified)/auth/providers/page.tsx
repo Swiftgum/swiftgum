@@ -1,10 +1,10 @@
 import NotionIcon from "@/components/Icons/notionIcon";
 import { createClient, createServerOnlyClient } from "@/utils/supabase/server";
-import { faGoogle, faMicrosoft } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { ReactNode } from "react";
 
 import { getURL } from "@/utils/helpers";
+import type { Provider } from "@knowledgex/shared/types/overload";
 import { redirect } from "next/navigation";
 import OAuthProvider from "./oauthprovider";
 interface DecryptedCredentials {
@@ -37,7 +37,12 @@ export default async function Providers() {
 	}
 
 	// Fetch providers
-	const { data: providers, error: providersError } = await supabase.from("providers").select("*");
+	const { data: providers, error: providersError } = (await supabase
+		.from("providers")
+		.select("*")) as {
+		data: Provider[];
+		error: Error | null;
+	};
 
 	// Fetch integrations associated with the user's workspace
 	const { data: integrations, error: integrationsError } = await supabaseServer
@@ -51,13 +56,6 @@ export default async function Providers() {
 		throw new Error("Failed to fetch data");
 	}
 
-	const providerIcons: Record<string, ReactNode> = {
-		Microsoft: <FontAwesomeIcon icon={faMicrosoft} className="w-5 h-5" />,
-		"google:drive": <FontAwesomeIcon icon={faGoogle} className="w-5 h-5" />,
-		"notion:notion": <NotionIcon className="w-5 h-5" />,
-	};
-
-	const baseURL = getURL();
 	return (
 		<div className="p-20">
 			<div className="mb-10">
@@ -90,10 +88,10 @@ export default async function Providers() {
 				return (
 					<OAuthProvider
 						key={provider.name}
+						metadata={provider.metadata}
 						name={provider.name}
 						providerId={provider.provider_id}
 						workspaceId={workspace.workspace_id}
-						icon={providerIcons[provider.identifier] || null}
 						callbackUrl={`${getURL("/portal/auth/callback")}`}
 						integration={integration}
 					/>

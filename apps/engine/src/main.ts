@@ -1,4 +1,3 @@
-import { indexingTask } from "@knowledgex/shared";
 import Fastify from "fastify";
 import { processExport } from "./export";
 import { processIndexingTask, processInternalTask } from "./providers";
@@ -18,32 +17,26 @@ const start = async () => {
 	try {
 		await fastify.listen({ host: "0.0.0.0", port: 8000 });
 
-		void addQueueListener("indexing_queue", async (row) => {
+		void addQueueListener("queue:indexing", async (row) => {
 			if (!row) {
 				return;
 			}
 
-			const task = indexingTask.parse(row.message);
-
-			await processIndexingTask(task);
+			await processIndexingTask(row.message);
 		});
 
-		for (let i = 0; i < 20; i++) {
-			void addQueueListener(
-				"internal_queue",
-				async (row) => {
-					if (!row) {
-						return;
-					}
+		for (let i = 0; i < 30; i++) {
+			void addQueueListener("queue:internal", async (row) => {
+				if (!row) {
+					return;
+				}
 
-					await processInternalTask(row.message);
-				},
-				10 * 60,
-			);
+				await processInternalTask(row.message);
+			});
 		}
 
 		for (let i = 0; i < 20; i++) {
-			void addQueueListener("export_queue", async (row) => {
+			void addQueueListener("queue:export", async (row) => {
 				if (!row) {
 					return;
 				}

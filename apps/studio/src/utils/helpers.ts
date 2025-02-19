@@ -56,3 +56,11 @@ export const getErrorRedirect = (
 	disableButton?: boolean,
 	arbitraryParams?: string,
 ) => getToastRedirect(path, "error", errorName, errorDescription, disableButton, arbitraryParams);
+
+export const capitalize = (str: string) => {
+	return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+export const titleCase = (str: string) => {
+	return str.replace(/\b\w/g, (char) => char.toUpperCase());
+};

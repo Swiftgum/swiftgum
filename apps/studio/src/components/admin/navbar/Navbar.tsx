@@ -12,7 +12,7 @@ export default async function Navbar() {
 
 	return (
 		<>
-			<div className="w-16 flex-0" />
+			<div className="w-14 mr-px flex-0" />
 			<Navlinks />
 		</>
 	);

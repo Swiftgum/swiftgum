@@ -1,7 +1,10 @@
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/admin/navbar";
+import { adminRoute } from "@/utils/auth/admin";
 import { Toaster } from "react-hot-toast";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+	await adminRoute();
+
 	return (
 		<>
 			<Toaster position="top-right" />

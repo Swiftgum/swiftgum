@@ -1,24 +1,25 @@
 import { z } from "zod";
 
-export const GenericAuthSession = z.object({
-	redirect: z.string().optional(),
-	portal_session_id: z.string(),
+export const genericAuthSession = z.object({
+	redirect: z.string(),
+	portal_session_id: z.string().uuid(),
 	scope: z.string(),
+	workspace_id: z.string().uuid(),
 });
 
-export type GenericAuthSession = z.infer<typeof GenericAuthSession>;
+export type GenericAuthSession = z.infer<typeof genericAuthSession>;
 
-export const Oauth2AuthSession = z
+export const oauth2AuthSession = z
 	.object({
 		type: z.literal("oauth2"),
 		oauth2: z.object({
 			pkce_code_verifier: z.string(),
 		}),
 	})
-	.merge(GenericAuthSession);
+	.merge(genericAuthSession);
 
-export type Oauth2AuthSession = z.infer<typeof Oauth2AuthSession>;
+export type Oauth2AuthSession = z.infer<typeof oauth2AuthSession>;
 
-export const AuthSession = z.discriminatedUnion("type", [Oauth2AuthSession]);
+export const authSession = z.discriminatedUnion("type", [oauth2AuthSession]);
 
-export type AuthSession = z.infer<typeof AuthSession>;
+export type AuthSession = z.infer<typeof authSession>;

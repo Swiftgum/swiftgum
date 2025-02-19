@@ -2,7 +2,7 @@ import { type ExportTask, exportTask } from "@knowledgex/shared/interfaces";
 import type { DecryptedDestination } from "@knowledgex/shared/types/overload";
 import { sql } from "../db";
 
-export const exportFile = async (task: ExportTask) => {
+export const exportFile = async (task: Omit<ExportTask, "taskId">) => {
 	// Safeguard
 	exportTask.parse(task);
 
@@ -29,11 +29,13 @@ export const getDestinations = async ({
 	return destinations as unknown as DecryptedDestination[];
 };
 
-export const processExport = async ({ content, metadata }: ExportTask) => {
-	const destinations = await getDestinations({ tokenId: metadata.tokenId });
-
+export const processExport = async (task: ExportTask) => {
 	// Safeguard
-	exportTask.parse({ content, metadata });
+	const {
+		task: { content, metadata },
+	} = exportTask.parse(task);
+
+	const destinations = await getDestinations({ tokenId: metadata.tokenId });
 
 	for (const destination of destinations) {
 		switch (destination.decrypted_destination_params.type) {

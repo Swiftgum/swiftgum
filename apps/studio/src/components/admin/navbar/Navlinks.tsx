@@ -2,7 +2,7 @@
 import { handleRequest } from "@/utils/auth-helpers/client";
 import { SignOut } from "@/utils/auth-helpers/server";
 import { getRedirectMethod } from "@/utils/auth-helpers/settings";
-import { Database, House, KeyRound, LoaderPinwheel, LogOut, Settings } from "lucide-react";
+import { Database, House, KeyRound, LoaderPinwheel, LogOut, Logs, Settings } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { NavItem } from "./NavItem";
 
@@ -12,31 +12,38 @@ export default function Navlinks() {
 
 	return (
 		<div className="group/nav fixed left-0 top-0 flex h-screen transition-all duration-300">
-			<nav className="flex flex-col flex-grow border-r shadow-lg  bg-white min-w-16 overflow-hidden transition-all duration-300 w-16 group-hover/nav:w-64 group-focus-within/nav:has-[:focus-visible]:w-64">
-				<div className="flex items-center justify-center h-16 w-16">
+			<nav className="flex flex-col flex-grow border-r bg-white overflow-hidden transition-all duration-300 w-14 group-hover/nav:w-56 group-focus-within/nav:has-[:focus-visible]:w-56 group-hover/nav:shadow-lg box-content">
+				<div className="flex items-center justify-center h-14 w-14">
 					<LoaderPinwheel color="#0094FF" />
 				</div>
-				<div className="flex flex-grow flex-col items-stretch gap-1 p-2">
+				<div className="flex flex-grow flex-col items-stretch gap-1 p-1.5">
 					<NavItem
 						as="link"
 						href="/admin"
 						icon={<House size={18} />}
 						label="Home"
-						isActive={pathname === "/"}
+						isActive={pathname === "/admin"}
 					/>
 					<NavItem
 						as="link"
 						href="/admin/auth/providers"
 						icon={<KeyRound size={18} />}
 						label="Authentication"
-						isActive={pathname.startsWith("/auth/providers")}
+						isActive={pathname.startsWith("/admin/auth/providers")}
 					/>
 					<NavItem
 						as="link"
 						href="/admin/destination/webhook"
 						icon={<Database size={18} />}
 						label="Destination"
-						isActive={pathname.startsWith("/destination/webhook")}
+						isActive={pathname.startsWith("/admin/destination/webhook")}
+					/>
+					<NavItem
+						as="link"
+						href="/admin/analytics"
+						icon={<Logs size={18} />}
+						label="Analytics"
+						isActive={pathname.startsWith("/admin/analytics")}
 					/>
 					<NavItem
 						as="link"

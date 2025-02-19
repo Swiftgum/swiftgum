@@ -1,15 +1,22 @@
 {
 	"name": "@knowledgex/shared",
+	"version": "0.0.0",
 	"private": "true",
 	"main": "./index.ts",
 	"exports": {
 		"./interfaces": "./src/interfaces/index.ts",
+		"./log": "./src/log/index.ts",
 		"./types/database": "./src/types/database.d.ts",
 		"./types/overload": "./src/types/overload.d.ts",
 		"./types/database-server": "./src/types/database-server.d.ts",
 		".": "./index.ts"
 	},
+	"peerDependencies": {
+		"@supabase/supabase-js": "^2.39.0",
+		"postgres": "^3.4.0"
+	},
 	"dependencies": {
-		"zod": "^3.24.1"
+		"@lukeed/uuid": "^2.0.1",
+		"zod": "^3.22.4"
 	}
 }

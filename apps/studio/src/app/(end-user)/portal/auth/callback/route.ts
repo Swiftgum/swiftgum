@@ -1,13 +1,15 @@
 import { queueForIndexing } from "@/utils/integrations/queue";
 import { claimAuthSession, getIntegrationCredentials } from "@/utils/integrations/session";
 import { saveIntegrationToken } from "@/utils/integrations/token";
+import { log } from "@/utils/log";
 import type { IntegrationCredentials } from "@knowledgex/shared/interfaces";
-import { NextResponse } from "next/server";
+import { resourceUri } from "@knowledgex/shared/log";
+import { type NextRequest, NextResponse } from "next/server";
 import * as client from "openid-client";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
 	const url = new URL(request.url);
 	const state = url.searchParams.get("state");
 
@@ -45,6 +47,30 @@ export async function GET(request: Request) {
 		throw new Error("Session is missing integration_id or end_user_id");
 	}
 
+	if (request.nextUrl.searchParams.get("error")) {
+		const redirect = new URL(session.auth_session.redirect);
+
+		redirect.searchParams.set("error", request.nextUrl.searchParams.get("error") || "");
+
+		void log({
+			workspace_id: session.auth_session.workspace_id,
+			end_user_id: session.end_user_id,
+			level: "error",
+			type: "portal-auth-session",
+			name: "error",
+			id: {
+				portal_session: session.auth_session.portal_session_id,
+				auth_session: session.auth_session_id,
+				end_user: session.end_user_id,
+			},
+			metadata: {
+				error: request.nextUrl.searchParams.get("error") || "",
+			},
+		});
+
+		return NextResponse.redirect(redirect);
+	}
+
 	switch (session.auth_session.type) {
 		case "oauth2":
 			{
@@ -59,30 +85,41 @@ export async function GET(request: Request) {
 					expectedState: session.auth_session_id || "",
 				});
 
+				const tokenset = {
+					type: "oauth2" as const,
+					oauth2: {
+						access_token: tokens.access_token,
+						refresh_token: tokens.refresh_token || "",
+						expires_in: tokens.expires_in,
+						expires_at: tokens.expires_in
+							? new Date(Date.now() + tokens.expires_in * 1000).toISOString()
+							: undefined,
+						scope: session.auth_session.scope,
+					},
+				};
+
 				const token = await saveIntegrationToken({
 					integration_id: session.integration_id,
 					end_user_id: session.end_user_id,
 					expires_at: tokens.expires_in
 						? new Date(Date.now() + tokens.expires_in * 1000).toISOString()
 						: undefined,
-					tokenset: {
-						type: "oauth2",
-						oauth2: {
-							access_token: tokens.access_token,
-							refresh_token: tokens.refresh_token || "",
-							expires_in: tokens.expires_in,
-							expires_at: tokens.expires_in
-								? new Date(Date.now() + tokens.expires_in * 1000).toISOString()
-								: undefined,
-							scope: session.auth_session.scope,
-						},
-					},
+					tokenset,
 				});
 
-				// TODO: move this somewhere else.
 				await queueForIndexing({
-					provider: "google:drive",
-					tokenId: token.token_id,
+					workspaceId: token.workspace_id,
+					endUserId: token.end_user_id,
+					parentTaskIds: resourceUri({
+						integration: token.integration_id,
+						token: token.token_id,
+					}),
+					task: {
+						provider: "google:drive",
+						payload: {
+							tokenId: token.token_id,
+						},
+					},
 				});
 			}
 
