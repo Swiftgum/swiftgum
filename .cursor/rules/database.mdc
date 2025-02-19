@@ -1,0 +1,34 @@
+---
+description: Database migration rules
+globs: supabase/migrations/**
+---
+## Provider
+
+We use Supabase with Postgres.
+
+### Schemas
+
+We have two app managed schemas:
+
+- `public`: in this schema, tables are accessible to the anonymous users. They should always have RLS in place (if it makes sense) to secure them.
+- `private`: in this schema, access is denied to everyone except for the superuser. This is already set up.
+
+In general, functions, views etc. should go to the private table. End user information (as defined in [logic.mdc](mdc:.cursor/rules/logic.mdc)) is to be stored in the private schema, as they are never logged in, making it insuitable for RLS.
+
+Always qualify the extensions and functions (except postgres native).
+
+There also is a few non-managed schemas:
+
+- `extensions`: pgcrypto is installed in this schema.
+- `pgmq`: pgmq is installed in this schema.
+- `auth`: supabase managed
+- ... other supabase managed schemas.
+
+### Guides
+
+When working with cryptography, always create the appropriate functions for encryption and decryption. Workspaces, as defined in [20250130131824_create_workspace_table.sql](mdc:supabase/migrations/20250130131824_create_workspace_table.sql) have an encryption key associated. When asked by the user for encryption in a table, try to join to the workspace and use this key.
+
+
+
+
+
