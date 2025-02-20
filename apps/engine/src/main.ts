@@ -1,4 +1,6 @@
 import Fastify from "fastify";
+import { closePool } from "./db";
+import { sql } from "./db";
 import { processExport } from "./export";
 import { processIndexingTask, processInternalTask } from "./providers";
 import { addQueueListener, getQueueSize } from "./queue";
@@ -9,9 +11,21 @@ const fastify = Fastify({
 
 // Declare a route
 fastify.get("/health", async function handler() {
-	return {
-		status: "healthy",
-	};
+	try {
+		// Test database connection
+		await sql`SELECT 1`;
+		return {
+			status: "healthy",
+			database: "connected",
+		};
+	} catch (err) {
+		const error = err as Error;
+		return {
+			status: "unhealthy",
+			database: "disconnected",
+			error: error.message,
+		};
+	}
 });
 
 const lastProcessed = {
@@ -79,8 +93,20 @@ const start = async () => {
 		}
 
 		console.log("Started");
+
+		// Handle graceful shutdown
+		const shutdown = async () => {
+			console.log("Shutting down...");
+			await fastify.close();
+			await closePool();
+			process.exit(0);
+		};
+
+		process.on("SIGTERM", shutdown);
+		process.on("SIGINT", shutdown);
 	} catch (err) {
 		fastify.log.error(err);
+		await closePool();
 		process.exit(1);
 	}
 };

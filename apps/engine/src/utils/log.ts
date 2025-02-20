@@ -1,12 +1,8 @@
 import { createPostgresDriver, initializeLogger, log } from "@knowledgex/shared/log";
-import "../db";
-import postgres from "postgres";
+import { sql } from "../db";
 
-if (!process.env.POSTGRES_URL) {
-	throw new Error("POSTGRES_URL is not set");
-}
-
-const logDriver = createPostgresDriver(postgres(process.env.POSTGRES_URL));
+// Reuse the existing SQL connection pool
+const logDriver = createPostgresDriver(sql);
 
 initializeLogger(logDriver);
 
