@@ -5,7 +5,6 @@ import { auth, drive_v3 } from "@googleapis/drive";
 import { providerSchemas } from "@knowledgex/shared/interfaces";
 import mime from "mime-types";
 import type { z } from "zod";
-import { exportFile } from "../../export";
 import { runMarkitdown } from "../../parser";
 import { tempFileName } from "../../tmp";
 import { getToken } from "../../utils/token";
@@ -44,7 +43,7 @@ const getDrive = ({
 
 export const googleDriveProvider = provider({
 	schema: providerSchemas.googleDriveSchema,
-	internal: async ({ task }) => {
+	internal: async ({ task, exportFile }) => {
 		const token = await getToken(task);
 
 		const drive = getDrive({

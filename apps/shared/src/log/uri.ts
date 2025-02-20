@@ -56,3 +56,14 @@ export const mergeResourceUris = (...uris: ResourceUri[]) => {
 		.filter((uri) => uri.length)
 		.join(";");
 };
+
+export const splitResourceUris = (uri: string) => {
+	return uri.split(";").map((resource) => {
+		const [key, value] = resource.split(":");
+
+		return { resource: key, id: value } as {
+			resource: Resource;
+			id: string;
+		};
+	});
+};

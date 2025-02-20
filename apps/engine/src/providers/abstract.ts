@@ -1,4 +1,5 @@
 import {
+	type ExportTask,
 	type GenericQueueTask,
 	type IndexingTaskSchema,
 	type InternalTaskSchema,
@@ -11,6 +12,19 @@ import {
 import { mergeResourceUris } from "@knowledgex/shared/log";
 import type { z } from "zod";
 import { sql } from "../db";
+import { exportFile } from "../export";
+
+const createExport = (parentTask: GenericQueueTask) => {
+	return (exportTask: Omit<ExportTask, "taskId">) =>
+		exportFile({
+			...exportTask,
+			workspaceId: parentTask.workspaceId,
+			endUserId: parentTask.endUserId,
+			parentTaskIds: mergeResourceUris(parentTask.parentTaskIds || "", {
+				task: parentTask.taskId,
+			}),
+		});
+};
 
 const createQueue = <TId extends string, I extends z.ZodTypeAny>({
 	provider,
@@ -60,6 +74,7 @@ type QueueHandler<TId extends string, I extends z.ZodTypeAny, IT extends z.ZodTy
 	task: z.infer<I>["payload"];
 	// Whereas IT is the outbound task schema, which is always the internal task schema
 	queue: ReturnType<ReturnType<typeof createQueue<TId, IT>>>;
+	exportFile: ReturnType<typeof createExport>;
 }) => Promise<void>;
 
 interface Provider<S extends ProviderSchema> {
@@ -77,8 +92,16 @@ export const provider = <S extends ProviderSchema>({ schema, internal, indexing 
 		schema,
 		owns,
 		internal: (parentTask: Extract<InternalTaskSchema, { task: { provider: S["identifier"] } }>) =>
-			internal({ task: parseProviderTask(parseQueueTask(parentTask)), queue: queue(parentTask) }),
+			internal({
+				task: parseProviderTask(parseQueueTask(parentTask)),
+				queue: queue(parentTask),
+				exportFile: createExport(parentTask),
+			}),
 		indexing: (parentTask: Extract<IndexingTaskSchema, { task: { provider: S["identifier"] } }>) =>
-			indexing({ task: parseProviderTask(parseQueueTask(parentTask)), queue: queue(parentTask) }),
+			indexing({
+				task: parseProviderTask(parseQueueTask(parentTask)),
+				queue: queue(parentTask),
+				exportFile: createExport(parentTask),
+			}),
 	};
 };

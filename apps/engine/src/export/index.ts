@@ -4,13 +4,13 @@ import { sql } from "../db";
 
 export const exportFile = async (task: Omit<ExportTask, "taskId">) => {
 	// Safeguard
-	exportTask.parse(task);
+	const safeTask = exportTask.parse(task);
 
 	await sql`
     SELECT * FROM pgmq.send_batch(
 					queue_name => 'export_queue',
 					msgs => ARRAY[
-						${sql.array([JSON.stringify(task)])}::jsonb[]
+						${sql.array([JSON.stringify(safeTask)])}::jsonb[]
 					]
 				)
 		`;

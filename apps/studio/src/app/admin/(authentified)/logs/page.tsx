@@ -7,7 +7,6 @@ export default async function AnalyticsPage() {
 
 	return (
 		<div>
-			<AnalyticsGraph />
 			<AnalyticsTable logs={logs.data} />
 		</div>
 	);

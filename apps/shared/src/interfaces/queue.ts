@@ -2,7 +2,10 @@ import { v4 as uuid } from "@lukeed/uuid/secure";
 import { z } from "zod";
 
 export const genericQueueTask = z.object({
-	taskId: z.string().uuid().default(uuid()),
+	taskId: z
+		.string()
+		.uuid()
+		.default(() => uuid()),
 	workspaceId: z.string().uuid(),
 	endUserId: z.string().uuid().optional(),
 	parentTaskIds: z.string().optional(),
