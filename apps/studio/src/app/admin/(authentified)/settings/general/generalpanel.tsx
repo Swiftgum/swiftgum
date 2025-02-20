@@ -61,73 +61,71 @@ export default function GeneralPanel({ label, workspaceId }: OAuthSettingsPanelP
 	};
 
 	return (
-		<div className="overflow-y-auto">
-			<Card className="bg-white text-zinc-900 border border-gray-300 w-full shadow-md !rounded-none">
-				<CardContent className="space-y-6 p-5 bg-gray-50 max-h-[calc(100vh-150px)] overflow-y-auto">
-					<div className="flex">
-						<div className="w-1/2 flex items-start gap-3">
-							<div>
-								<span className="text-sm text-zinc-700 font-bold">General Settings</span>
-							</div>
+		<Card>
+			<CardContent className="space-y-6 p-5">
+				<div className="flex">
+					<div className="w-1/2 flex items-start gap-3">
+						<div>
+							<span className="text-sm text-zinc-700 font-bold">General Settings</span>
+						</div>
+					</div>
+
+					<div className="flex flex-col w-1/2 gap-5">
+						<div>
+							<label htmlFor="clientId" className="block text-sm font-medium text-zinc-700 mb-px">
+								Project name
+							</label>
+							<Input
+								id="clientId"
+								value={projectName}
+								onChange={(e) => setProjectName(e.target.value)}
+								placeholder="Project name"
+							/>
 						</div>
 
-						<div className="flex flex-col w-1/2 gap-5">
-							<div>
-								<label htmlFor="clientId" className="block text-sm font-medium text-zinc-700 mb-px">
-									Project name
-								</label>
+						<div>
+							<label htmlFor="label" className="block text-sm font-medium text-zinc-700 mb-1">
+								Project ID
+							</label>
+							<div className="relative">
 								<Input
-									id="clientId"
-									value={projectName}
-									onChange={(e) => setProjectName(e.target.value)}
-									placeholder="Project name"
+									disabled
+									id="label"
+									value={workspaceId}
+									readOnly
+									className="bg-gray-100 !cursor-default pr-16"
 								/>
-							</div>
-
-							<div>
-								<label htmlFor="label" className="block text-sm font-medium text-zinc-700 mb-1">
-									Project ID
-								</label>
-								<div className="relative">
-									<Input
-										disabled
-										id="label"
-										value={workspaceId}
-										readOnly
-										className="bg-gray-100 !cursor-default pr-16"
-									/>
-									<button
-										type="button"
-										className="absolute right-2 top-1/2 transform -translate-y-1/2 px-3 py-1 border border-gray-300 rounded-md text-gray-700 bg-gray-50 transition"
-										onClick={handleCopy}
-									>
-										<Copy className="w-4 h-4 inline-block mr-1" />
-										<span className="text-sm">{copyText}</span>
-									</button>
-								</div>
+								<button
+									type="button"
+									className="absolute right-2 top-1/2 transform -translate-y-1/2 px-3 py-1 border border-gray-300 rounded-md text-gray-700 bg-gray-50 transition"
+									onClick={handleCopy}
+								>
+									<Copy className="w-4 h-4 inline-block mr-1" />
+									<span className="text-sm">{copyText}</span>
+								</button>
 							</div>
 						</div>
 					</div>
-					<div className="flex justify-end mt-4 gap-3">
-						<Button
-							variant="outline"
-							disabled={!isModified || isSaving}
-							onClick={handleCancel}
-							className={!isModified ? "opacity-50 !cursor-default" : ""}
-						>
-							Cancel
-						</Button>
-						<Button
-							variant="default"
-							onClick={handleSave}
-							disabled={!isModified || isSaving}
-							className={!isModified ? "opacity-50 !cursor-default" : ""}
-						>
-							{isSaving ? "Saving..." : "Save"}
-						</Button>
-					</div>
-				</CardContent>
-			</Card>
-		</div>
+				</div>
+				<div className="flex justify-end mt-4 gap-3">
+					<Button
+						variant="outline"
+						disabled={!isModified || isSaving}
+						onClick={handleCancel}
+						className={!isModified ? "opacity-50 !cursor-default" : ""}
+					>
+						Cancel
+					</Button>
+					<Button
+						variant="default"
+						onClick={handleSave}
+						disabled={!isModified || isSaving}
+						className={!isModified ? "opacity-50 !cursor-default" : ""}
+					>
+						{isSaving ? "Saving..." : "Save"}
+					</Button>
+				</div>
+			</CardContent>
+		</Card>
 	);
 }
