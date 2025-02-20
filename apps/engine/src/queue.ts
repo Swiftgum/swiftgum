@@ -19,6 +19,16 @@ const getNextMessage = async (queueName: string, timeout = 60) => {
 	};
 };
 
+export const getQueueSize = async (queueName: string) => {
+	const queueTableName = `pgmq.q_${queueName.split(":")[1]}_queue`;
+
+	const result = await sql`
+		SELECT count(*) FROM ${sql(queueTableName)}
+	`;
+
+	return result[0] as { count: number };
+};
+
 const archiveMessage = async (queueName: string, messageId: string) => {
 	await sql`
     SELECT pgmq.archive(

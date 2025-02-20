@@ -1,7 +1,7 @@
 import Fastify from "fastify";
 import { processExport } from "./export";
 import { processIndexingTask, processInternalTask } from "./providers";
-import { addQueueListener } from "./queue";
+import { addQueueListener, getQueueSize } from "./queue";
 
 const fastify = Fastify({
 	logger: true,
@@ -9,7 +9,25 @@ const fastify = Fastify({
 
 // Declare a route
 fastify.get("/health", async function handler() {
-	return { status: "healthy" };
+	return {
+		status: "healthy",
+	};
+});
+
+const lastProcessed = {
+	indexing: null,
+	internal: null,
+	export: null,
+} as Record<string, Date | null>;
+
+fastify.get("/queues", async function handler() {
+	return {
+		queues: {
+			indexing: await getQueueSize("queue:"),
+			internal: await getQueueSize("queue:internal"),
+			export: await getQueueSize("queue:export"),
+		},
+	};
 });
 
 const start = async () => {
@@ -23,6 +41,8 @@ const start = async () => {
 			}
 
 			await processIndexingTask(row.message);
+
+			lastProcessed.indexing = new Date();
 		});
 
 		for (let i = 0; i < 30; i++) {
@@ -32,6 +52,8 @@ const start = async () => {
 				}
 
 				await processInternalTask(row.message);
+
+				lastProcessed.internal = new Date();
 			});
 		}
 
@@ -42,6 +64,8 @@ const start = async () => {
 				}
 
 				await processExport(row.message);
+
+				lastProcessed.export = new Date();
 			});
 		}
 
