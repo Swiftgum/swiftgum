@@ -13,32 +13,44 @@ const exec = promisify(execCallback);
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 const TIMEOUT_SECONDS = 120;
 
-export const runMarkitdown = async (file: string) => {
-	// Check file size
-	const stats = await fs.stat(file);
-	if (stats.size > MAX_FILE_SIZE) {
-		throw new Error(
-			`File size ${stats.size} bytes exceeds maximum allowed size of ${MAX_FILE_SIZE} bytes`,
-		);
-	}
+interface ExecError extends Error {
+	code?: string;
+	stdout?: string;
+	stderr?: string;
+}
 
-	// Execute markitdown with timeout
-	const { stdout, stderr, status } = await exec(`markitdown ${file}`, {
-		timeout: TIMEOUT_SECONDS * 1000,
-	})
-		.then((result) => ({ ...result, status: 0 }))
-		.catch((error) => {
-			if ("status" in error) {
-				return { stdout: error.stdout, stderr: error.stderr, status: error.status };
-			}
-			throw error;
+export const runMarkitdown = async (file: string) => {
+	try {
+		// Check file size
+		const stats = await fs.stat(file);
+		if (stats.size > MAX_FILE_SIZE) {
+			throw new Error(
+				`File size ${stats.size} bytes exceeds maximum allowed size of ${MAX_FILE_SIZE} bytes`,
+			);
+		}
+
+		// Execute markitdown with timeout
+		const result = await exec(`markitdown ${file}`, {
+			timeout: TIMEOUT_SECONDS * 1000,
+			killSignal: "SIGKILL", // Use SIGKILL instead of SIGTERM for harder termination
 		});
 
-	// Only throw if we have a non-zero exit code
-	if (status !== 0) {
-		const output = [stdout, stderr].filter(Boolean).join("\n").trim();
-		throw new Error(`Markitdown failed with status ${status}:\n${output}`);
-	}
+		return { textContents: result.stdout.trim() };
+	} catch (error) {
+		const execError = error as ExecError;
 
-	return { textContents: stdout.trim() };
+		// Handle specific error cases
+		if (execError.code === "ETIMEDOUT") {
+			throw new Error(`Process timed out after ${TIMEOUT_SECONDS} seconds`);
+		}
+
+		// For exec errors, include both stdout and stderr in the error message
+		if (execError.stdout || execError.stderr) {
+			const output = [execError.stdout, execError.stderr].filter(Boolean).join("\n").trim();
+			throw new Error(`Markitdown failed: ${output}`);
+		}
+
+		// For other errors, pass through the error message
+		throw new Error(`Failed to process markdown file: ${execError.message || String(error)}`);
+	}
 };
