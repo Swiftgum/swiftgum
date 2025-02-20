@@ -3,7 +3,7 @@
 import { type Log, splitResourceUris } from "@knowledgex/shared/log";
 import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import clsx from "clsx";
-import { Cpu, Info, Key, Lock, ToyBrick } from "lucide-react";
+import { Cpu, Info, Key, Lock, Monitor, ToyBrick, User } from "lucide-react";
 import { useMemo } from "react";
 
 const LevelBadge = ({ level }: { level: Log["level"] }) => {
@@ -39,6 +39,10 @@ const ResourceBadge = ({
 						return <ToyBrick className="w-3 h-3" />;
 					case "token":
 						return <Key className="w-3 h-3" />;
+					case "portal_session":
+						return <Monitor className="w-3 h-3" />;
+					case "end_user":
+						return <User className="w-3 h-3" />;
 					default:
 						return <span>{resourceUri.resource}</span>;
 				}
