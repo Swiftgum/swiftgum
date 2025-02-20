@@ -25,7 +25,6 @@ primary_region = 'sjc'
   path = "/health"
 
 [[vm]]
-  memory = '1gb'
+  memory = '2gb'
   cpu_kind = 'shared'
-  cpus = 1
-  memory_mb = 1024
+  cpus = 4
