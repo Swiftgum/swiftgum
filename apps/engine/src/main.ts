@@ -54,7 +54,7 @@ const start = async () => {
 			lastProcessed.indexing = new Date();
 		});
 
-		for (let i = 0; i < 30; i++) {
+		for (let i = 0; i < 5; i++) {
 			void addQueueListener("queue:internal", async (row) => {
 				if (!row) {
 					return;
@@ -66,7 +66,7 @@ const start = async () => {
 			});
 		}
 
-		for (let i = 0; i < 20; i++) {
+		for (let i = 0; i < 5; i++) {
 			void addQueueListener("queue:export", async (row) => {
 				if (!row) {
 					return;
