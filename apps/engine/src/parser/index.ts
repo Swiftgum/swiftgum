@@ -41,16 +41,16 @@ export const runMarkitdown = async (file: string) => {
 
 		// Handle specific error cases
 		if (execError.code === "ETIMEDOUT") {
-			throw new Error(`Process timed out after ${TIMEOUT_SECONDS} seconds`);
+			throw new Error(`Markitdown process timed out after ${TIMEOUT_SECONDS} seconds`);
 		}
 
 		// For exec errors, include both stdout and stderr in the error message
 		if (execError.stdout || execError.stderr) {
 			const output = [execError.stdout, execError.stderr].filter(Boolean).join("\n").trim();
-			throw new Error(`Markitdown failed: ${output}`);
+			throw new Error(`Markitdown process failed: ${output}`);
 		}
 
 		// For other errors, pass through the error message
-		throw new Error(`Failed to process markdown file: ${execError.message || String(error)}`);
+		throw new Error(`Markitdown process failed: ${execError.message || String(error)}`);
 	}
 };
