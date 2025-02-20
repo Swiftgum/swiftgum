@@ -87,7 +87,7 @@ export const AnalyticsTable = ({
 					accessorKey: "id",
 					cell: ({ cell }) => {
 						const value = cell.getValue() as string;
-						const resources = splitResourceUris(value);
+						const resources = splitResourceUris(value || "");
 
 						return (
 							<div className="flex flex-wrap gap-1 items-center">

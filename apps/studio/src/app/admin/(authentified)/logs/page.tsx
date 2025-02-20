@@ -1,5 +1,4 @@
 import { getLogs } from "./actions";
-import { AnalyticsGraph } from "./graph";
 import { AnalyticsTable } from "./table";
 
 export default async function AnalyticsPage() {
