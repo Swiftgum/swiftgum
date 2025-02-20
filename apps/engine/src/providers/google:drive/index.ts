@@ -27,9 +27,14 @@ const DRIVE_MIME_TYPES_MAPPING = {
 	"application/vnd.google-apps.drawing": "image/png",
 };
 
-const OTHER_SUPPORTED_MIME_TYPES = ["application/pdf"];
-const ALLOWED_MIME_TYPES = [...DRIVE_MIME_TYPES, ...OTHER_SUPPORTED_MIME_TYPES];
-const MAX_DRIVE_EXPORT_SIZE = 1e7; // 10MB
+const SUPPORTED_MIME_TYPES = [
+	"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	"application/vnd.openxmlformats-officedocument.presentationml.presentation",
+	"application/pdf",
+];
+
+const MAX_DRIVE_EXPORT_SIZE = 100 * 1024 * 1024; // 100MB
 
 const getDrive = ({
 	accessToken,
@@ -72,13 +77,9 @@ export const googleDriveProvider = provider({
 
 					readableStream = stream.data;
 				} else if (task.exportLinks) {
-					let targetMimeType = Object.keys(task.exportLinks).find((mimeType) =>
-						ALLOWED_MIME_TYPES.includes(mimeType),
+					const targetMimeType = SUPPORTED_MIME_TYPES.find(
+						(mimeType) => task.exportLinks && mimeType in task.exportLinks,
 					);
-
-					if (!targetMimeType && "application/pdf" in task.exportLinks) {
-						targetMimeType = "application/pdf";
-					}
 
 					if (targetMimeType) {
 						const response = await fetch(task.exportLinks[targetMimeType], {
@@ -183,7 +184,7 @@ export const googleDriveProvider = provider({
 				continue;
 			}
 
-			if (!ALLOWED_MIME_TYPES.includes(file.mimeType)) {
+			if (!SUPPORTED_MIME_TYPES.includes(file.mimeType)) {
 				continue;
 			}
 

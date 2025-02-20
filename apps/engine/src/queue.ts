@@ -5,6 +5,18 @@ import { sql } from "./db";
 import { keepAlive } from "./utils/keepalive";
 import { log } from "./utils/log";
 
+// Contains a public reason property that will be logged
+export class QueueError extends Error {
+	reason: string;
+
+	constructor(reason: string) {
+		super(reason);
+		this.reason = reason;
+	}
+}
+
+export class FinalQueueError extends QueueError {}
+
 const getNextMessage = async (queueName: string, timeout = 60) => {
 	const result = await sql`
     SELECT * FROM pgmq.read(
@@ -61,12 +73,9 @@ export const addQueueListener = async (
 		// throw error;
 	}
 
-	let errors = 0;
-
-	while (errors < maxErrors) {
+	while (true) {
 		try {
 			const message = await getNextMessage(realQueueName, timeout);
-			errors = 0;
 
 			if (message) {
 				keepAlive();
@@ -115,6 +124,8 @@ export const addQueueListener = async (
 				} catch (error) {
 					console.error(error);
 
+					const errorReason = error instanceof QueueError ? error.reason : "Unknown error";
+
 					void log({
 						level: "error",
 						type: queueName,
@@ -123,9 +134,14 @@ export const addQueueListener = async (
 						id: mergeResourceUris(message.message.parentTaskIds || "", {
 							task: message.message.taskId,
 						}),
-						metadata: {},
+						metadata: { error: errorReason },
 						private: false,
 					});
+
+					// If it's a FinalQueueError, we still want to remove the message from the queue
+					if (error instanceof FinalQueueError) {
+						await archiveMessage(realQueueName, message.msg_id);
+					}
 				}
 
 				// If a message has been read, we can process a new one immediately.
@@ -133,8 +149,6 @@ export const addQueueListener = async (
 			}
 		} catch (error) {
 			console.error(error);
-
-			errors++;
 
 			void log({
 				level: "error",
@@ -146,6 +160,4 @@ export const addQueueListener = async (
 
 		await new Promise((resolve) => setTimeout(resolve, 1000));
 	}
-
-	throw new Error(`Max errors reached for queue ${realQueueName}`);
 };

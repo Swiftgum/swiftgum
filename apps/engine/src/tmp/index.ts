@@ -1,19 +1,20 @@
 import { randomUUID } from "node:crypto";
+import { mkdirSync, readdirSync, rmSync } from "node:fs";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 
 const TEMP_DIR = "/tmp/engine";
 
-const ensureTempDirectory = async () => {
-	await fs.mkdir(TEMP_DIR, { recursive: true });
+const ensureTempDirectory = () => {
+	mkdirSync(TEMP_DIR, { recursive: true });
 };
 
-const clearTempDirectory = async () => {
-	await ensureTempDirectory();
+const clearTempDirectory = () => {
+	ensureTempDirectory();
 
-	const files = await fs.readdir(TEMP_DIR);
+	const files = readdirSync(TEMP_DIR);
 	for (const file of files) {
-		await fs.unlink(path.join(TEMP_DIR, file));
+		rmSync(path.join(TEMP_DIR, file), { recursive: true, force: true });
 	}
 };
 

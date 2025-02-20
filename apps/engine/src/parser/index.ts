@@ -7,6 +7,7 @@
 import { exec as execCallback } from "node:child_process";
 import fs from "node:fs/promises";
 import { promisify } from "node:util";
+import { FinalQueueError, QueueError } from "../queue";
 
 const exec = promisify(execCallback);
 
@@ -24,7 +25,7 @@ export const runMarkitdown = async (file: string) => {
 		// Check file size
 		const stats = await fs.stat(file);
 		if (stats.size > MAX_FILE_SIZE) {
-			throw new Error(
+			throw new FinalQueueError(
 				`File size ${stats.size} bytes exceeds maximum allowed size of ${MAX_FILE_SIZE} bytes`,
 			);
 		}
@@ -41,7 +42,7 @@ export const runMarkitdown = async (file: string) => {
 
 		// Handle specific error cases
 		if (execError.code === "ETIMEDOUT") {
-			throw new Error(`Markitdown process timed out after ${TIMEOUT_SECONDS} seconds`);
+			throw new QueueError(`Markitdown process timed out after ${TIMEOUT_SECONDS} seconds`);
 		}
 
 		// For exec errors, include both stdout and stderr in the error message
