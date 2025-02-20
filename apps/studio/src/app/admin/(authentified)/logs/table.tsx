@@ -47,7 +47,7 @@ const ResourceBadge = ({
 						return <span>{resourceUri.resource}</span>;
 				}
 			})()}
-			<span>{resourceUri.id.split("-")[0]}</span>
+			<span>{resourceUri.id}</span>
 		</span>
 	);
 };
@@ -96,7 +96,10 @@ export const AnalyticsTable = ({
 						return (
 							<div className="flex flex-wrap gap-1 items-center">
 								{resources.map((resource) => (
-									<ResourceBadge key={resource.id} resourceUri={resource} />
+									<ResourceBadge
+										key={`${resource.resource}:${resource.id}`}
+										resourceUri={resource}
+									/>
 								))}
 							</div>
 						);
