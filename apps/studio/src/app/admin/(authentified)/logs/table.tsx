@@ -47,7 +47,7 @@ const ResourceBadge = ({
 						return <span>{resourceUri.resource}</span>;
 				}
 			})()}
-			<span>{resourceUri.id}</span>
+			<span>{resourceUri.id.split("-")[0]}</span>
 		</span>
 	);
 };
