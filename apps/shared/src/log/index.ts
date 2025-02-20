@@ -47,6 +47,14 @@ export async function log(input: LogInput) {
 		id: resourceUri(processedInput.id || {}),
 	});
 
+	switch (processedInput.level) {
+		case "error":
+			console.error(logEntry);
+			break;
+		default:
+			console.log(logEntry);
+	}
+
 	await _driver.insert(logEntry);
 }
 
