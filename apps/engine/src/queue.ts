@@ -2,6 +2,7 @@ import type { GenericQueueTask } from "@knowledgex/shared/interfaces";
 import { type QueueName, mergeResourceUris } from "@knowledgex/shared/log";
 import type postgres from "postgres";
 import { sql } from "./db";
+import { keepAlive } from "./utils/keepalive";
 import { log } from "./utils/log";
 
 const getNextMessage = async (queueName: string, timeout = 60) => {
@@ -68,6 +69,8 @@ export const addQueueListener = async (
 			errors = 0;
 
 			if (message) {
+				keepAlive();
+
 				const timeoutHandle = setTimeout(() => {
 					log({
 						level: "warning",
