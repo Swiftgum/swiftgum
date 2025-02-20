@@ -23,9 +23,18 @@ const lastProcessed = {
 fastify.get("/queues", async function handler() {
 	return {
 		queues: {
-			indexing: await getQueueSize("queue:"),
-			internal: await getQueueSize("queue:internal"),
-			export: await getQueueSize("queue:export"),
+			indexing: {
+				size: await getQueueSize("queue:indexing"),
+				lastProcessed: lastProcessed.indexing,
+			},
+			internal: {
+				size: await getQueueSize("queue:internal"),
+				lastProcessed: lastProcessed.internal,
+			},
+			export: {
+				size: await getQueueSize("queue:export"),
+				lastProcessed: lastProcessed.export,
+			},
 		},
 	};
 });
