@@ -494,6 +494,12 @@ export type Database = {
 				};
 				Returns: number;
 			};
+			rotate_api_key: {
+				Args: {
+					p_workspace_id: string;
+				};
+				Returns: string;
+			};
 			sign_portal_session: {
 				Args: {
 					p_portal_session_id: string;

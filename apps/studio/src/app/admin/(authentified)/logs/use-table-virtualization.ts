@@ -22,7 +22,7 @@ export function useTableVirtualization<T>({
 
 	const rowVirtualizer = useVirtualizer({
 		count: table.getRowModel().rows.length,
-		estimateSize: () => 41,
+		estimateSize: () => 33,
 		getScrollElement: () => containerRef.current,
 		measureElement:
 			typeof window !== "undefined" && navigator.userAgent.indexOf("Firefox") === -1

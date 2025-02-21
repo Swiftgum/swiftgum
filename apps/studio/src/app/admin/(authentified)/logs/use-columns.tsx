@@ -3,9 +3,9 @@
 import type { Log } from "@knowledgex/shared/log";
 import { splitResourceUris } from "@knowledgex/shared/log";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Cpu, Key, Monitor, ToyBrick, User } from "lucide-react";
+import { Cpu, Key, Monitor, Puzzle, ToyBrick, User } from "lucide-react";
 import { useMemo } from "react";
-import { LevelBadge } from "./log-level-badge";
+import { LogLevelBadge } from "./log-level-badge";
 
 const ResourceBadge = ({
 	resourceUri,
@@ -33,6 +33,8 @@ const ResourceBadge = ({
 						return <Monitor className="w-3 h-3" />;
 					case "end_user":
 						return <User className="w-3 h-3" />;
+					case "provider":
+						return <Puzzle className="w-3 h-3" />;
 					default:
 						return <span>{resourceUri.resource}</span>;
 				}
@@ -76,7 +78,7 @@ export function useColumns() {
 					accessorKey: "level",
 					cell: ({ cell }) => {
 						const value = cell.getValue() as Log["level"];
-						return <LevelBadge level={value} />;
+						return <LogLevelBadge level={value} />;
 					},
 					size: 100,
 					minSize: 80,
@@ -101,7 +103,7 @@ export function useColumns() {
 						const resources = splitResourceUris(value || "");
 
 						return (
-							<div className="flex flex-wrap gap-1 items-center">
+							<div className="flex flex-nowrap gap-1 items-center">
 								{resources.map((resource) => (
 									<ResourceBadge
 										key={`${resource.resource}:${resource.id}`}

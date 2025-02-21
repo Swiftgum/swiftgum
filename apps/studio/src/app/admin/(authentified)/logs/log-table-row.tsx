@@ -1,9 +1,11 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import type { Log } from "@knowledgex/shared/log";
 import type { Row } from "@tanstack/react-table";
 import { flexRender } from "@tanstack/react-table";
 import type { Virtualizer } from "@tanstack/react-virtual";
+import clsx from "clsx";
 import { memo } from "react";
 
 interface LogTableRowProps {
@@ -11,9 +13,18 @@ interface LogTableRowProps {
 	rowRefsMap: React.MutableRefObject<Map<number, HTMLTableRowElement>>;
 	rowVirtualizer: Virtualizer<HTMLDivElement, Element>;
 	virtualRowIndex: number;
+	onClick?: () => void;
+	isSelected?: boolean;
 }
 
-function LogTableRow({ row, rowRefsMap, rowVirtualizer, virtualRowIndex }: LogTableRowProps) {
+function LogTableRow({
+	row,
+	rowRefsMap,
+	rowVirtualizer,
+	virtualRowIndex,
+	onClick,
+	isSelected,
+}: LogTableRowProps) {
 	return (
 		<tr
 			data-index={virtualRowIndex}
@@ -25,11 +36,26 @@ function LogTableRow({ row, rowRefsMap, rowVirtualizer, virtualRowIndex }: LogTa
 			}}
 			key={row.id}
 			data-key={row.id}
-			className="hover:bg-white transition-colors text-gray-700 border-b flex absolute min-w-full"
+			className={cn(
+				"transition-colors text-gray-700 border-b flex absolute min-w-full cursor-pointer hover:bg-gray-100",
+				isSelected && "bg-white hover:bg-white font-bold",
+			)}
+			onClick={onClick}
+			onKeyDown={(e) => {
+				if (e.key === "Enter" || e.key === " ") {
+					e.preventDefault();
+					onClick?.();
+				}
+			}}
+			tabIndex={0}
+			// biome-ignore lint/a11y/useSemanticElements: this is a semantic table row
+			role="button"
 		>
 			{row.getVisibleCells().map((cell) => (
 				<td
-					className="p-2 flex items-start"
+					className={clsx(
+						"px-2 flex items-center whitespace-nowrap h-8 overflow-hidden text-ellipsis border-r border-r-gray-100",
+					)}
 					key={cell.id}
 					style={{
 						width: `calc(var(--col-${cell.column.id}-size) * 1px)`,
@@ -47,6 +73,7 @@ export const MemoizedLogTableRow = memo(LogTableRow, (prev, next) => {
 	// Always rerender if the row data changes
 	if (prev.row.id !== next.row.id) return false;
 	if (prev.virtualRowIndex !== next.virtualRowIndex) return false;
+	if (prev.isSelected !== next.isSelected) return false;
 
 	// Prevent rerenders only while scrolling
 	return next.rowVirtualizer.isScrolling;

@@ -44,6 +44,7 @@ export const integrationLogEvent = logSchema.extend({
 		"internal:started",
 		"internal:completed",
 		"internal:failed",
+		"configuration:changed",
 	]),
 });
 
@@ -84,6 +85,7 @@ export const resourceTypes = z.enum([
 	"portal_session",
 	"task",
 	"end_user",
+	"provider",
 ]);
 
 // Export the type for TypeScript usage

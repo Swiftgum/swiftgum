@@ -3,7 +3,16 @@
 import { handleRequest } from "@/utils/auth-helpers/client";
 import { SignOut } from "@/utils/auth-helpers/server";
 import { getRedirectMethod } from "@/utils/auth-helpers/settings";
-import { Database, House, KeyRound, LoaderPinwheel, LogOut, Logs, Settings } from "lucide-react";
+import {
+	Database,
+	House,
+	KeyRound,
+	LoaderPinwheel,
+	LogOut,
+	Logs,
+	Puzzle,
+	Settings,
+} from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import { NavbarItem } from "./navbar-item";
@@ -33,10 +42,16 @@ export function NavbarContents({ onItemClick }: NavbarContentsProps) {
 			isActive: pathname === "/admin",
 		},
 		{
-			href: "/admin/auth/providers",
+			href: "/admin/api",
 			icon: <KeyRound size={18} />,
-			label: "Authentication",
-			isActive: pathname.startsWith("/admin/auth/providers"),
+			label: "API Access",
+			isActive: pathname.startsWith("/admin/api"),
+		},
+		{
+			href: "/admin/integrations",
+			icon: <Puzzle size={18} />,
+			label: "Integrations",
+			isActive: pathname.startsWith("/admin/integrations"),
 		},
 		{
 			href: "/admin/destination/webhook",

@@ -2,7 +2,7 @@ import type { Log } from "@knowledgex/shared/log";
 import { clsx } from "clsx";
 import { AlertCircle, AlertTriangle, Info, Lock } from "lucide-react";
 
-export const LevelBadge = ({ level }: { level: Log["level"] }) => {
+export const LogLevelBadge = ({ level }: { level: Log["level"] }) => {
 	return (
 		<span
 			className={clsx(

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Log } from "@knowledgex/shared/log";
 import { Filter } from "lucide-react";
-import { LevelBadge } from "./log-level-badge";
+import { LogLevelBadge } from "./log-level-badge";
 
 const LOG_LEVELS: Log["level"][] = ["verbose", "debug", "info", "security", "warning", "error"];
 
@@ -28,7 +28,7 @@ export const LogLevelFilter = ({
 					{selectedLevels.length === 0 ? (
 						"All levels"
 					) : selectedLevels.length === 1 ? (
-						<LevelBadge level={selectedLevels[0]} />
+						<LogLevelBadge level={selectedLevels[0]} />
 					) : (
 						`${selectedLevels.length} levels`
 					)}
@@ -53,7 +53,7 @@ export const LogLevelFilter = ({
 								htmlFor={`level-${level}`}
 								className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center"
 							>
-								<LevelBadge level={level} />
+								<LogLevelBadge level={level} />
 							</label>
 						</div>
 					))}
