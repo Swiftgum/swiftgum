@@ -88,6 +88,7 @@ export const AnalyticsTable = () => {
 		initialLevels,
 		initialResources,
 		setFilters,
+		refetch,
 	} = useLogsTable();
 
 	const [selectedLevels, setSelectedLevels] = useState<Log["level"][]>(
@@ -99,6 +100,10 @@ export const AnalyticsTable = () => {
 		setSelectedLevels(["info", "security", "warning", "error"]);
 		setSelectedResources([]);
 	}, []);
+
+	const handleRefresh = useCallback(() => {
+		refetch();
+	}, [refetch]);
 
 	const handleRowClick = useCallback((log: Log) => {
 		setSelectedLog(log);
@@ -149,6 +154,8 @@ export const AnalyticsTable = () => {
 							onResourcesChange={setSelectedResources}
 							onReset={handleReset}
 							resourceFilterRef={resourceFilterRef}
+							onRefresh={handleRefresh}
+							isRefreshing={isFetching}
 						/>
 						<TableBody
 							table={table}

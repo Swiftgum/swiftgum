@@ -1,9 +1,10 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import type { Log } from "@knowledgex/shared/log";
 import type { Table } from "@tanstack/react-table";
 import { flexRender } from "@tanstack/react-table";
-import { GripVertical } from "lucide-react";
+import { GripVertical, RotateCw } from "lucide-react";
 import { LogFiltersReset } from "./log-filters-reset";
 import { LogLevelFilter } from "./log-level-filter";
 import { LogResourceFilter, type LogResourceFilterRef } from "./log-resource-filter";
@@ -16,6 +17,8 @@ interface TableHeaderProps {
 	onResourcesChange: (resources: string[]) => void;
 	onReset: () => void;
 	resourceFilterRef: React.RefObject<LogResourceFilterRef | null>;
+	onRefresh: () => void;
+	isRefreshing: boolean;
 }
 
 export function TableHeader({
@@ -26,6 +29,8 @@ export function TableHeader({
 	onResourcesChange,
 	onReset,
 	resourceFilterRef,
+	onRefresh,
+	isRefreshing,
 }: TableHeaderProps) {
 	return (
 		<thead className="shadow-sm bg-white w-full z-10 sticky top-0">
@@ -43,6 +48,16 @@ export function TableHeader({
 							selectedResources={selectedResources}
 							onReset={onReset}
 						/>
+						<Button
+							variant="secondary"
+							size="sm"
+							onClick={onRefresh}
+							disabled={isRefreshing}
+							className="ml-auto font-sans"
+						>
+							<RotateCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+							<span className="ml-2">Refresh</span>
+						</Button>
 					</div>
 				</th>
 			</tr>

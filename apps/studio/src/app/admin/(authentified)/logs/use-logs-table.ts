@@ -16,7 +16,7 @@ export function useLogsTable() {
 
 	const columns = useColumns();
 
-	const { data, fetchNextPage, isFetching, isLoading, hasNextPage } = useInfiniteQuery({
+	const { data, fetchNextPage, isFetching, isLoading, hasNextPage, refetch } = useInfiniteQuery({
 		queryKey: ["logs", initialLevels, initialResources],
 		queryFn: async ({ pageParam }) => {
 			const result = await getLogs({
@@ -65,5 +65,6 @@ export function useLogsTable() {
 		initialLevels,
 		initialResources,
 		setFilters,
+		refetch,
 	};
 }

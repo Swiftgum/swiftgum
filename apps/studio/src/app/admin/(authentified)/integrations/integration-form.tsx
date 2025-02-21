@@ -108,7 +108,7 @@ export function IntegrationForm({ provider, integration }: IntegrationFormProps)
 								/>
 							</RevealInput.Input>
 							<RevealInput.Reveal asChild>
-								<Button type="button" variant="default" disabled={isLoading} />
+								<Button type="button" variant="outline" disabled={isLoading} />
 							</RevealInput.Reveal>
 						</RevealInput.Root>
 						{integration?.decrypted_credentials && !clientSecret && (
@@ -121,7 +121,7 @@ export function IntegrationForm({ provider, integration }: IntegrationFormProps)
 			{/* Actions Section */}
 			<div className="flex justify-end">
 				<Button
-					variant="outline"
+					variant="default"
 					className="w-full sm:w-auto"
 					onClick={handleSubmit}
 					disabled={isLoading}
