@@ -11,8 +11,8 @@ export default function Navlinks() {
 	const pathname = usePathname();
 
 	return (
-		<div className="group/nav fixed left-0 top-0 flex h-screen transition-all duration-300">
-			<nav className="flex flex-col flex-grow border-r bg-white overflow-hidden transition-all duration-300 w-14 group-hover/nav:w-56 group-focus-within/nav:has-[:focus-visible]:w-56 group-hover/nav:shadow-lg box-content z-50">
+		<div className="group/nav fixed left-0 top-0 flex h-screen transition-all duration-300 z-50">
+			<nav className="flex flex-col flex-grow border-r bg-white overflow-hidden transition-all duration-300 w-14 group-hover/nav:w-56 group-focus-within/nav:has-[:focus-visible]:w-56 group-hover/nav:shadow-lg box-content relative">
 				<div className="flex items-center justify-center h-14 w-14">
 					<LoaderPinwheel color="#0094FF" />
 				</div>

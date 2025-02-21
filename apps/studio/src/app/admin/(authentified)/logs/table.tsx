@@ -1,146 +1,153 @@
 "use client";
 
-import { type Log, splitResourceUris } from "@knowledgex/shared/log";
-import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import clsx from "clsx";
-import { Cpu, Info, Key, Lock, Monitor, ToyBrick, User } from "lucide-react";
-import { useMemo } from "react";
+import type { Log } from "@knowledgex/shared/log";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { LogResourceFilterRef } from "./log-resource-filter";
+import { MemoizedLogTableRow } from "./log-table-row";
+import { TableHeader } from "./table-header";
+import { useColumnSizes } from "./use-column-sizes";
+import { useLogsTable } from "./use-logs-table";
+import { useTableVirtualization } from "./use-table-virtualization";
 
-const LevelBadge = ({ level }: { level: Log["level"] }) => {
-	return (
-		<span
-			className={clsx(
-				"inline-flex items-center gap-1",
-				level === "verbose" && "",
-				level === "info" && "text-blue-600",
-				level === "security" && "text-amber-600",
-			)}
-		>
-			{level === "info" && <Info className="w-3 h-3" />}
-			{level === "security" && <Lock className="w-3 h-3" />}
-			{level}
-		</span>
-	);
-};
-
-const ResourceBadge = ({
-	resourceUri,
-}: { resourceUri: ReturnType<typeof splitResourceUris>[number] }) => {
-	return (
-		<span
-			className="inline-flex items-center gap-1.5 text-xs px-1.5 py-0.5 rounded-md bg-gray-100 text-gray-600"
-			title={`${resourceUri.resource}:${resourceUri.id}`}
-		>
-			{(() => {
-				switch (resourceUri.resource) {
-					case "task":
-						return <Cpu className="w-3 h-3" />;
-					case "integration":
-						return <ToyBrick className="w-3 h-3" />;
-					case "token":
-						return <Key className="w-3 h-3" />;
-					case "portal_session":
-						return <Monitor className="w-3 h-3" />;
-					case "end_user":
-						return <User className="w-3 h-3" />;
-					default:
-						return <span>{resourceUri.resource}</span>;
-				}
-			})()}
-			<span>{resourceUri.id.split("-")[0]}</span>
-		</span>
-	);
-};
-
-export const AnalyticsTable = ({
-	logs,
+function TableBody({
+	rowVirtualizer,
+	table,
+	rowRefsMap,
+	isLoading,
 }: {
-	logs: Log[];
-}) => {
-	const columns = useMemo(
-		() =>
-			[
-				{
-					header: "Timestamp",
-					accessorKey: "timestamp",
-					cell: ({ cell }) => {
-						const value = cell.getValue() as Log["timestamp"];
+	table: ReturnType<typeof useLogsTable>["table"];
+	rowVirtualizer: ReturnType<typeof useTableVirtualization<Log>>["rowVirtualizer"];
+	rowRefsMap: ReturnType<typeof useTableVirtualization<Log>>["rowRefsMap"];
+	isLoading: boolean;
+}) {
+	const { rows } = table.getRowModel();
+	const virtualRowIndexes = rowVirtualizer.getVirtualItems().map((item) => item.index);
 
-						return <span suppressHydrationWarning>{new Date(value).toLocaleString()}</span>;
-					},
-				},
-				{
-					header: "Level",
-					accessorKey: "level",
-					cell: ({ cell }) => {
-						const value = cell.getValue() as Log["level"];
+	if (isLoading) {
+		return (
+			<tbody
+				style={{
+					display: "grid",
+					height: "100px",
+					position: "relative",
+					width: "100%",
+				}}
+			>
+				<tr className="absolute inset-0 flex items-center justify-center">
+					<td>Loading...</td>
+				</tr>
+			</tbody>
+		);
+	}
 
-						return <LevelBadge level={value} />;
-					},
-				},
-				{
-					header: "Type",
-					accessorKey: "type",
-				},
-				{
-					header: "Name",
-					accessorKey: "name",
-				},
-				{
-					header: "Resources",
-					accessorKey: "id",
-					cell: ({ cell }) => {
-						const value = cell.getValue() as string;
-						const resources = splitResourceUris(value || "");
-
-						return (
-							<div className="flex flex-wrap gap-1 items-center">
-								{resources.map((resource) => (
-									<ResourceBadge
-										key={`${resource.resource}:${resource.id}`}
-										resourceUri={resource}
-									/>
-								))}
-							</div>
-						);
-					},
-				},
-			] as ColumnDef<Log>[],
-		[],
+	return (
+		<tbody
+			style={{
+				display: "grid",
+				height: `${rowVirtualizer.getTotalSize()}px`,
+				position: "relative",
+				width: "100%",
+			}}
+		>
+			{virtualRowIndexes.map((virtualRowIndex) => {
+				const row = rows[virtualRowIndex];
+				return (
+					<MemoizedLogTableRow
+						key={row.id}
+						row={row}
+						rowRefsMap={rowRefsMap}
+						rowVirtualizer={rowVirtualizer}
+						virtualRowIndex={virtualRowIndex}
+					/>
+				);
+			})}
+		</tbody>
 	);
+}
 
-	const table = useReactTable({
-		data: logs,
-		columns: columns,
-		getCoreRowModel: getCoreRowModel(),
+export const AnalyticsTable = () => {
+	const tableContainerRef = useRef<HTMLDivElement>(null);
+	const resourceFilterRef = useRef<LogResourceFilterRef>(null);
+
+	const {
+		table,
+		isFetching,
+		isLoading,
+		flatData,
+		totalDBRowCount,
+		fetchMoreOnBottomReached,
+		initialLevels,
+		initialResources,
+		setFilters,
+	} = useLogsTable();
+
+	const [selectedLevels, setSelectedLevels] = useState<Log["level"][]>(
+		initialLevels.length > 0 ? initialLevels : ["info", "security", "warning", "error"],
+	);
+	const [selectedResources, setSelectedResources] = useState<string[]>(initialResources);
+
+	const handleReset = useCallback(() => {
+		setSelectedLevels(["info", "security", "warning", "error"]);
+		setSelectedResources([]);
+	}, []);
+
+	// Update URL when filters change
+	useEffect(() => {
+		setFilters(selectedLevels, selectedResources);
+		// Scroll to top when filters change
+		tableContainerRef.current?.scrollTo(0, 0);
+	}, [selectedLevels, selectedResources, setFilters]);
+
+	// Listen for resource add events
+	useEffect(() => {
+		const handleAddResource = (e: Event) => {
+			const resource = (e as CustomEvent).detail;
+			resourceFilterRef.current?.addResource(resource);
+		};
+		window.addEventListener("addLogResource", handleAddResource);
+		return () => window.removeEventListener("addLogResource", handleAddResource);
+	}, []);
+
+	const { rowVirtualizer, rowRefsMap } = useTableVirtualization({
+		table,
+		containerRef: tableContainerRef,
 	});
 
+	const columnSizeVars = useColumnSizes(table);
+
 	return (
-		<table className="w-full font-mono text-sm max-h-screen overflow-y-auto">
-			<thead className="sticky top-0 bg-white shadow-sm z-10">
-				{table.getHeaderGroups().map((headerGroup) => (
-					<tr key={headerGroup.id} className="border-b">
-						{headerGroup.headers.map((header) => (
-							<th className="text-left p-2" key={header.id}>
-								{header.isPlaceholder
-									? null
-									: flexRender(header.column.columnDef.header, header.getContext())}
-							</th>
-						))}
-					</tr>
-				))}
-			</thead>
-			<tbody>
-				{table.getRowModel().rows.map((row) => (
-					<tr className="border-b" key={row.original.log_id}>
-						{row.getVisibleCells().map((cell) => (
-							<td className="p-2" key={cell.id}>
-								{flexRender(cell.column.columnDef.cell, cell.getContext())}
-							</td>
-						))}
-					</tr>
-				))}
-			</tbody>
-		</table>
+		<div className="h-screen flex flex-col">
+			<div
+				ref={tableContainerRef}
+				className="w-full font-mono text-xs overflow-auto relative basis-0 flex-grow bg-gray-50"
+				onScroll={(e) => fetchMoreOnBottomReached(e.currentTarget)}
+			>
+				<table className="grid w-full min-w-[fit-content]" style={{ ...columnSizeVars }}>
+					<TableHeader
+						table={table}
+						selectedLevels={selectedLevels}
+						selectedResources={selectedResources}
+						onLevelsChange={setSelectedLevels}
+						onResourcesChange={setSelectedResources}
+						onReset={handleReset}
+						resourceFilterRef={resourceFilterRef}
+					/>
+					<TableBody
+						table={table}
+						rowVirtualizer={rowVirtualizer}
+						rowRefsMap={rowRefsMap}
+						isLoading={isLoading}
+					/>
+				</table>
+				{isFetching && !isLoading && (
+					<div className="absolute bottom-0 left-0 right-0 p-2 text-center bg-white border-t">
+						Loading more...
+					</div>
+				)}
+			</div>
+			<div className="text-xs text-gray-500 border-t px-2 py-1">
+				Showing {flatData.length} of {totalDBRowCount} logs
+			</div>
+		</div>
 	);
 };

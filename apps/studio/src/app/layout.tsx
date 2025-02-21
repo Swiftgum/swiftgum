@@ -1,3 +1,4 @@
+import { Providers } from "@/components/providers";
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
@@ -18,7 +19,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" className={`${sansFont.variable}`}>
-			<body className="antialiased">{children}</body>
+			<body className="antialiased">
+				<Providers>{children}</Providers>
+			</body>
 		</html>
 	);
 }

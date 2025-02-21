@@ -31,7 +31,7 @@ export function NavItem({ icon, label, isActive, ...props }: NavItemProps) {
 	const content = (
 		<>
 			<div className="flex items-center justify-center w-11 shrink-0">{icon}</div>
-			<span className="whitespace-nowrap opacity-0 pr-4 shrink-0 group-hover/nav:opacity-100 transition-[opacity,transform] duration-300 -translate-x-2 group-hover/nav:-translate-x-0 group-has-[:focus-visible]/nav:opacity-100 group-has-[:focus-visible]/nav:-translate-x-0 font-medium text-base">
+			<span className="whitespace-nowrap opacity-0 pr-4 shrink-0 group-hover/nav:opacity-100 transition-[opacity,transform] duration-300 -translate-x-2 group-hover/nav:-translate-x-0 group-has-[:focus-visible]/nav:opacity-100 group-has-[:focus-visible]/nav:-translate-x-0 font-medium text-sm">
 				{label}
 			</span>
 		</>
