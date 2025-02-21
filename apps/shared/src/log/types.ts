@@ -26,12 +26,17 @@ export const portalAuthSessionLogEvent = logSchema.extend({
 
 export const tokenLogEvent = logSchema.extend({
 	type: z.literal("token"),
-	name: z.enum(["created"]),
+	name: z.enum(["created", "rotated", "retrieved"]),
 });
 
 export const adminAuthLogEvent = logSchema.extend({
 	type: z.literal("admin-auth"),
 	name: z.enum(["sign-in", "sign-out"]),
+});
+
+export const apiKeyLogEvent = logSchema.extend({
+	type: z.literal("api-key"),
+	name: z.enum(["created", "rotated", "read", "compromised"]),
 });
 
 export const integrationLogEvent = logSchema.extend({
@@ -46,6 +51,11 @@ export const integrationLogEvent = logSchema.extend({
 		"internal:failed",
 		"configuration:changed",
 	]),
+});
+
+export const destinationLogEvent = logSchema.extend({
+	type: z.literal("destination"),
+	name: z.enum(["configuration:changed"]),
 });
 
 export const exportLogEvent = logSchema.extend({
@@ -74,8 +84,10 @@ export const logEvent = z.discriminatedUnion("type", [
 	tokenLogEvent,
 	adminAuthLogEvent,
 	integrationLogEvent,
+	destinationLogEvent,
 	exportLogEvent,
 	queueLogEvent,
+	apiKeyLogEvent,
 ]) satisfies z.ZodType<Database["public"]["Tables"]["logs"]["Insert"]>;
 
 export const resourceTypes = z.enum([
@@ -86,6 +98,7 @@ export const resourceTypes = z.enum([
 	"task",
 	"end_user",
 	"provider",
+	"destination",
 ]);
 
 // Export the type for TypeScript usage

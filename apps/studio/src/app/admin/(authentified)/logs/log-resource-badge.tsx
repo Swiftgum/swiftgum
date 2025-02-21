@@ -1,7 +1,7 @@
 "use client";
 
 import type { splitResourceUris } from "@knowledgex/shared/log";
-import { Cpu, Key, Monitor, Puzzle, ToyBrick, User } from "lucide-react";
+import { CloudUpload, Cpu, Key, Monitor, Puzzle, ToyBrick, User } from "lucide-react";
 
 type ResourceBadgeProps = {
 	resourceUri: ReturnType<typeof splitResourceUris>[number];
@@ -38,6 +38,8 @@ export function ResourceBadge({
 						return <User className="w-3 h-3" />;
 					case "provider":
 						return <Puzzle className="w-3 h-3" />;
+					case "destination":
+						return <CloudUpload className="w-3 h-3" />;
 					default:
 						return <span>{resourceUri.resource}</span>;
 				}

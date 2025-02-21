@@ -4,6 +4,7 @@ import { handleRequest } from "@/utils/auth-helpers/client";
 import { SignOut } from "@/utils/auth-helpers/server";
 import { getRedirectMethod } from "@/utils/auth-helpers/settings";
 import {
+	CloudUpload,
 	Database,
 	House,
 	KeyRound,
@@ -54,10 +55,10 @@ export function NavbarContents({ onItemClick }: NavbarContentsProps) {
 			isActive: pathname.startsWith("/admin/integrations"),
 		},
 		{
-			href: "/admin/destination/webhook",
-			icon: <Database size={18} />,
+			href: "/admin/destination",
+			icon: <CloudUpload size={18} />,
 			label: "Destination",
-			isActive: pathname.startsWith("/admin/destination/webhook"),
+			isActive: pathname.startsWith("/admin/destination"),
 		},
 		{
 			href: "/admin/logs",

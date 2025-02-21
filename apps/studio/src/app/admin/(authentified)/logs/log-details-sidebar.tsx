@@ -42,7 +42,7 @@ export function LogDetailsSidebar({ log, onClose, className }: LogDetailsSidebar
 						{/* Basic Info */}
 						<div>
 							<h3 className="font-medium text-gray-500">Basic Information</h3>
-							<dl className="mt-2 space-y-1">
+							<dl className="mt-2 space-y-1 text-sm">
 								<div className="flex justify-between">
 									<dt className="text-gray-500">ID</dt>
 									<dd className="font-mono">{log.log_id}</dd>
@@ -93,7 +93,7 @@ export function LogDetailsSidebar({ log, onClose, className }: LogDetailsSidebar
 						{(log.workspace_id || log.user_id || log.end_user_id) && (
 							<div>
 								<h3 className="font-medium text-gray-500">Related IDs</h3>
-								<dl className="mt-2 space-y-1">
+								<dl className="mt-2 space-y-1 text-sm">
 									{log.workspace_id && (
 										<div className="flex justify-between">
 											<dt className="text-gray-500">Workspace ID</dt>

@@ -1,5 +1,6 @@
 "use server";
 
+import { log } from "@/utils/log";
 import { createServerOnlyClient } from "@/utils/supabase/server";
 import { getWorkspace } from "@/utils/workspace";
 
@@ -20,6 +21,15 @@ export async function getApiKey() {
 		throw new Error("Error fetching API key");
 	}
 
+	void log({
+		level: "security",
+		type: "api-key",
+		name: "read",
+		workspace_id: workspace.workspace_id,
+		metadata: {},
+		private: false,
+	});
+
 	return token.decrypted_api_key ?? "";
 }
 
@@ -37,6 +47,15 @@ export async function rotateApiKey(formData: FormData) {
 		throw new Error("Error rotating API key");
 	}
 
-	// Redirect back to the same page to show the new key
+	void log({
+		level: "security",
+		type: "api-key",
+		name: "rotated",
+		workspace_id: workspace.workspace_id,
+		metadata: {},
+		private: false,
+	});
+
+	// Return the new key
 	return data;
 }

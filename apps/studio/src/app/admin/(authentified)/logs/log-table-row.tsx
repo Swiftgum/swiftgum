@@ -38,7 +38,7 @@ function LogTableRow({
 			data-key={row.id}
 			className={cn(
 				"transition-colors text-gray-700 border-b flex absolute min-w-full cursor-pointer hover:bg-gray-100",
-				isSelected && "bg-white hover:bg-white font-bold",
+				isSelected && "bg-white hover:bg-white font-medium",
 			)}
 			onClick={onClick}
 			onKeyDown={(e) => {

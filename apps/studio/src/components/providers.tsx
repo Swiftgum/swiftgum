@@ -10,7 +10,7 @@ export function Providers({ children }: { children: ReactNode }) {
 				defaultOptions: {
 					queries: {
 						// Disable automatic background refetching
-						refetchOnWindowFocus: false,
+						refetchOnWindowFocus: true,
 						// Keep data for 5 minutes before considering it stale
 						staleTime: 5 * 60 * 1000,
 					},
