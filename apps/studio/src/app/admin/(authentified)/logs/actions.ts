@@ -3,18 +3,17 @@
 import { createClient } from "@/utils/supabase/server";
 import type { Log } from "@knowledgex/shared/log";
 
-const PAGE_SIZE = 50;
-
 export const getLogs = async ({
 	levels,
 	resources,
-	page = 0,
+	cursor,
 }: {
 	levels?: string[];
 	resources?: string[];
-	page?: number;
+	cursor?: { timestamp: string; log_id: string };
 } = {}) => {
 	const supabase = await createClient();
+	const PAGE_SIZE = 50;
 
 	// First get total count
 	let countQuery = supabase.from("logs").select("*", { count: "exact", head: true });
@@ -27,8 +26,10 @@ export const getLogs = async ({
 	}
 	const { count: totalCount } = await countQuery;
 
-	// Then get paginated data
+	// Build the main query
 	let query = supabase.from("logs").select("*");
+
+	// Apply filters
 	if (levels?.length) {
 		query = query.in("level", levels);
 	}
@@ -37,9 +38,17 @@ export const getLogs = async ({
 		query = query.or(resourceConditions.join(","));
 	}
 
+	// Apply cursor conditions if we have a cursor
+	if (cursor) {
+		query = query.or(
+			`and(timestamp.lt.${cursor.timestamp},log_id.gt.${cursor.log_id}),timestamp.lt.${cursor.timestamp}`,
+		);
+	}
+
 	const { data, error } = await query
 		.order("timestamp", { ascending: false })
-		.range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+		.order("log_id", { ascending: true })
+		.limit(PAGE_SIZE);
 
 	return {
 		data,
@@ -47,6 +56,13 @@ export const getLogs = async ({
 		meta: {
 			totalCount,
 			pageSize: PAGE_SIZE,
+			nextCursor:
+				data?.length === PAGE_SIZE
+					? {
+							timestamp: data[data.length - 1].timestamp,
+							log_id: data[data.length - 1].log_id,
+						}
+					: null,
 		},
 	} as {
 		data: Log[];
@@ -54,6 +70,7 @@ export const getLogs = async ({
 		meta: {
 			totalCount: number;
 			pageSize: number;
+			nextCursor: { timestamp: string; log_id: string } | null;
 		};
 	};
 };

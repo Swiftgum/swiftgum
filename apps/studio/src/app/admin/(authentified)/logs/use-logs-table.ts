@@ -8,6 +8,8 @@ import { getLogs } from "./actions";
 import { useColumns } from "./use-columns";
 import { useFilterParams } from "./use-filter-params";
 
+type Cursor = { timestamp: string; log_id: string } | undefined;
+
 export function useLogsTable() {
 	const { getFilters, setFilters } = useFilterParams();
 	const { levels: initialLevels, resources: initialResources } = getFilters();
@@ -16,19 +18,16 @@ export function useLogsTable() {
 
 	const { data, fetchNextPage, isFetching, isLoading, hasNextPage } = useInfiniteQuery({
 		queryKey: ["logs", initialLevels, initialResources],
-		queryFn: async ({ pageParam = 0 }) => {
+		queryFn: async ({ pageParam }) => {
 			const result = await getLogs({
 				levels: initialLevels,
 				resources: initialResources,
-				page: pageParam as number,
+				cursor: pageParam as Cursor,
 			});
 			return result;
 		},
-		initialPageParam: 0,
-		getNextPageParam: (lastPage, allPages) => {
-			const totalFetched = allPages.reduce((acc, page) => acc + page.data.length, 0);
-			return totalFetched < (lastPage.meta?.totalCount || 0) ? allPages.length : undefined;
-		},
+		initialPageParam: undefined as Cursor,
+		getNextPageParam: (lastPage) => lastPage.meta.nextCursor || undefined,
 		refetchOnWindowFocus: false,
 	});
 
