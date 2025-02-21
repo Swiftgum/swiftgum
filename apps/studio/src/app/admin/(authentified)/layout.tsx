@@ -8,7 +8,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 	return (
 		<>
 			<Toaster position="top-right" />
-			<div className="flex h-screen">
+			<div className="flex flex-col md:flex-row h-screen">
 				<Navbar />
 				<div className="flex-1">{children}</div>
 			</div>

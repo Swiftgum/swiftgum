@@ -1,19 +1,14 @@
 import { createClient } from "@/utils/supabase/server";
-import Navlinks from "./Navlinks";
+import React from "react";
+import { NavbarClient } from "./navbar-client";
 
 export default async function Navbar() {
 	const supabase = await createClient();
-
 	const {
 		data: { user },
 	} = await supabase.auth.getUser();
 
 	if (!user) return null;
 
-	return (
-		<>
-			<div className="w-14 mr-px flex-0" />
-			<Navlinks />
-		</>
-	);
+	return <NavbarClient />;
 }
