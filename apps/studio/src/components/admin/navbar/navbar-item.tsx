@@ -1,14 +1,13 @@
 import clsx from "clsx";
 import Link from "next/link";
 import type React from "react";
-import type { ComponentProps, MouseEvent } from "react";
+import type { ComponentProps } from "react";
 import { focusStyles } from "../../ui/shared";
 
 type BaseProps = {
 	icon: React.ReactNode;
 	label: string;
 	isActive?: boolean;
-	onClick?: () => void;
 };
 
 type AsLink = BaseProps & {
@@ -43,14 +42,7 @@ export function NavbarItem({ icon, label, isActive, onClick, ...props }: NavbarI
 	if (props.as === "link") {
 		const { as, ...linkProps } = props;
 		return (
-			<Link
-				className={className}
-				{...linkProps}
-				onClick={(e) => {
-					onClick?.();
-					linkProps.onClick?.(e);
-				}}
-			>
+			<Link className={className} {...linkProps}>
 				{content}
 			</Link>
 		);
@@ -58,14 +50,7 @@ export function NavbarItem({ icon, label, isActive, onClick, ...props }: NavbarI
 
 	const { as, ...buttonProps } = props;
 	return (
-		<button
-			className={className}
-			{...buttonProps}
-			onClick={(e) => {
-				onClick?.();
-				buttonProps.onClick?.(e);
-			}}
-		>
+		<button className={className} {...buttonProps}>
 			{content}
 		</button>
 	);
