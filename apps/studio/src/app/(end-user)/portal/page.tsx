@@ -9,6 +9,7 @@ import { getPagePortalSession } from "@/utils/portal/session";
 import { createServerOnlyClient } from "@/utils/supabase/server";
 import type { Provider } from "@knowledgex/shared/types/overload";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import React from "react";
 import OAuthProvider from "./oauthprovider";
@@ -20,21 +21,22 @@ const LegalInformation = ({
 	return (
 		<div>
 			<p className="text-xs md:text-sm text-gray-500 animate-in slide-in-from-bottom">
-				{session.workspace.app_name || "App"} uses KnowledgeX for its data processing services.
+				{session.workspace.app_name || "App"} uses Swiftgum for its data processing services.
 				<br />
 				<span className="text-blue-600 font-medium hover:underline">Terms of Service</span>
 				{" | "}
 				<span className="text-blue-600 font-medium hover:underline">Privacy Policy</span>
 				{" | "}
-				<a
-					className="text-blue-600 font-medium hover:underline"
-					href="mailto:contact@knowledgex.com"
-				>
+				<a className="text-blue-600 font-medium hover:underline" href="mailto:contact@swiftgum.com">
 					Something is wrong?
 				</a>
 			</p>
 		</div>
 	);
+};
+
+export const metadata: Metadata = {
+	title: "Portal - Swiftgum Studio",
 };
 
 export default async function PortalPage({

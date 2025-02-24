@@ -5,8 +5,13 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion";
+import type { Metadata } from "next";
 import { listIntegrations } from "./actions";
 import { IntegrationForm } from "./integration-form";
+
+export const metadata: Metadata = {
+	title: "Integrations - Swiftgum Studio",
+};
 
 export default async function IntegrationsPage() {
 	const integrations = await listIntegrations();

@@ -1,4 +1,9 @@
 import { adminRoute } from "@/utils/auth/admin";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+	title: "Dashboard - Swiftgum Studio",
+};
 
 export default async function Home() {
 	const user = await adminRoute();

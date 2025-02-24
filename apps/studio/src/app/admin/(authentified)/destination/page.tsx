@@ -1,6 +1,11 @@
 import { PageHeader, PageShell } from "@/components/admin/shell";
+import type { Metadata } from "next";
 import { listDestinations } from "./actions";
 import { DestinationForm } from "./destination-form";
+
+export const metadata: Metadata = {
+	title: "Destinations - Swiftgum Studio",
+};
 
 export default async function DestinationPage() {
 	const destinations = await listDestinations();

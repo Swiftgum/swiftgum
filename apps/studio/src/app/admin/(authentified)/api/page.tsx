@@ -3,8 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import * as RevealInput from "@/components/ui/reveal-input";
+import type { Metadata } from "next";
 import { getApiKey } from "./actions";
 import { RotateKeyButton } from "./rotate-key-button";
+
+export const metadata: Metadata = {
+	title: "API Settings - Swiftgum Studio",
+};
 
 export default async function ApiPage() {
 	const apiKey = await getApiKey();
@@ -19,7 +24,7 @@ export default async function ApiPage() {
 						<div>
 							<h2 className="text-lg font-medium text-zinc-700 mb-2">API Key</h2>
 							<p className="text-sm text-gray-500 mb-4">
-								Use this API key to authenticate your requests to the KnowledgeX API. Keep it secure
+								Use this API key to authenticate your requests to the Swiftgum API. Keep it secure
 								and do not share it publicly.
 							</p>
 							<RevealInput.Root>

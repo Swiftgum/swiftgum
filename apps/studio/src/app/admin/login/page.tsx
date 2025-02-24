@@ -1,4 +1,9 @@
 import OauthSignIn from "@/components/AuthForms/OauthSignIn";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+	title: "Sign in - Swiftgum Studio",
+};
 
 export default function Login() {
 	return (
@@ -6,9 +11,9 @@ export default function Login() {
 			<div className="w-full md:max-w-lg">
 				<div className="bg-white outline outline-[0.5px] outline-black/10 shadow-lg p-8 md:rounded-2xl animate-in slide-in-from-bottom fade-in relative">
 					<div className="flex flex-col gap-8 justify-center">
-						<h1 className="text-4xl font-extrabold tracking-tighter text-balance">KnowledgeX</h1>
+						<h1 className="text-4xl font-extrabold tracking-tighter text-balance">Swiftgum</h1>
 						<p className="text-gray-500 text-lg text-balance leading-tight">
-							Log in to KnowledgeX to start connecting your user's private data to your app.
+							Log in to Swiftgum to start connecting your user's private data to your app.
 						</p>
 						<OauthSignIn />
 					</div>

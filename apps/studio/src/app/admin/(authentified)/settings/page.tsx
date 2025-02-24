@@ -1,7 +1,12 @@
 import { PageHeader, PageShell } from "@/components/admin/shell";
 import { Card, CardContent } from "@/components/ui/card";
+import type { Metadata } from "next";
 import { getWorkspaceSettings } from "./actions";
 import { SettingsForm } from "./settings-form";
+
+export const metadata: Metadata = {
+	title: "Settings - Swiftgum Studio",
+};
 
 export default async function SettingsPage() {
 	const settings = await getWorkspaceSettings();
