@@ -1,64 +1,66 @@
 ---
 title: "Configuration"
-description: "Customizing KnowledgeX with environment variables and settings."
+description: "Customizing Swiftgum for cloud or on-prem usage."
 icon: "gear"
 ---
 
-# Configuration
+Swiftgum requires very little setup in the **cloud** environment: typically, you only need an **API key**. If you choose to run Swiftgum **on-prem**, you can customize environment variables and settings for your local deployment.
 
-KnowledgeX offers several environment variables and settings to tailor the platform to your needs.
+## 1. Cloud Configuration
 
-## Core Environment Variables
+For most teams using **Swiftgum Cloud**:
 
-| Variable            | Required | Description                                                           |
-|---------------------|----------|-----------------------------------------------------------------------|
-| `KNOWLEDGEX_URL`    | **Yes**  | The base URL for your KnowledgeX instance. (e.g., `https://cloud.knowledgex.io`) |
-| `KNOWLEDGEX_TOKEN`  | **Yes**  | The primary token used to authenticate your server or project.        |
-| `DATABASE_URL`      | Optional | If self-hosting with Postgres/SQLite, specify the DB connection string. |
-| `ENCRYPTION_KEY`    | Optional | Used for encrypting credentials at rest. If not provided, a default is used (not recommended for production). |
-| `PORT`              | Optional | The local port KnowledgeX listens on (e.g., `3000`).                   |
+- **No Environment Variables**: Simply include your `x-api-key` in the header when calling Swiftgum’s API (e.g., `https://api.swiftgum.com`).
+- **Dashboard Settings**: Manage provider credentials (like Google OAuth secrets) and advanced configurations directly in the Swiftgum admin UI.
 
-## Example `.env`
+Tip: If you need to rotate your API key, do so from the Swiftgum Cloud dashboard. Make sure to update your applications accordingly.
 
-```bash
-# KnowledgeX
-KNOWLEDGEX_URL=https://cloud.knowledgex.io
-KNOWLEDGEX_TOKEN=your-cloud-token
+## 2. On-Prem Environment Variables
 
-# Local DB config (only if self-hosting)
-DATABASE_URL=postgres://user:password@localhost:5432/knowledgex
+If you have an **on-prem** Swiftgum license, you can set the following environment variables to tailor your deployment:
 
-# Optionally define an encryption key
+| Variable         | Required | Description                                                                                           |
+|------------------|----------|-------------------------------------------------------------------------------------------------------|
+| `DATABASE_URL`   | Optional | If self-hosting with Postgres/SQLite, specify the DB connection string.                                |
+| `ENCRYPTION_KEY` | Optional | Used for encrypting credentials at rest. If not provided, a default is used (not recommended for prod). |
+| `PORT`           | Optional | The local port Swiftgum listens on (e.g., `3000`).                                                    |
+| `LOG_LEVEL`      | Optional | Set to `info`, `warn`, `error`, or `debug` for logging verbosity.                                     |
+| `SESSION_TIMEOUT`| Optional | How long a portal session remains valid (e.g., 3600 for one hour).                                    |
+| `COOKIE_SECRET`  | Optional | Used to sign session cookies if running Swiftgum behind a custom domain.                              |
+
+### Example `.env`
+
+DATABASE_URL=postgres://user:password@localhost:5432/swiftgum
 ENCRYPTION_KEY=something-secure
-
-# Port
 PORT=3000
-```
+LOG_LEVEL=info
+SESSION_TIMEOUT=3600
+COOKIE_SECRET=my_cookie_secret
 
+Avoid committing your `.env` file to source control. Use secure secret management (e.g., GitHub Actions secrets, AWS Parameter Store).
 
-<Warning>
-Avoid committing your .env file to source control. Use secure secret management (e.g. GitHub Actions secrets, AWS Parameter Store, etc.).
-</Warning>
-Additional Settings
-<AccordionGroup>
-  <Accordion title="Logging & Debug Options">
-    LOG_LEVEL: Choose from info, warn, error, debug.
-    ENABLE_DEBUG: Boolean to enable verbose logs for troubleshooting.
-  </Accordion>
-  <Accordion title="Session & Portal Config" >
-    SESSION_TIMEOUT: Sets how long a portal session remains valid.
-    COOKIE_SECRET: Used to sign session cookies if you run KnowledgeX behind a custom domain.
-  </Accordion>
-  <Accordion title="Provider Credentials">
-    Store third-party provider credentials (e.g., Google OAuth client secrets) in environment variables or vault secrets. Then reference them in the KnowledgeX admin panel or directly in Integrations table.
-  </Accordion>
-</AccordionGroup>
+## 3. Additional Settings
 
+### Provider Credentials
+If using OAuth integrations (e.g., Google Drive), store client IDs/secrets in environment variables or a secrets manager. Then reference them in Swiftgum’s admin UI under **Integrations**.
 
-## Testing Your Configuration
+### Debug & Logging
+- **LOG_LEVEL**: Change verbosity (`info`, `warn`, `error`, or `debug`).
+- **ENABLE_DEBUG**: For more verbose logs, set this to `true`.
 
-### Local  
-Spin up KnowledgeX and check the logs for any config errors.
+### Session & Portal
+- **SESSION_TIMEOUT**: Dictates how long a portal session is valid.
+- **COOKIE_SECRET**: If running behind a custom domain, helps sign session cookies securely.
 
-### Cloud  
-Use the Cloud dashboard to confirm your environment variables or secrets are correct.
+## 4. Testing Your Configuration
+
+### 4.1 On-Prem
+- **Spin up Swiftgum**: Run via Docker Compose or your custom deployment.
+- **Check Logs**: Look for any missing variables or config errors.
+- **Access Admin UI**: Visit `http://localhost:3000/admin` (or your chosen port) and log in with your admin credentials.
+
+### 4.2 Cloud
+- **Dashboard Confirmation**: Use the Swiftgum Cloud dashboard to confirm that your integrations, OAuth credentials, and advanced settings are correct.
+- **API Calls**: Verify that your `x-api-key` is working by calling the Portal Session endpoint.
+
+With these configurations in place, you’re ready to manage integrations, tokens, and user sessions confidently.

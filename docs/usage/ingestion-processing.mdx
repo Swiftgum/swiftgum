@@ -1,10 +1,10 @@
 ---
 title: "Ingestion & Processing"
-description: "How files and documents move from external integrations into KnowledgeX."
+description: "How files and documents move from external integrations into Siftgum."
 icon: 'upload'
 ---
 
-KnowledgeX automates the retrieval, conversion, and indexing of documents from multiple external sources (e.g., Google Drive, Notion). This ensures your AI workflows have **fresh, consistent data**. The steps below outline how files are fetched, transformed, and made available for AI use cases.
+Siftgum automates the retrieval, conversion, and indexing of documents from multiple external sources (e.g., Google Drive, Notion). This ensures your AI workflows have **fresh, consistent data**. The steps below outline how files are fetched, transformed, and made available for AI use cases.
 
 ---
 
@@ -13,11 +13,11 @@ KnowledgeX automates the retrieval, conversion, and indexing of documents from m
 ```mermaid
 flowchart LR
     subgraph External Systems
-      A["Google Drive"] -->|OAuth Token| B["KnowledgeX"]
-      C["Notion"] -->|OAuth Token| B["KnowledgeX"]
+      A["Google Drive"] -->|OAuth Token| B["Siftgum"]
+      C["Notion"] -->|OAuth Token| B["Siftgum"]
     end
 
-    subgraph KnowledgeX
+    subgraph Siftgum
       B["Ingestion Queue"] --> D["File Fetcher"]
       D --> E["Markdown Converter"]
       E --> F["Enrichment & Embeddings"]
@@ -60,17 +60,17 @@ flowchart LR
 </Steps>
 
 ## 2. Triggering Ingestion
-KnowledgeX supports both automatic and manual triggers.
+Siftgum supports both automatic and manual triggers.
 
 <Info>
     **Automatic Sync**
-    By default, KnowledgeX periodically checks each integration for new/updated files. You can customize these intervals in the **Integrations** or **Configuration** panel.
+    By default, Siftgum periodically checks each integration for new/updated files. You can customize these intervals in the **Integrations** or **Configuration** panel.
 </Info>
 
 Manual Trigger via API
 ```js
-// Example call using the KnowledgeX client
-await knowledgeXClient.triggerIngestion({
+// Example call using the Siftgum client
+await SiftgumClient.triggerIngestion({
   endUserId: 'user_123',
   integrationId: 'integration_abc',
   fileIds: ['doc_456']
@@ -93,18 +93,18 @@ await knowledgeXClient.triggerIngestion({
 ## 3. Processing Logic
 <AccordionGroup>
     <Accordion title="File Fetch & Content Extraction">
-        - **Check OAuth Token**: KnowledgeX uses the user’s stored token to fetch documents from the provider’s API. - **Rate Limiting**: Some providers (Google, Notion) have daily or per-minute quotas. KnowledgeX automatically handles retry logic.
+        - **Check OAuth Token**: Siftgum uses the user’s stored token to fetch documents from the provider’s API. - **Rate Limiting**: Some providers (Google, Notion) have daily or per-minute quotas. Siftgum automatically handles retry logic.
     </Accordion>
     <Accordion title="Markdown Conversion">
-        - **Text Extraction**: For PDFs, `.docx`, or other formats, KnowledgeX parses text content. - **Standardization**: The extracted text is saved as Markdown, ensuring consistency across different file types. - **Metadata Insertion**: Timestamps, user IDs, and file references are inserted as YAML frontmatter or JSON.
+        - **Text Extraction**: For PDFs, `.docx`, or other formats, Siftgum parses text content. - **Standardization**: The extracted text is saved as Markdown, ensuring consistency across different file types. - **Metadata Insertion**: Timestamps, user IDs, and file references are inserted as YAML frontmatter or JSON.
     </Accordion>
     <Accordion title="Embeddings & Enrichment">
-        - **Optional Step**: If configured, each chunk of text is passed to an embedding model (e.g., OpenAI, local model) for vector representation. - **Storage**: Vectors + text are then stored in Supabase/Postgres. - **Entity Tagging**: If an enrichment pipeline is set up, KnowledgeX can label or tag documents (e.g., categories, named entities).
+        - **Optional Step**: If configured, each chunk of text is passed to an embedding model (e.g., OpenAI, local model) for vector representation. - **Storage**: Vectors + text are then stored in Supabase/Postgres. - **Entity Tagging**: If an enrichment pipeline is set up, Siftgum can label or tag documents (e.g., categories, named entities).
     </Accordion>
 </AccordionGroup>
 
 ## 4. Access Control & Visibility
-During ingestion, KnowledgeX validates user permissions. If a user revokes access or the integration is disabled, the ingestion process halts for that user’s files. Additionally:
+During ingestion, Siftgum validates user permissions. If a user revokes access or the integration is disabled, the ingestion process halts for that user’s files. Additionally:
 
 RBAC: Only users with proper roles can see or query these newly ingested documents.
 Audit Logs: Ingestion events are logged (including file metadata and timestamps).
@@ -112,7 +112,7 @@ Audit Logs: Ingestion events are logged (including file metadata and timestamps)
 ## 5. Debugging Ingestion Issues
 <Steps>
     <Step title="Check the Logs">
-    Look for ingestion-related messages in KnowledgeX server logs or the **admin panel logs**.
+    Look for ingestion-related messages in Siftgum server logs or the **admin panel logs**.
     </Step>
     <Step title="QueueIngestions Table">
     The `QueueIngestions` table tracks each file’s status (*queued, in-progress, done, error*). Inspect failed jobs for error messages.

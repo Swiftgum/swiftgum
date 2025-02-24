@@ -15,34 +15,39 @@
 	],
 	"security": [
 		{
-			"bearerAuth": []
+			"apiKeyAuth": []
 		}
 	],
 	"paths": {
-		"/plants": {
-			"get": {
-				"description": "Returns all plants from the system that the user has access to",
-				"parameters": [
-					{
-						"name": "limit",
-						"in": "query",
-						"description": "The maximum number of results to return",
-						"schema": {
-							"type": "integer",
-							"format": "int32"
+		"/api/portal/session": {
+			"post": {
+				"description": "Creates a new session",
+				"parameters": [],
+				"requestBody": {
+					"description": "Payload to create a new session",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NewSession"
+							},
+							"example": {
+								"uniqueUserId": "titouan.launay@hotmail.com",
+								"configuration": {
+									"userDisplay": "Arthur",
+									"returnUrl": "https://example.com"
+								}
+							}
 						}
-					}
-				],
+					},
+					"required": true
+				},
 				"responses": {
 					"200": {
-						"description": "Plant response",
+						"description": "Session created successfully",
 						"content": {
 							"application/json": {
 								"schema": {
-									"type": "array",
-									"items": {
-										"$ref": "#/components/schemas/Plant"
-									}
+									"$ref": "#/components/schemas/Session"
 								}
 							}
 						}
@@ -58,111 +63,62 @@
 						}
 					}
 				}
-			},
-			"post": {
-				"description": "Creates a new plant in the store",
-				"requestBody": {
-					"description": "Plant to add to the store",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/NewPlant"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "plant response",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Plant"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "unexpected error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/plants/{id}": {
-			"delete": {
-				"description": "Deletes a single plant based on the ID supplied",
-				"parameters": [
-					{
-						"name": "id",
-						"in": "path",
-						"description": "ID of plant to delete",
-						"required": true,
-						"schema": {
-							"type": "integer",
-							"format": "int64"
-						}
-					}
-				],
-				"responses": {
-					"204": {
-						"description": "Plant deleted",
-						"content": {}
-					},
-					"400": {
-						"description": "unexpected error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					}
-				}
 			}
 		}
 	},
 	"components": {
 		"schemas": {
-			"Plant": {
-				"required": ["name"],
+			"NewSession": {
 				"type": "object",
+				"required": ["uniqueUserId", "configuration"],
 				"properties": {
-					"name": {
-						"description": "The name of the plant",
-						"type": "string"
+					"uniqueUserId": {
+						"type": "string",
+						"description": "Unique identifier for the user"
 					},
-					"tag": {
-						"description": "Tag to specify the type",
-						"type": "string"
-					}
-				}
-			},
-			"NewPlant": {
-				"allOf": [
-					{
-						"$ref": "#/components/schemas/Plant"
-					},
-					{
-						"required": ["id"],
+					"configuration": {
 						"type": "object",
+						"required": ["userDisplay", "returnUrl"],
 						"properties": {
-							"id": {
-								"description": "Identification number of the plant",
-								"type": "integer",
-								"format": "int64"
+							"userDisplay": {
+								"type": "string",
+								"description": "Display name for the user"
+							},
+							"returnUrl": {
+								"type": "string",
+								"description": "URL to redirect the user after session creation"
 							}
 						}
 					}
-				]
+				}
+			},
+			"Session": {
+				"type": "object",
+				"required": ["sessionId", "uniqueUserId", "configuration"],
+				"properties": {
+					"sessionId": {
+						"type": "string",
+						"description": "The session identifier"
+					},
+					"uniqueUserId": {
+						"type": "string",
+						"description": "Unique identifier for the user"
+					},
+					"configuration": {
+						"type": "object",
+						"required": ["userDisplay", "returnUrl"],
+						"properties": {
+							"userDisplay": {
+								"type": "string",
+								"description": "Display name for the user"
+							},
+							"returnUrl": {
+								"type": "string",
+								"description": "URL to redirect the user after session creation"
+							}
+						}
+					}
+				}
 			},
 			"Error": {
 				"required": ["error", "message"],
@@ -179,9 +135,10 @@
 			}
 		},
 		"securitySchemes": {
-			"bearerAuth": {
-				"type": "http",
-				"scheme": "bearer"
+			"apiKeyAuth": {
+				"type": "apiKey",
+				"in": "header",
+				"name": "x-api-key"
 			}
 		}
 	}

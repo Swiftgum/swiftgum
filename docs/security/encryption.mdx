@@ -1,16 +1,14 @@
 ---
 title: "Encryption & Credentials"
-description: "Secure handling of tokens and API credentials in KnowledgeX."
+description: "Secure handling of tokens and API credentials in Swiftgum."
 icon: 'key'
 ---
 
-# Encryption & Credentials
-
-KnowledgeX ensures that **tokens** (user OAuth tokens) and **API credentials** (e.g., client secrets) are stored in an **encrypted** format—minimizing risk even if the database is compromised.
+Swiftgum ensures that **tokens** (user OAuth tokens) and **API credentials** (e.g., client secrets) are stored in an **encrypted** format—minimizing risk even if the database is compromised.
 
 <Info>
 **Why Encryption Matters**
-Storing tokens in plaintext is a major security risk. KnowledgeX uses an **encryption key** to scramble all sensitive fields, preventing unauthorized use or exposure.
+Storing tokens in plaintext is a major security risk. Swiftgum uses an **encryption key** to scramble all sensitive fields, preventing unauthorized use or exposure.
 </Info>
 
 <AccordionGroup>
@@ -52,10 +50,10 @@ Storing tokens in plaintext is a major security risk. KnowledgeX uses an **encry
   
   <Accordion title="2. Transport Security (TLS)">
   
-  All KnowledgeX endpoints must be accessed via HTTPS. This ensures that data in transit (including tokens) isn’t exposed to eavesdroppers or man-in-the-middle attacks.
+  All Swiftgum endpoints must be accessed via HTTPS. This ensures that data in transit (including tokens) isn’t exposed to eavesdroppers or man-in-the-middle attacks.
   
   - **Custom SSL**: For self-hosted setups, add an SSL certificate to your server or load balancer.
-  - **Cloud**: KnowledgeX Cloud enforces TLS by default.
+  - **Cloud**: Swiftgum Cloud enforces TLS by default.
   
   </Accordion>
   
@@ -67,7 +65,7 @@ Storing tokens in plaintext is a major security risk. KnowledgeX uses an **encry
   
   **Rotation**  
   - Periodically rotate your encryption key.
-  - KnowledgeX provides a tool/CLI to re-encrypt existing records with a new key.
+  - Swiftgum provides a tool/CLI to re-encrypt existing records with a new key.
   - **Warning**: Ensure you have backups and a tested rotation process to avoid data loss.
   
   </Accordion>

@@ -1,63 +1,53 @@
 ---
 title: "Installation"
-description: "Options for installing KnowledgeX locally or using the cloud."
+description: "Options for using Swiftgum in the cloud, or exploring on-prem solutions."
 icon: "computer"
 ---
 
-# Installation
-
-Depending on your needs, you can **self-host** KnowledgeX or rely on our **cloud** offering. Below is an overview of both approaches.
+Depending on your needs, you can **rely on Swiftgum Cloud** or explore private hosting. Below is an overview of both approaches.
 
 <Check>
-**Recommended: KnowledgeX Cloud**
+**Recommended: Swiftgum Cloud**
 
-If you want the quickest path, sign up for KnowledgeX Cloud and skip server management.  
-[Sign Up Here](https://your-knowledgex-domain.com/signup)
+If you want the quickest path, sign up for Swiftgum Cloud and skip server management.  
+[Sign Up Here](https://your-swiftgum-domain.com/signup)
 </Check>
 
 ## 1. Cloud Installation
 
 1. **Sign Up**  
-   - Register on [KnowledgeX Cloud](https://your-knowledgex-domain.com/signup).  
-   - Obtain your `KNOWLEDGEX_URL` and `KNOWLEDGEX_TOKEN` from the dashboard.
+   - Register on [Swiftgum Cloud](https://your-swiftgum-domain.com/signup).  
+   - Log into your admin dashboard to **reveal your `x-api-key`**.
 
-2. **Configure Your App**  
-   - Set the environment variables:
-     ```bash
-     KNOWLEDGEX_URL=<YOUR_KNOWLEDGEX_CLOUD_URL>
-     KNOWLEDGEX_TOKEN=<YOUR_GENERATED_TOKEN>
-     ```
-   - Install the KnowledgeX client in your project.
+2. **Use the API**  
+   - Swiftgum’s endpoint is fixed (e.g., `https://api.swiftgum.com`), so no custom URL is required.
+   - **Include** your `x-api-key` header in all requests (see [Quick Start](quick-start.md) for sample code).
 
-3. **Run**  
-   - Everything else is handled on the KnowledgeX Cloud’s end.  
-   - Head to [Quick Start](quick-start.md) for usage instructions.
+3. **Go Live**  
+   - Everything else is handled on **Swiftgum Cloud**.  
+   - Head to the [Quick Start](quick-start.md) guide to create portal sessions and manage integrations.
 
-## 2. Local Installation (Docker/Next.js)
+---
 
-For teams requiring **full control**, you can run KnowledgeX on-prem.
+## 2. Self-Hosted / On-Prem (Optional)
 
-1. **Clone the Repo**  
-   ```bash
-   git clone https://github.com/your-org/knowledgex.git
-   cd knowledgex
+If you require **full control** over your data and hosting environment, consider **on-prem** deployment:
 
-2. **Build & Run Docker**
+1. **Contact Swiftgum**  
+   - We currently offer an enterprise version for on-prem hosting.  
+   - Email [sales@swiftgum.com](mailto:sales@swiftgum.com) (or your relevant contact) for license details and setup instructions.
 
-    ```bash
-    docker-compose up -d
+2. **Installation Steps** (Example)  
+   - **Clone the Repo**: Access the private repository your enterprise license grants.  
+   - **Docker-Compose** or **Kubernetes**: Build containers and spin them up locally or in your private cloud.  
+   - **Configuration**: In your admin UI (e.g., `http://localhost:3000/admin`), retrieve an on-prem `x-api-key` for authenticating your local Swiftgum instance.
 
-This spins up:
+3. **Maintenance**  
+   - You control updates, backups, and server scaling.  
+   - Swiftgum provides occasional patches or new releases that you can pull and redeploy.
 
-The KnowledgeX server (Next.js or Node)
-A local database (SQLite or Postgres)
-Obtain Local Credentials
+---
 
-On first run, the server logs or CLI outputs a default `KNOWLEDGEX_URL` (usually http://localhost:3000) and a generated `KNOWLEDGEX_TOKEN`.
-Test
+## Next Steps
 
-Access the local KnowledgeX dashboard at http://localhost:3000/admin.
-Use your admin credentials (generated on startup).
-
-Next Steps
-Once you have KnowledgeX running (locally or in the cloud), head to the Configuration guide to customize environment variables and manage keys.
+After choosing **Swiftgum Cloud** (recommended) or setting up your **on-prem** instance, visit the [Quick Start](quick-start.md) to create user sessions and explore integrations. For security details, check out [Security & Compliance](../security/encryption.md).

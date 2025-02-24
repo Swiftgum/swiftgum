@@ -1,11 +1,11 @@
 ---
 title: "Overview"
-description: "Overview of KnowledgeX tables, relationships, and entity management."
+description: "Overview of Swiftgum tables, relationships, and entity management."
 ---
 
 # Database & Entities
 
-KnowledgeX uses a relational schema to manage workspaces, integrations, tokens, and user sessions. This design enforces secure and scalable storage of credentials, session data, and more. Below is a high-level view of how tables connect to each other.
+Swiftgum uses a relational schema to manage workspaces, integrations, tokens, and user sessions. This design enforces secure and scalable storage of credentials, session data, and more. Below is a high-level view of how tables connect to each other.
 
 <Info>
 Encryption & Credentials
@@ -121,13 +121,13 @@ The above diagram is a simplified representation. It doesn’t show every column
   <h3>End Users & Tokens</h3>
   <ul>
     <li>End users link personal accounts.</li>
-    <li>KnowledgeX stores their OAuth tokens in the Tokens table, ensuring each token is encrypted and bound to a single workspace + integration.</li>
+    <li>Swiftgum stores their OAuth tokens in the Tokens table, ensuring each token is encrypted and bound to a single workspace + integration.</li>
   </ul>
 
   <h3>Sessions</h3>
   <ul>
     <li>Auth Sessions handle the in-progress OAuth flow.</li>
-    <li>Portal Sessions let an end user temporarily access the KnowledgeX portal UI to manage their connections.</li>
+    <li>Portal Sessions let an end user temporarily access the Swiftgum portal UI to manage their connections.</li>
   </ul>
 
   <h3>Destinations</h3>
@@ -136,5 +136,5 @@ The above diagram is a simplified representation. It doesn’t show every column
   <h3>Queue Ingestions</h3>
   <p>Tracks new or updated documents for ingestion. The Engine processes these items into a normalized format or embeddings.</p>
 
-  <p>By splitting data across these entities, KnowledgeX ensures secure, scalable, and modular handling of user data, credentials, and ingestion flows.</p>
+  <p>By splitting data across these entities, Swiftgum ensures secure, scalable, and modular handling of user data, credentials, and ingestion flows.</p>
 </Card>

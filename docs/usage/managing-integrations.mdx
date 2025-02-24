@@ -1,111 +1,52 @@
 ---
 title: "Managing Integrations"
-description: "Set up OAuth apps (Google, Notion, etc.) and manage tokens in KnowledgeX."
-icon: 'link'
+description: "Set up OAuth apps (Google, Notion, etc.) and manage tokens in Swiftgum."
+icon: "link"
 ---
 
-KnowledgeX simplifies the process of connecting third-party services (e.g., Google Drive, Notion) by providing an **Integrations** module. This allows both **developers** (who configure OAuth apps) and **end users** (who link personal or admin drives) to manage access securely.
+Swiftgum simplifies the process of connecting third-party services (e.g., Google Drive, Notion) by providing an Integrations module in the admin dashboard. This allows developers/admins (who configure OAuth apps) and end users (who link personal or admin drives) to manage access securely.
+
 
 ## Prerequisites
 
-<Callout type="info" title="Prerequisites">
-  <ul>
-    <li>A running KnowledgeX instance (local or cloud).</li>
-    <li>Environment variables set (<code>KNOWLEDGEX_URL</code>, <code>KNOWLEDGEX_TOKEN</code>, etc.).</li>
-    <li>Sufficient permissions (administrator role) to add or modify integrations.</li>
-  </ul>
-</Callout>
+A Swiftgum admin account (Cloud).
+An API key (for creating portal sessions if you’ll be redirecting users).
+Sufficient permissions (administrator role) to add or modify integrations.
 
----
 
-## 1. Developer Setup
+## Developer Setup (Enabling a Provider)
 
 ### Step 1: Register an OAuth App with the Provider
+Each provider (e.g., Google, Notion) usually requires an OAuth application (or “Client”):
+- Provider’s Developer Console: For Google, visit https://console.cloud.google.com . For Notion, https://developers.notion.com .
+- Create an OAuth Client: Provide a name and callback URLs.
+- Redirect URIs: Typically set to the Swiftgum callback domain (e.g., https://api.swiftgum.com/oauth/callback).
+- Client ID & Secret: Copy these credentials for use in Swiftgum.
 
-Each provider (Google, Notion, etc.) requires you to create an **OAuth application** (or “Client”). This typically involves:
+### Step 2: Add Provider Credentials in Swiftgum
+1. Integrations Dashboard
+   Log in to the Swiftgum admin panel and navigate to Integrations. Find the provider (e.g., Google Drive) or click “Add New Integration” if available.
 
-- Visiting the provider’s developer console (e.g., [Google Cloud Console](https://console.cloud.google.com/)).  
-- Creating a new OAuth client, setting **redirect URIs** to point to your KnowledgeX instance (e.g., `https://your-knowledgex-domain.com/oauth/callback`).  
-- Copying the **client ID** and **client secret**.
+2. Enter Credentials
+   Paste your Client ID and Client Secret. Some providers also require scopes (e.g., drive.readonly, notion.pages.read).
+   <img src="/images/integration-ui.png" alt="Swiftgum Integration UI" width="450"/>
 
-<Steps>
-  <Step title="Access the Provider Console">
-    Sign in to your provider’s developer dashboard and create a new OAuth client.
-  </Step>
-  <Step title="Configure Callbacks">
-    Make sure to set the callback (redirect) URL correctly, matching your KnowledgeX environment.
-  </Step>
-  <Step title="Save Your Client Secrets">
-    Copy your **Client ID** and **Client Secret**. You’ll need these in the next step.
-  </Step>
-</Steps>
-
-### Step 2: Add Provider Credentials in KnowledgeX
-
-<Steps>
-  <Step title="Integrations Dashboard">
-    If using KnowledgeX Cloud, log into the admin panel and navigate to **Integrations** → **Add New Provider**.  
-    For self-hosted versions, visit `http://localhost:3000/admin` (or the equivalent route).
-  </Step>
-  <Step title="Enter Credentials">
-    Paste your **Client ID** and **Client Secret**. Some providers also require **Scopes** or other configurations (e.g., `drive.readonly`, `notion.pages.read`).
-  </Step>
-  <Step title="Enable the Integration">
-    Once saved, your new integration should be labeled **Enabled** (or provide a toggle for enabling/disabling).
-  </Step>
-</Steps>
-
----
-
-## 2. End User Flow (Linking Personal Accounts)
-
-Once a provider is set up, end users can connect their own accounts. Here’s the typical flow:
-
-### Step 1: Portal Session
-
-In your app, you might create a **Portal Session** for the user:
-
-```js
-// Pseudo-code example
-const portalSessionUrl = await knowledgeXClient.createPortalSession({
-  endUserId: 'user_123'
-})
-
-// Redirect your user to portalSessionUrl
-```
+3. Enable the Integration
+   Toggle the integration to Enabled. Now end users can connect their personal accounts for that service via the Swiftgum Portal.
 
 
+## Troubleshooting Tips
 
-Step 2: User Chooses an Integration
-In the KnowledgeX portal, the user sees available integrations (Google, Notion, etc.). They click Connect next to the integration they want.
+Invalid Redirect URI:
+Make sure the redirect URI in the provider’s console exactly matches Swiftgum’s callback URL. Small mismatches (HTTP vs HTTPS, trailing slashes) can cause errors.
 
-Step 3: OAuth Redirect
-The user is sent to the provider’s OAuth consent page.
-After consenting, they’re redirected back to KnowledgeX, which stores an encrypted token.
-<Success>
-**Token Lifecycle**
-Each token is encrypted and stored in KnowledgeX. The system auto-refreshes tokens where supported (e.g., Google OAuth). Admins can revoke access at any time.
-</Success>
+Token Refresh Issues:
+• Some providers require manual re-auth if refresh tokens expire or scopes change.
+• Check if the user has revoked access in their provider account settings.
 
-Managing Tokens & Permissions
-From the Integrations panel, administrators can:
+Scopes Not Permitted:
+Certain providers limit which scopes an app can request. Ensure you only request necessary scopes (e.g., drive.readonly, notion.database.read).
 
-Revoke an individual user’s token if they should no longer access a certain account.
-Set default scopes for new OAuth connections.
-Audit which users have connected to each integration.
-End users only see and manage their own connections, ensuring privacy and a minimal attack surface.
 
-Troubleshooting Tips
-<AccordionGroup>
-  <Accordion title="Invalid Redirect URI">
-    Ensure your redirect URI in the provider’s console exactly matches your KnowledgeX domain, including `https://` and any path or port.
-  </Accordion>
-  <Accordion title="Token Refresh Issues">
-    <ul> <li>Check if your provider requires **manual re-auth** or **advanced scopes** for refresh tokens.</li> <li>Ensure the user has not **revoked access** from their provider account settings.</li> </ul>
-  </Accordion>
-  <Accordion title="Scopes Not Permitted">
-    Some providers limit the scope an app can request. Verify you’re only requesting needed scopes (e.g., `drive.readonly`, `notion.database.read`).
-  </Accordion>
-</AccordionGroup>
-Next Steps
-With your integrations set up and end users connecting accounts, you can begin ingesting documents and applying RBAC or policy rules. See the Ingestion & Processing guide for details on how files are transformed into Markdown and stored for AI-ready workflows.
+## Next Steps
+With integrations enabled and end users connecting accounts, you can start ingesting documents and applying advanced features like RBAC or policy rules. See the Ingestion & Processing guide for details on how files are transformed and prepared for AI workflows.

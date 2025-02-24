@@ -26,7 +26,7 @@
 						]
 					},
 					{
-						"group": "Using KnowledgeX",
+						"group": "Using Swiftgum",
 						"pages": [
 							"usage/managing-integrations",
 							"usage/ingestion-processing",
@@ -71,7 +71,7 @@
 					},
 					{
 						"group": "Endpoint Examples",
-						"pages": ["api-reference/endpoint/get"]
+						"pages": ["api-reference/endpoint/create"]
 					}
 				]
 			}
@@ -79,14 +79,14 @@
 		"global": {
 			"anchors": [
 				{
-					"anchor": "KnowledgeX Website",
-					"href": "https://your-knowledgex-domain.com",
+					"anchor": "Swiftgum Website",
+					"href": "https://swiftgum.com",
 					"icon": "globe"
 				},
 				{
 					"anchor": "Community",
-					"href": "https://yourcommunitychat.com",
-					"icon": "slack"
+					"href": "https://discord.gg/adnqxUb8",
+					"icon": "discord"
 				}
 			]
 		}
