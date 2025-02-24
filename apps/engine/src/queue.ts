@@ -60,7 +60,6 @@ export const addQueueListener = async (
 	queueName: QueueName,
 	handler: (row?: postgres.Row) => unknown,
 	timeout = 120,
-	maxErrors = 5 * 60,
 ) => {
 	const realQueueName = `${queueName.replace("queue:", "")}_queue`;
 

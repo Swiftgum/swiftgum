@@ -11,6 +11,7 @@ export const exportTask = asTask(
 			fileName: z.string(),
 			provider: z.string(),
 			mimeType: z.string(),
+			kxid: z.string(),
 		}),
 	}),
 );

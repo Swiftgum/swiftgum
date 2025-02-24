@@ -1,6 +1,10 @@
+import crypto from "node:crypto";
 import { type ExportTask, exportTask } from "@knowledgex/shared/interfaces";
+import { mergeResourceUris } from "@knowledgex/shared/log";
 import type { DecryptedDestination } from "@knowledgex/shared/types/overload";
 import { sql } from "../db";
+import { QueueError } from "../queue";
+import { log } from "../utils/log";
 
 export const exportFile = async (task: Omit<ExportTask, "taskId">) => {
 	// Safeguard
@@ -14,6 +18,20 @@ export const exportFile = async (task: Omit<ExportTask, "taskId">) => {
 					]
 				)
 		`;
+};
+
+export const makeKxid = ({
+	contentSignature,
+	sourceId,
+	providerId,
+}: {
+	contentSignature: string;
+	sourceId: string;
+	providerId: string;
+}) => {
+	const hash = crypto.createHash("sha256").update(`${contentSignature}-${sourceId}`).digest("hex");
+
+	return `${providerId}/${hash}`;
 };
 
 export const getDestinations = async ({
@@ -40,11 +58,57 @@ export const processExport = async (task: ExportTask) => {
 	for (const destination of destinations) {
 		switch (destination.decrypted_destination_params.type) {
 			case "webhook":
-				await fetch(destination.decrypted_destination_params.webhook.url, {
-					method: "POST",
-					body: content,
-				});
+				try {
+					const response = await fetch(destination.decrypted_destination_params.webhook.url, {
+						method: "POST",
+						body: JSON.stringify({ metadata, content }),
+						headers: {
+							"Content-Type": "application/json",
+						},
+					});
 
+					if (!response.ok) {
+						await log({
+							id: mergeResourceUris(task.parentTaskIds || "", {
+								task: task.taskId,
+								destination: destination.destination_id,
+							}),
+							workspace_id: task.workspaceId,
+							type: "webhook",
+							name: "delivered:error",
+							level: "error",
+							metadata: {
+								statusCode: response.status,
+								destinationId: destination.destination_id,
+								kxid: metadata.kxid,
+							},
+							private: false,
+						});
+						throw new QueueError(`Webhook delivery failed with status ${response.status}`);
+					}
+
+					await log({
+						id: mergeResourceUris(task.parentTaskIds || "", {
+							task: task.taskId,
+							destination: destination.destination_id,
+						}),
+						workspace_id: task.workspaceId,
+						type: "webhook",
+						name: "delivered:success",
+						level: "verbose",
+						metadata: {
+							destinationId: destination.destination_id,
+							kxid: metadata.kxid,
+						},
+						private: false,
+					});
+				} catch (error) {
+					if (error instanceof QueueError) {
+						throw error;
+					}
+					// For any other error (network etc), requeue
+					throw new QueueError(error instanceof Error ? error.message : String(error));
+				}
 				break;
 		}
 	}

@@ -5,6 +5,7 @@ import { auth, drive_v3 } from "@googleapis/drive";
 import { providerSchemas } from "@knowledgex/shared/interfaces";
 import mime from "mime-types";
 import type { z } from "zod";
+import { makeKxid } from "../../export";
 import { runMarkitdown } from "../../parser";
 import { tempFileName } from "../../tmp";
 import { getToken } from "../../utils/token";
@@ -129,9 +130,14 @@ export const googleDriveProvider = provider({
 								fileId: task.fileId,
 								fileName: task.fileName,
 								remoteUrl: task.remoteUrl,
-								provider: "google:drive",
+								provider: providerSchemas.googleDriveSchema.identifier,
 								tokenId: task.tokenId,
 								mimeType: task.mimeType,
+								kxid: makeKxid({
+									contentSignature: textContents,
+									sourceId: task.fileId,
+									providerId: providerSchemas.googleDriveSchema.identifier,
+								}),
 							},
 						},
 					});

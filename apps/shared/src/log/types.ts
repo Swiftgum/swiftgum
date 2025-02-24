@@ -39,6 +39,11 @@ export const apiKeyLogEvent = logSchema.extend({
 	name: z.enum(["created", "rotated", "read", "compromised"]),
 });
 
+export const webhookLogEvent = logSchema.extend({
+	type: z.literal("webhook"),
+	name: z.enum(["delivered:success", "delivered:error", "aborted"]),
+});
+
 export const integrationLogEvent = logSchema.extend({
 	type: z.literal("integration"),
 	name: z.enum([
@@ -93,6 +98,7 @@ export const logEvent = z.discriminatedUnion("type", [
 	exportLogEvent,
 	queueLogEvent,
 	apiKeyLogEvent,
+	webhookLogEvent,
 	workspaceLogEvent,
 ]) satisfies z.ZodType<Database["public"]["Tables"]["logs"]["Insert"]>;
 
