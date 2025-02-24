@@ -16,6 +16,10 @@ export const queueForIndexing = async (task: Omit<IndexingTaskSchema, "taskId">)
 		return;
 	}
 
+	if (process.env.KEEPALIVE_URL) {
+		void fetch(process.env.KEEPALIVE_URL);
+	}
+
 	void log({
 		level: "info",
 		type: "integration",
