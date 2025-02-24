@@ -1,14 +1,9 @@
-import { createClient } from "@/utils/supabase/server";
+import { adminRoute } from "@/utils/auth/admin";
 import React from "react";
 import { NavbarClient } from "./navbar-client";
 
 export default async function Navbar() {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-
-	if (!user) return null;
+	await adminRoute();
 
 	return <NavbarClient />;
 }
