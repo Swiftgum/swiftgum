@@ -1,0 +1,63 @@
+---
+title: "Installation"
+description: "Options for installing KnowledgeX locally or using the cloud."
+icon: "computer"
+---
+
+# Installation
+
+Depending on your needs, you can **self-host** KnowledgeX or rely on our **cloud** offering. Below is an overview of both approaches.
+
+<Check>
+**Recommended: KnowledgeX Cloud**
+
+If you want the quickest path, sign up for KnowledgeX Cloud and skip server management.  
+[Sign Up Here](https://your-knowledgex-domain.com/signup)
+</Check>
+
+## 1. Cloud Installation
+
+1. **Sign Up**  
+   - Register on [KnowledgeX Cloud](https://your-knowledgex-domain.com/signup).  
+   - Obtain your `KNOWLEDGEX_URL` and `KNOWLEDGEX_TOKEN` from the dashboard.
+
+2. **Configure Your App**  
+   - Set the environment variables:
+     ```bash
+     KNOWLEDGEX_URL=<YOUR_KNOWLEDGEX_CLOUD_URL>
+     KNOWLEDGEX_TOKEN=<YOUR_GENERATED_TOKEN>
+     ```
+   - Install the KnowledgeX client in your project.
+
+3. **Run**  
+   - Everything else is handled on the KnowledgeX Cloud’s end.  
+   - Head to [Quick Start](quick-start.md) for usage instructions.
+
+## 2. Local Installation (Docker/Next.js)
+
+For teams requiring **full control**, you can run KnowledgeX on-prem.
+
+1. **Clone the Repo**  
+   ```bash
+   git clone https://github.com/your-org/knowledgex.git
+   cd knowledgex
+
+2. **Build & Run Docker**
+
+    ```bash
+    docker-compose up -d
+
+This spins up:
+
+The KnowledgeX server (Next.js or Node)
+A local database (SQLite or Postgres)
+Obtain Local Credentials
+
+On first run, the server logs or CLI outputs a default `KNOWLEDGEX_URL` (usually http://localhost:3000) and a generated `KNOWLEDGEX_TOKEN`.
+Test
+
+Access the local KnowledgeX dashboard at http://localhost:3000/admin.
+Use your admin credentials (generated on startup).
+
+Next Steps
+Once you have KnowledgeX running (locally or in the cloud), head to the Configuration guide to customize environment variables and manage keys.

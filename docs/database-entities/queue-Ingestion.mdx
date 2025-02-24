@@ -1,0 +1,17 @@
+---
+title: "Queue Ingestions"
+icon: "arrow-right"
+---
+<p>Although not shown in the diagram, Queue Ingestions is a table that tracks files or documents needing (re-)processing.</p>
+
+<ParamField path="token_id" type="uuid">
+  Which token or integration is tied to the file.
+</ParamField>
+
+<ParamField path="file_url" type="text">
+  Reference to the file in an external system.
+</ParamField>
+
+<ParamField path="status" type="text">
+  Tracks ingestion progress.
+</ParamField>

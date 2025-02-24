@@ -1,0 +1,110 @@
+---
+title: Architecture
+description: Overview of knowledge sourcing and system architecture using Mermaid diagrams.
+icon: 'sitemap'
+---
+
+# Knowledge Sourcing & Engine Architecture
+
+## Knowledge Sourcing
+
+<Info>
+Below is the Mermaid diagram representing the Knowledge Sourcing pipeline, explaining how data is ingested, processed, and stored.
+</Info>
+
+```mermaid
+flowchart LR
+    %% Define external sources
+    AdminKnowledge["Admin Knowledge<br/>(Company websites, Notion, etc.)"]
+    UserKnowledge["User Knowledge<br/>(e.g. mails, personal Drive, draft Notion, ...)"]
+
+    %% Subgraph for knowledge sourcing logic
+    subgraph Knowledge Sourcing
+        direction LR
+        Drive["Drive"]
+        Notion["Notion"]
+        Refresh["Refresh"]
+        AccessControl["Access Control"]
+        Embeddings["Embeddings"]
+
+        Drive --> Refresh
+        Notion --> Refresh
+        Drive --> AccessControl
+        Notion --> AccessControl
+        Refresh --> AccessControl
+        AccessControl --> Embeddings
+    end
+
+    %% Connect external sources into the subgraph
+    AdminKnowledge --> Drive
+    UserKnowledge --> Notion
+
+    %% Downstream steps after Embeddings
+    Supabase["Supabase<br/>Table w/ Vectors"]
+    RAG["RAG"]
+    Inference["Inference"]
+    Mem0["Mem0"]
+
+    %% Embeddings flow to vector DB + RAG
+    Embeddings --> Supabase
+    Embeddings --> RAG
+
+    %% RAG leads to Inference
+    RAG --> Inference
+
+    %% Inference can use or feed Mem0
+    Inference --> Mem0
+    Mem0 --> Inference
+```
+
+### Explanation
+
+- **Knowledge Sourcing subgraph**: Demonstrates the ingestion pipeline from Drive and Notion through Refresh, Access Control, and Embeddings.
+- **Admin/User Knowledge**: External sources feeding into the system.
+- **Supabase, RAG, Inference, Mem0**: Shows AI feature pipelines (RAG-based retrieval, inference, and memory functionality).
+
+
+---
+
+## Engine & App Architecture
+
+<Info>
+The following Mermaid diagram illustrates how the Engine processes files and interacts with the App, which manages integrations, OAuth flows, and storage.
+</Info>
+
+```mermaid
+flowchart LR
+    subgraph Engine
+        direction TB
+        ProcessFiles["Process Files<br/>(e.g., Python to convert to Markdown)"] --> UpdatesDB["Writes new/updated data"]
+    end
+
+    subgraph App
+        direction TB
+        BackendDB["Backend Database<br/>(SQLite local or Supabase cloud)"]
+        ManageIntegrations["Manage Integrations + Set up External Sync"]
+        OAuthFlows["Handle OAuth Content Flows"]
+        ThirdParty["3rd-Party (Google Drive, Notion, etc.)"]
+        
+        BackendDB -->|"Stores Token"| OAuthFlows
+        OAuthFlows -->|"Initiates OAuth"| ThirdParty
+        ManageIntegrations --> BackendDB
+    end
+
+    Developer --> ManageIntegrations
+    Engine -->|"Reads Token/DB String"| BackendDB
+    Engine --> ProcessFiles
+    UpdatesDB -->|"Push Data"| Supabase["Supabase (or Postgres)"]
+    Developer --> UIKit["UI Kit"]
+    UIKit --> EndUser["End User"]
+
+    %% Show relation from App to Engine
+    App -->|"Provides DB info / Token"| Engine
+```
+
+### Explanation
+
+- **Engine**: Processes files (e.g., converts to Markdown) and updates the database.
+- **App**: Manages integrations, tokens, and OAuth flows with external providers.
+- **Developer**: Configures integrations.
+- **UI Kit & End User**: Users interact with UI components to connect their accounts.

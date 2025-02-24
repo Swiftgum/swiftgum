@@ -1,0 +1,15 @@
+---
+title: "Auth Sessions"
+icon: "arrow-right"
+---
+<ParamField path="auth_session_id" type="uuid">
+  Used to track an OAuth session in progress.
+</ParamField>
+
+<ParamField path="integration_id" type="uuid">
+  Identifies which integration is in the authentication process.
+</ParamField>
+
+<ParamField path="auth_session" type="jsonb">
+  JSON payload storing step-by-step OAuth details or tokens prior to finalizing.
+</ParamField>

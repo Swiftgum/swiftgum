@@ -1,0 +1,21 @@
+---
+title: "Tokens"
+icon: "arrow-right"
+---
+<ParamField path="token_id" type="uuid">
+  Primary key for a token record.
+</ParamField>
+
+<ParamField path="workspace_id + end_user_id" type="uuid">
+  Associates the token with a user in a specific workspace.
+</ParamField>
+
+<ParamField path="integration_id" type="uuid">
+  Indicates which external provider/integration this token belongs to.
+</ParamField>
+
+<ParamField path="encrypted_tokenset" type="bytea">
+  Stores OAuth access/refresh tokens (encrypted).
+</ParamField>
+
+<p>Tokens are revoked or refreshed according to each provider’s policy, ensuring secure, short-lived credentials.</p>

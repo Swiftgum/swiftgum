@@ -1,0 +1,17 @@
+---
+title: "Portal Sessions"
+icon: "arrow-right"
+---
+<ParamField path="portal_session_id" type="uuid">
+  Unique link session for the KnowledgeX portal.
+</ParamField>
+
+<ParamField path="workspace_id & end_user_id" type="uuid">
+  Allows a user to access the “Manage Knowledge” or integration screen.
+</ParamField>
+
+<ParamField path="configuration" type="jsonb">
+  JSON with ephemeral settings (UX prefs, redirect URL, etc.).
+</ParamField>
+
+<p>These sessions function similarly to Stripe customer portal sessions, often with an expiration for security.</p>

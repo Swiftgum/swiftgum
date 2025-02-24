@@ -1,0 +1,15 @@
+---
+title: "Destinations"
+icon: "arrow-right"
+---
+<ParamField path="destination_id" type="uuid">
+  Primary key to represent an output or target service (e.g., Supabase, local Postgres, etc.).
+</ParamField>
+
+<ParamField path="workspace_id" type="uuid">
+  Links it to a workspace.
+</ParamField>
+
+<ParamField path="encrypted_destination_config" type="bytea">
+  Encrypted settings (credentials, connection strings, etc.).
+</ParamField>

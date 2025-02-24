@@ -1,0 +1,74 @@
+---
+title: "RBAC & Permissions"
+description: "How KnowledgeX handles role-based access control and compliance."
+icon: 'user-shield'
+---
+
+# RBAC & Permissions
+
+<Callout type="info">
+KnowledgeX leverages <Tooltip text="RBAC stands for Role-Based Access Control">RBAC</Tooltip> to ensure users only interact with data and configurations they’re allowed to see.
+</Callout>
+
+## Overview
+
+<Steps>
+  <Step icon="code">
+    **Developers & Admins:** Configure OAuth apps and manage workspaces.
+  </Step>
+  <Step icon="user">
+    **End Users:** Connect personal accounts or retrieve documents.
+  </Step>
+</Steps>
+
+<Tabs>
+  <Tab title="Admins">
+    <p>
+      Admins (or workspace owners) have full control to add integrations, revoke tokens, and view logs of ingestion events.
+    </p>
+  </Tab>
+  <Tab title="End Users">
+    <p>
+      End Users can manage only their own tokens and files, ensuring privacy and minimal exposure.
+    </p>
+  </Tab>
+</Tabs>
+{/* 
+```mermaid
+  flowchart TB
+    Admin[Admin Role] -->|Full Access<br>(Manage Integrations)| Workspace
+    EndUser[End User Role] -->|Limited Access| Workspace
+    Workspace -- token mgmt --> Data
+``` */}
+
+## Permission Layers
+
+<AccordionGroup>
+  <Accordion title="Workspace Ownership">
+    Each workspace is typically owned by a single admin user with top-level privileges. Owners can add or remove other admin-level users or invite standard users.
+  </Accordion>
+  <Accordion title="Integration Ownership">
+    Creating or configuring integrations requires admin rights. End Users may connect personal accounts under these integrations, which generate individual tokens.
+  </Accordion>
+  <Accordion title="Token-Level Access">
+    End users can view only their own tokens, while admins can revoke any token as needed. Note that raw OAuth credentials remain encrypted and are not directly exposed.
+  </Accordion>
+</AccordionGroup>
+
+## Compliance & Logging
+
+<Warning>
+    **Audit Trails:** Every change to roles, tokens, or integrations is logged with a timestamp, actor (admin or system), and a record of the modifications. These audit logs support compliance with standards such as SOC 2 and GDPR.
+</Warning>
+
+<CardGroup>
+  <Card title="Data Minimization">
+    KnowledgeX only stores file contents when ingestion is explicitly enabled. Otherwise, it retains only references or metadata about files unless a local ingestion pipeline is used for transformation.
+  </Card>
+  <Card title="Best Practices">
+    - **Least Privilege:** Grant only the minimum permissions necessary.
+    - **Regular Reviews:** Monitor logs for changes or suspicious revocations.
+    - **Segmentation:** Use separate workspaces for different teams to minimize cross-access.
+  </Card>
+</CardGroup>
+

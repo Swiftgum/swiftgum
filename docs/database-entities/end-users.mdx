@@ -1,0 +1,17 @@
+---
+title: "End Users"
+icon: "arrow-right"
+---
+<ParamField path="end_user_id" type="uuid">
+  Primary key for each end user within a workspace.
+</ParamField>
+
+<ParamField path="foreign_id" type="text">
+  External reference (e.g., your app’s user ID).
+</ParamField>
+
+<ParamField path="workspace_id" type="uuid">
+  Links the end user to a specific workspace.
+</ParamField>
+
+<p>End users can have multiple tokens and sessions, depending on their integrations.</p>

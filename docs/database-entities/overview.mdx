@@ -1,0 +1,140 @@
+---
+title: "Overview"
+description: "Overview of KnowledgeX tables, relationships, and entity management."
+---
+
+# Database & Entities
+
+KnowledgeX uses a relational schema to manage workspaces, integrations, tokens, and user sessions. This design enforces secure and scalable storage of credentials, session data, and more. Below is a high-level view of how tables connect to each other.
+
+<Info>
+Encryption & Credentials
+Sensitive fields—like **API keys** and **OAuth tokens**—are stored in an encrypted format, often leveraging a dedicated vault or encryption layer. This ensures that even if the database is accessed, the credentials remain secure.
+</Info>
+
+## Entity Relationship Overview
+
+```mermaid
+erDiagram
+    %% Mermaid ER Diagram representing tables/relationships
+    WORKSPACE {
+        uuid workspace_id PK
+        uuid owner_user_id
+        bytea encryption_key_id
+        bytea encrypted_api_key
+        text hashed_api_key
+        text label
+        timestamptz created_at
+        timestamptz updated_at
+        text dns_name
+    }
+    END_USERS {
+        uuid end_user_id PK
+        text foreign_id
+        uuid workspace_id FK
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    TOKENS {
+        uuid token_id PK
+        uuid workspace_id FK
+        uuid end_user_id FK
+        uuid integration_id FK
+        bytea encrypted_tokenset
+        timestamptz created_at
+        timestamptz refreshed_at
+        timestamptz expires_at
+        timestamptz revoked_at
+    }
+    INTEGRATIONS {
+        uuid integration_id PK
+        uuid provider_id FK
+        uuid workspace_id FK
+        bool enabled
+        bytea encrypted_credentials
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    PROVIDERS {
+        uuid provider_id PK
+        text identifier
+        text name
+        text description
+        jsonb metadata
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    DESTINATIONS {
+        uuid destination_id PK
+        uuid workspace_id FK
+        bytea encrypted_destination_config
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    AUTH_SESSIONS {
+        uuid auth_session_id PK
+        uuid end_user_id FK
+        uuid integration_id FK
+        jsonb auth_session
+        timestamptz created_at
+        timestamptz claimed_at
+    }
+    PORTAL_SESSIONS {
+        uuid portal_session_id PK
+        uuid workspace_id FK
+        uuid end_user_id FK
+        jsonb configuration
+        timestamptz created_at
+        timestamptz expires_at
+        text cookie_hash
+    }
+
+    %% Relationships
+    WORKSPACE ||--|{ END_USERS : "has many"
+    WORKSPACE ||--|{ TOKENS : "has many"
+    WORKSPACE ||--|{ INTEGRATIONS : "has many"
+    WORKSPACE ||--|{ DESTINATIONS : "has many"
+    WORKSPACE ||--|{ PORTAL_SESSIONS : "has many"
+
+    END_USERS ||--|{ AUTH_SESSIONS : "has many"
+    END_USERS ||--|{ PORTAL_SESSIONS : "has many"
+
+    INTEGRATIONS ||--|{ TOKENS : "has many"
+    INTEGRATIONS ||--|{ AUTH_SESSIONS : "has many"
+
+    PROVIDERS ||--|{ INTEGRATIONS : "supports many"
+```
+<Card title="Note" img="/images/diagram.png">
+The above diagram is a simplified representation. It doesn’t show every column or constraint but highlights the core relationships.
+</Card>
+
+<Card title="How It All Ties Together">
+  <h3>Workspace</h3>
+  <p>Each developer or company sets up a workspace. They configure integrations (with providers) to enable OAuth for end users.</p>
+
+  <h3>Providers & Integrations</h3>
+  <ul>
+    <li>A single Provider can serve multiple Integrations (e.g., dev vs. prod).</li>
+    <li>Each Integration has <code>encrypted_credentials</code> (client secrets, etc.).</li>
+  </ul>
+
+  <h3>End Users & Tokens</h3>
+  <ul>
+    <li>End users link personal accounts.</li>
+    <li>KnowledgeX stores their OAuth tokens in the Tokens table, ensuring each token is encrypted and bound to a single workspace + integration.</li>
+  </ul>
+
+  <h3>Sessions</h3>
+  <ul>
+    <li>Auth Sessions handle the in-progress OAuth flow.</li>
+    <li>Portal Sessions let an end user temporarily access the KnowledgeX portal UI to manage their connections.</li>
+  </ul>
+
+  <h3>Destinations</h3>
+  <p>Where processed or extracted data gets written (e.g., Supabase or local Postgres). Also stored securely, with connection info in <code>encrypted_destination_config</code>.</p>
+
+  <h3>Queue Ingestions</h3>
+  <p>Tracks new or updated documents for ingestion. The Engine processes these items into a normalized format or embeddings.</p>
+
+  <p>By splitting data across these entities, KnowledgeX ensures secure, scalable, and modular handling of user data, credentials, and ingestion flows.</p>
+</Card>

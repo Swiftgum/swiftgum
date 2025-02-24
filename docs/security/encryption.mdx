@@ -1,0 +1,91 @@
+---
+title: "Encryption & Credentials"
+description: "Secure handling of tokens and API credentials in KnowledgeX."
+icon: 'key'
+---
+
+# Encryption & Credentials
+
+KnowledgeX ensures that **tokens** (user OAuth tokens) and **API credentials** (e.g., client secrets) are stored in an **encrypted** format—minimizing risk even if the database is compromised.
+
+<Info>
+**Why Encryption Matters**
+Storing tokens in plaintext is a major security risk. KnowledgeX uses an **encryption key** to scramble all sensitive fields, preventing unauthorized use or exposure.
+</Info>
+
+<AccordionGroup>
+
+  <Accordion title="1. Encryption at Rest">
+  
+  **Implementation Details**
+  
+  **Master Encryption Key**  
+  - Configured via `ENCRYPTION_KEY` (or a secrets manager if self-hosted).  
+  - Used to encrypt/decrypt fields such as **encrypted_tokenset** and **encrypted_credentials**.
+  
+  **AES-256 (Recommended)**  
+  - We default to strong ciphers (AES-256-GCM or AES-256-CBC) to ensure secure encryption.  
+  - A unique Initialization Vector (IV) is generated for each record.
+  
+  **Secure Storage**  
+  - Depending on your deployment, encrypted fields may live in Postgres or a dedicated vault.  
+  - **No plaintext** secrets are written to logs or public console output.
+  
+  <CardGroup>
+    <Card title="Strong Cipher">
+      AES-256-GCM / AES-256-CBC ensures robust encryption.
+    </Card>
+    <Card title="Unique IV">
+      Each record gets its own initialization vector.
+    </Card>
+  </CardGroup>
+  
+  <MermaidDiagram code="
+    flowchart LR
+        Secrets[OAuth Tokens or Client IDs] --> Encrypt[Encryption Layer]
+        Encrypt --> DB[Database (encrypted fields)]
+        DB --> Decrypt[On-Demand Decryption]
+        Decrypt --> Secrets
+  "/>
+  
+  </Accordion>
+  
+  <Accordion title="2. Transport Security (TLS)">
+  
+  All KnowledgeX endpoints must be accessed via HTTPS. This ensures that data in transit (including tokens) isn’t exposed to eavesdroppers or man-in-the-middle attacks.
+  
+  - **Custom SSL**: For self-hosted setups, add an SSL certificate to your server or load balancer.
+  - **Cloud**: KnowledgeX Cloud enforces TLS by default.
+  
+  </Accordion>
+  
+  <Accordion title="3. Managing Keys & Rotation">
+  
+  **Key Generation**  
+  - Use a strong, randomly generated string for your `ENCRYPTION_KEY`.  
+  - Avoid guessable passphrases or storing the key in source control.
+  
+  **Rotation**  
+  - Periodically rotate your encryption key.
+  - KnowledgeX provides a tool/CLI to re-encrypt existing records with a new key.
+  - **Warning**: Ensure you have backups and a tested rotation process to avoid data loss.
+  
+  </Accordion>
+  
+  <Accordion title="4. Access Controls">
+  
+  - **Admin-Only**: Only administrators can configure or rotate encryption keys.
+  - **Zero-Knowledge**: The raw key is never displayed in the admin UI or logs.
+  
+  </Accordion>
+  
+  <Accordion title="5. Audit & Compliance">
+  
+  - **Encryption Logs**: When specific fields are decrypted or re-encrypted, an event is recorded.
+  - **Compliance**: Strong encryption supports compliance with GDPR, HIPAA, and SOC 2 data security requirements.
+  
+  </Accordion>
+
+</AccordionGroup>
+
+After ensuring your tokens and credentials are protected at rest (and in transit), review our RBAC & Permissions guide for more details on controlling data access.

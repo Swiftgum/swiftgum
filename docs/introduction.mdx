@@ -1,71 +1,107 @@
 ---
-title: Introduction
-description: "Welcome to the home of your new documentation"
+title: "Introduction"
+description: "What is Swiftgum?"
 ---
 
-<img
-  className="block dark:hidden"
-  src="/images/hero-light.png"
-  alt="Hero Light"
-/>
-<img
-  className="hidden dark:block"
-  src="/images/hero-dark.png"
-  alt="Hero Dark"
-/>
 
-## Setting up
+Swiftgum provides a **unified solution for sourcing, managing, and securing content for AI-powered applications**.
+{/* Whether you’re building retrieval-augmented generation (RAG) flows, role-based access control (RBAC) layers, or simply need a robust way to integrate multiple content sources, Swiftgum simplifies the process. */}
 
-The first step to world-class documentation is setting up your editing environments.
+
+
+## Why Swiftgum?
+
+<Card 
+  title="Unified Access Control" 
+  icon="lock" 
+  iconType="solid" 
+  color="#4F46E5" 
+  horizontal
+>
+  <p><strong>Easily manage tokens, permissions, and roles</strong> across multiple integrations (e.g., Google Drive, Notion). This ensures consistent, secure, and straightforward permission handling in your AI apps.</p>
+</Card>
+
+<Card 
+  title="ETL for AI" 
+  icon="database" 
+  iconType="solid" 
+  color="#10B981" 
+  horizontal
+>
+  <p><strong>Automatically ingest and convert</strong> files to Markdown, refresh content on a schedule, and store data in Supabase or your own Postgres. This standardizes your data flow and ensures content is always ready for AI queries.</p>
+</Card>
+
+<Card 
+  title="Secure & Compliant" 
+  icon="shield-halved" 
+  iconType="solid" 
+  color="#F59E0B" 
+  horizontal
+>
+  <p>Encrypted tokens, detailed audit logs, and integrated RBAC help you meet <strong>privacy regulations</strong> like GDPR or HIPAA. Swiftgum also provides advanced role-based constraints for enterprise-grade security.</p>
+</Card>
+
+{/* <Card 
+  title="Easy Onboarding" 
+  icon="user-check" 
+  iconType="solid" 
+  color="#3B82F6" 
+  horizontal
+>
+  <p><strong>Drop-in UI components</strong> let your users authorize integrations with minimal custom code. No need to reinvent login flows for every service.</p>
+</Card>
+
+<Card 
+  title="Flexible Hosting" 
+  icon="cloud" 
+  iconType="solid" 
+  color="#9333EA" 
+  horizontal
+>
+  <p>Run Swiftgum <strong>locally</strong> (Docker, Next.js) or in the <strong>cloud</strong> for hands-off scalability. This flexibility lets you choose the model that best suits your infrastructure.</p>
+</Card> */}
+
+
+## Key Features
 
 <CardGroup cols={2}>
-  <Card
-    title="Edit Your Docs"
-    icon="pen-to-square"
-    href="https://mintlify.com/docs/quickstart"
-  >
-    Get your docs set up locally for easy development
+  <Card title="Automated Policy Extraction" icon="shield-keyhole">
+    Standardize permissions from connected tools (e.g., Notion, Drive) into a common policy format.
   </Card>
-  <Card
-    title="Preview Changes"
-    icon="image"
-    href="https://mintlify.com/docs/development"
-  >
-    Preview your changes before you push to make sure they're perfect
+
+  {/* <Card title="📊 Permissions Dashboard" icon="chart-line">
+    Visualize user/group access across all integrated services, spotting mismatches or overlaps instantly.
+  </Card>
+
+  <Card title="🤖 Policy Inference & Recommendations" icon="lightbulb-on">
+    Get AI-powered suggestions for permission patterns and role alignments, saving time on policy setups.
+  </Card> */}
+
+  <Card title="Real-Time Sync" icon="arrows-rotate">
+    Keep multiple services in sync so your knowledge base never goes stale. Trigger updates on demand or via schedule.
+  </Card>
+
+  <Card title="Embeddings & RAG" icon="brain">
+    Push data into vector databases (like Supabase) to power advanced query/inference flows (Retrieval-Augmented Generation).
   </Card>
 </CardGroup>
 
-## Make it yours
+## Getting Started in 3 Steps
 
-Update your docs to your brand and add valuable content for the best user conversion.
+<Steps>
+  <Step title="Install & Configure">
+    Run `npm install Swiftgum` (or similar) and set your environment variables (`Swiftgum_URL`, `Swiftgum_TOKEN`).
+  </Step>
 
-<CardGroup cols={2}>
-  <Card
-    title="Customize Style"
-    icon="palette"
-    href="https://mintlify.com/docs/settings/global"
-  >
-    Customize your docs to your company's colors and brands
-  </Card>
-  <Card
-    title="Reference APIs"
-    icon="code"
-    href="https://mintlify.com/docs/api-playground/openapi"
-  >
-    Automatically generate endpoints from an OpenAPI spec
-  </Card>
-  <Card
-    title="Add Components"
-    icon="screwdriver-wrench"
-    href="https://mintlify.com/docs/content/components/accordions"
-  >
-    Build interactive features and designs to guide your users
-  </Card>
-  <Card
-    title="Get Inspiration"
-    icon="stars"
-    href="https://mintlify.com/customers"
-  >
-    Check out our showcase of our favorite documentation
-  </Card>
-</CardGroup>
+  <Step title="Manage Integrations">
+    In the Swiftgum dashboard, set up OAuth apps (Google, Notion, etc.) and grant end users the ability to connect their accounts.
+  </Step>
+
+  <Step title="Leverage in AI Flows">
+    Use our built-in connectors and retrieval pipeline to incorporate real-time documents into your LLM or RAG workflows.
+  </Step>
+</Steps>
+
+---
+
+Continue to the [High-Level Architecture](architecture/high-level-architecture) section to see how Swiftgum fits into your AI workflow.

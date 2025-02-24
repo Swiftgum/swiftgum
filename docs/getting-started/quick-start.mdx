@@ -1,0 +1,58 @@
+---
+title: "Quick Start"
+description: "A rapid introduction to KnowledgeX's setup and usage."
+icon: "code"
+---
+
+# Quick Start
+
+This guide walks you through setting up KnowledgeX in **three** simple steps.
+
+<Steps>
+    <Step title="Sign Up or Install">
+        - **Cloud**: [Create an account](https://your-knowledgex-domain.com/signup) on KnowledgeX Cloud.  
+        - **Local**: Clone or download the repository and run it locally (e.g., via Docker).  
+
+        After you sign up or install locally, you’ll obtain:
+        - `KNOWLEDGEX_URL`: The base URL of your KnowledgeX instance.  
+        - `KNOWLEDGEX_TOKEN`: Your generated token for API authentication.
+    </Step>
+    <Step title="Add KnowledgeX to Your App">
+        - **Install**:  
+            ```bash
+            npm install knowledgex
+            ```
+        - **Configure**: Add environment variables to your `.env` file:
+            ```bash
+            KNOWLEDGEX_URL=<YOUR_KNOWLEDGEX_URL>
+            KNOWLEDGEX_TOKEN=<YOUR_KNOWLEDGEX_TOKEN>
+            ```
+        - **Initialize**: In your backend or Next.js API route:
+            ```js
+            import { createKnowledgeXClient } from 'knowledgex'
+
+            const knowledgeXClient = createKnowledgeXClient({
+            url: process.env.KNOWLEDGEX_URL,
+            token: process.env.KNOWLEDGEX_TOKEN
+            })
+            ```
+    </Step>
+    <Step title="Create a Session & Launch the Portal">
+        - **Portal Session**: In your backend, you can generate a portal session link for a given user:
+            ```js
+            // Example pseudo-code
+            const portalSessionUrl = await knowledgeXClient.createPortalSession({
+            endUserId: 'user_123'
+            })
+            // Redirect or send this URL to your frontend.
+            ```
+        - **Redirection Flow**:  
+            1. Your user clicks “Manage Knowledge” in your app.  
+            2. You call `createPortalSession(...)` to get a secure link.  
+            3. The user is **redirected** to KnowledgeX to manage their integrations and data.  
+
+        This pattern is similar to Stripe’s customer portal session flow, providing a secure, short-lived URL.
+    </Step>
+</Steps>
+
+With these **three** steps, you have a working integration with KnowledgeX. Continue to [Installation](installation.md) for more details on local vs. cloud deployment.

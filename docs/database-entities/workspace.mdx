@@ -1,0 +1,21 @@
+---
+title: "Workspace"
+icon: "arrow-right"
+---
+<ParamField path="workspace_id" type="uuid">
+  Primary key for identifying a workspace.
+</ParamField>
+
+<ParamField path="owner_user_id" type="uuid">
+  References the main user or admin (often linked to `auth.users.id` if using Supabase Auth).
+</ParamField>
+
+<ParamField path="encrypted_api_key / hashed_api_key" type="bytea / text">
+  Securely store API credentials.
+</ParamField>
+
+<ParamField path="dns_name" type="text">
+  Optional custom domain reference.
+</ParamField>
+
+<p>A single Workspace can contain multiple Integrations, End Users, and Tokens.</p>

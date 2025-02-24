@@ -1,0 +1,17 @@
+---
+title: "Integrations"
+icon: "arrow-right"
+---
+<ParamField path="integration_id" type="uuid">
+  Unique identifier.
+</ParamField>
+
+<ParamField path="provider_id" type="uuid">
+  References the Providers table (Google, Notion, etc.).
+</ParamField>
+
+<ParamField path="encrypted_credentials" type="bytea">
+  Contains app-level credentials for OAuth (client secret, etc.), encrypted at rest.
+</ParamField>
+
+<p>When an integration is enabled, end users can link their personal accounts (generating tokens).</p>

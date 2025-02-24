@@ -1,0 +1,15 @@
+---
+title: "Providers"
+icon: "arrow-right"
+---
+<ParamField path="provider_id" type="uuid">
+  Primary key.
+</ParamField>
+
+<ParamField path="identifier & name" type="text">
+  E.g., google-drive, notion, etc.
+</ParamField>
+
+<ParamField path="metadata" type="jsonb">
+  JSON field for provider-specific details (scopes, endpoints, etc.).
+</ParamField>

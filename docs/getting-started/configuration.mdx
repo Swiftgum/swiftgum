@@ -1,0 +1,64 @@
+---
+title: "Configuration"
+description: "Customizing KnowledgeX with environment variables and settings."
+icon: "gear"
+---
+
+# Configuration
+
+KnowledgeX offers several environment variables and settings to tailor the platform to your needs.
+
+## Core Environment Variables
+
+| Variable            | Required | Description                                                           |
+|---------------------|----------|-----------------------------------------------------------------------|
+| `KNOWLEDGEX_URL`    | **Yes**  | The base URL for your KnowledgeX instance. (e.g., `https://cloud.knowledgex.io`) |
+| `KNOWLEDGEX_TOKEN`  | **Yes**  | The primary token used to authenticate your server or project.        |
+| `DATABASE_URL`      | Optional | If self-hosting with Postgres/SQLite, specify the DB connection string. |
+| `ENCRYPTION_KEY`    | Optional | Used for encrypting credentials at rest. If not provided, a default is used (not recommended for production). |
+| `PORT`              | Optional | The local port KnowledgeX listens on (e.g., `3000`).                   |
+
+## Example `.env`
+
+```bash
+# KnowledgeX
+KNOWLEDGEX_URL=https://cloud.knowledgex.io
+KNOWLEDGEX_TOKEN=your-cloud-token
+
+# Local DB config (only if self-hosting)
+DATABASE_URL=postgres://user:password@localhost:5432/knowledgex
+
+# Optionally define an encryption key
+ENCRYPTION_KEY=something-secure
+
+# Port
+PORT=3000
+```
+
+
+<Warning>
+Avoid committing your .env file to source control. Use secure secret management (e.g. GitHub Actions secrets, AWS Parameter Store, etc.).
+</Warning>
+Additional Settings
+<AccordionGroup>
+  <Accordion title="Logging & Debug Options">
+    LOG_LEVEL: Choose from info, warn, error, debug.
+    ENABLE_DEBUG: Boolean to enable verbose logs for troubleshooting.
+  </Accordion>
+  <Accordion title="Session & Portal Config" >
+    SESSION_TIMEOUT: Sets how long a portal session remains valid.
+    COOKIE_SECRET: Used to sign session cookies if you run KnowledgeX behind a custom domain.
+  </Accordion>
+  <Accordion title="Provider Credentials">
+    Store third-party provider credentials (e.g., Google OAuth client secrets) in environment variables or vault secrets. Then reference them in the KnowledgeX admin panel or directly in Integrations table.
+  </Accordion>
+</AccordionGroup>
+
+
+## Testing Your Configuration
+
+### Local  
+Spin up KnowledgeX and check the logs for any config errors.
+
+### Cloud  
+Use the Cloud dashboard to confirm your environment variables or secrets are correct.

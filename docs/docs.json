@@ -1,11 +1,11 @@
 {
 	"$schema": "https://mintlify.com/docs.json",
 	"theme": "mint",
-	"name": "Mint Starter Kit",
+	"name": "Swiftgum Documentation",
 	"colors": {
-		"primary": "#16A34A",
-		"light": "#07C983",
-		"dark": "#15803D"
+		"primary": "#0094ff",
+		"light": "#33a9ff",
+		"dark": "#026ab5"
 	},
 	"favicon": "/favicon.svg",
 	"navigation": {
@@ -14,19 +14,51 @@
 				"tab": "Guides",
 				"groups": [
 					{
-						"group": "Get Started",
-						"pages": ["introduction", "quickstart", "development"]
+						"group": "Overview",
+						"pages": ["introduction"]
 					},
 					{
-						"group": "Essentials",
+						"group": "Getting Started",
 						"pages": [
-							"essentials/markdown",
-							"essentials/code",
-							"essentials/images",
-							"essentials/settings",
-							"essentials/navigation",
-							"essentials/reusable-snippets"
+							"getting-started/quick-start",
+							"getting-started/installation",
+							"getting-started/configuration"
 						]
+					},
+					{
+						"group": "Using KnowledgeX",
+						"pages": [
+							"usage/managing-integrations",
+							"usage/ingestion-processing",
+							"usage/rag-llm-integration"
+						]
+					},
+					{
+						"group": "Architecture & Concepts",
+						"pages": [
+							"architecture/high-level-architecture",
+							{
+								"group": "Database",
+								"icon": "database",
+								"pages": [
+									"database-entities/overview",
+									"database-entities/auth-sessions",
+									"database-entities/end-users",
+									"database-entities/providers",
+									"database-entities/tokens/",
+									"database-entities/destinations",
+									"database-entities/integrations",
+									"database-entities/portal-sessions",
+									"database-entities/queue-Ingestion",
+									"database-entities/workspace"
+								]
+							}
+						]
+					},
+
+					{
+						"group": "Security & Compliance",
+						"pages": ["security/rbac", "security/encryption"]
 					}
 				]
 			},
@@ -39,11 +71,7 @@
 					},
 					{
 						"group": "Endpoint Examples",
-						"pages": [
-							"api-reference/endpoint/get",
-							"api-reference/endpoint/create",
-							"api-reference/endpoint/delete"
-						]
+						"pages": ["api-reference/endpoint/get"]
 					}
 				]
 			}
@@ -51,19 +79,14 @@
 		"global": {
 			"anchors": [
 				{
-					"anchor": "Documentation",
-					"href": "https://mintlify.com/docs",
-					"icon": "book-open-cover"
+					"anchor": "KnowledgeX Website",
+					"href": "https://your-knowledgex-domain.com",
+					"icon": "globe"
 				},
 				{
 					"anchor": "Community",
-					"href": "https://mintlify.com/community",
+					"href": "https://yourcommunitychat.com",
 					"icon": "slack"
-				},
-				{
-					"anchor": "Blog",
-					"href": "https://mintlify.com/blog",
-					"icon": "newspaper"
 				}
 			]
 		}
@@ -76,7 +99,7 @@
 		"links": [
 			{
 				"label": "Support",
-				"href": "mailto:hi@mintlify.com"
+				"href": "mailto:hi@swiftgum.com"
 			}
 		],
 		"primary": {
@@ -87,9 +110,7 @@
 	},
 	"footer": {
 		"socials": {
-			"x": "https://x.com/mintlify",
-			"github": "https://github.com/mintlify",
-			"linkedin": "https://linkedin.com/company/mintlify"
+			"github": "https://github.com/Titou325/knowledgex"
 		}
 	}
 }
