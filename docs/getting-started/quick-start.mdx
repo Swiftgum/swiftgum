@@ -6,7 +6,7 @@ icon: "code"
 
 # Quick Start
 
-This guide walks you through setting up Swiftgum in **four** simple steps.
+This guide walks you through setting up Swiftgum in **five** simple steps.
 
 <Steps>
 
@@ -16,8 +16,8 @@ This guide walks you through setting up Swiftgum in **four** simple steps.
 
     2. **Reveal Your API Key**  
        - Log into your admin dashboard.
-       - Access the [**API Keys**](/admin/api) section to copy your `x-api-key`.
-        <img src="/images/reveal.png" alt="Reaveal API UI" width="450"/>
+       - Access the [**API Keys**](/admin/api) section to copy your <code>x-api-key</code>.
+         <img src="/images/reveal.png" alt="Reveal API Key UI" width="450"/>
   </Step>
 
   <Step title="Activate an Integration">
@@ -25,7 +25,7 @@ This guide walks you through setting up Swiftgum in **four** simple steps.
 
     - **Toggle the Integration**: Switch the integration status to "Enabled".
     - **Enter OAuth Credentials**:  
-      - `Client ID` and `Client Secret` (from your Google Developer Console) or leave them blank if already configured.
+      - `Client ID` and `Client Secret` (from your Google Developer Console), or leave them blank if already configured.
       - Click **Update Integration** to save changes.
 
     <img src="/images/integration-ui.png" alt="Swiftgum Integration UI" width="450"/>
@@ -34,7 +34,7 @@ This guide walks you through setting up Swiftgum in **four** simple steps.
   </Step>
 
   <Step title="Create a Portal Session">
-    Next, call the `/api/portal/session` endpoint to generate a **sessionId** for a specific user, allowing them to manage their newly enabled integration.
+    Next, call the <code>/api/portal/session</code> endpoint to generate a <strong>sessionId</strong> for a specific user, allowing them to manage their newly enabled integration.
 
     ```bash
     POST /api/portal/session
@@ -65,17 +65,30 @@ This guide walks you through setting up Swiftgum in **four** simple steps.
   </Step>
 
   <Step title="Redirect User to the Portal">
-    1. Use the returned `sessionId` to build a portal link:
+    1. Use the returned <code>sessionId</code> to build a portal link:
        ```text
        https://api.swiftgum.com/portal/<sessionId>
        ```
     2. Redirect your user to that link (e.g., from a “Manage Knowledge” button in your app).
     3. The user can now authorize Google Drive (or any other enabled integration) under their account, set permissions, etc.
-    4. After finishing, they’ll be sent back to your specified `returnUrl`.
+    4. After finishing, they’ll be sent back to your specified <code>returnUrl</code>.
 
     This **short-lived** portal link ensures secure user access to Swiftgum’s integration management without exposing your app’s internal credentials.
   </Step>
 
+  <Step title="Configure a Webhook Destination">
+    By default, Swiftgum functions as an ETL engine—fetching data from the enabled integrations. To receive that data in your system:
+    
+    1. **Navigate to “Webhook Destination”** in your Swiftgum admin dashboard.
+    2. **Specify your Endpoint** (e.g., <code>https://api.yourdomain.com/swiftgum-webhook</code>):
+       - Swiftgum will send new or updated content to this endpoint whenever it completes a data fetch.
+    3. **Verify Delivery**: Once configured, Swiftgum will attempt a test POST request to ensure it can reach your endpoint.
+
+    <img src="/images/webhook.png" alt="Swiftgum Webhook UI" width="450"/>
+
+    After saving, your system can handle incoming data (e.g., store in Supabase, parse for further AI workflows, etc.).
+  </Step>
+
 </Steps>
 
-With these **four** steps, you have a working integration with **Swiftgum**—users can manage and authorize their content sources through the portal and you can automate knowledge ingestion. Continue to the [Installation](installation.md) guide if you’re exploring local hosting or advanced setups.
+With these **five** steps, you have a working integration with **Swiftgum**—users can manage and authorize their content sources through the portal, and you can automatically receive that data via a webhook. Continue to the [Installation](installation.md) guide if you’re exploring local hosting or advanced setups.
