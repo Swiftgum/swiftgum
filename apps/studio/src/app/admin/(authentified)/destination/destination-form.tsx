@@ -40,7 +40,7 @@ export function DestinationForm({ destinations }: DestinationFormProps) {
 	};
 
 	return (
-		<Card className="bg-white border-gray-300 shadow-sm">
+		<Card>
 			<CardContent className="space-y-6 p-6">
 				<div>
 					<h3 className="text-lg font-semibold text-zinc-900">Webhook Configuration</h3>

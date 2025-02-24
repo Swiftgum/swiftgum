@@ -20,7 +20,7 @@ export const exportFile = async (task: Omit<ExportTask, "taskId">) => {
 		`;
 };
 
-export const makeKxid = ({
+export const makeSgid = ({
 	contentSignature,
 	sourceId,
 	providerId,
@@ -80,7 +80,7 @@ export const processExport = async (task: ExportTask) => {
 							metadata: {
 								statusCode: response.status,
 								destinationId: destination.destination_id,
-								kxid: metadata.kxid,
+								sgid: metadata.sgid,
 							},
 							private: false,
 						});
@@ -98,7 +98,7 @@ export const processExport = async (task: ExportTask) => {
 						level: "verbose",
 						metadata: {
 							destinationId: destination.destination_id,
-							kxid: metadata.kxid,
+							sgid: metadata.sgid,
 						},
 						private: false,
 					});
