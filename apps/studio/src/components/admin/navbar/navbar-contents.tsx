@@ -137,22 +137,23 @@ export function NavbarContents({ onItemClick }: NavbarContentsProps) {
 			{user && (
 				<>
 					<NavDivider className="md:mt-auto" />
-					<div className="flex items-center gap-2 px-2 py-2">
-						<div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-							{user.user_metadata.picture ? (
-								<img
-									src={user.user_metadata.picture}
-									alt="User"
-									className="w-full h-full object-cover rounded-full"
-								/>
-							) : (
-								<UserIcon size={16} className="text-gray-500" />
-							)}
-						</div>
-						<span className="text-sm text-gray-700 truncate md:hidden md:group-hover/nav:block md:group-has-[:focus-visible]/nav:block">
-							{user.email}
-						</span>
-					</div>
+					<NavbarItem
+						as="button"
+						icon={
+							<div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center">
+								{user.user_metadata.picture ? (
+									<img
+										src={user.user_metadata.picture}
+										alt="User"
+										className="w-full h-full object-cover rounded-full"
+									/>
+								) : (
+									<UserIcon size={16} className="text-gray-500" />
+								)}
+							</div>
+						}
+						label={user.email || ""}
+					/>
 				</>
 			)}
 
@@ -162,7 +163,7 @@ export function NavbarContents({ onItemClick }: NavbarContentsProps) {
 					e.preventDefault();
 					handleRequest(e, SignOut, router);
 				}}
-				className="flex justify-stretch"
+				className="flex flex-col items-stretch justify-stretch"
 			>
 				<NavbarItem
 					as="button"

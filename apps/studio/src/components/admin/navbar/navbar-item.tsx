@@ -33,7 +33,7 @@ export function NavbarItem({ icon, label, isActive, onClick, ...props }: NavbarI
 	const content = (
 		<>
 			<div className="flex items-center justify-center w-11 shrink-0">{icon}</div>
-			<span className="whitespace-nowrap md:opacity-0 pr-4 shrink-0 md:group-hover/nav:opacity-100 transition-[opacity,transform] duration-300 md:-translate-x-2 md:group-hover/nav:-translate-x-0 md:group-has-[:focus-visible]/nav:opacity-100 md:group-has-[:focus-visible]/nav:-translate-x-0 font-medium text-sm">
+			<span className="truncate md:opacity-0 pr-4 md:group-hover/nav:opacity-100 transition-[opacity,transform] duration-300 md:-translate-x-2 md:group-hover/nav:-translate-x-0 md:group-has-[:focus-visible]/nav:opacity-100 md:group-has-[:focus-visible]/nav:-translate-x-0 font-medium text-sm">
 				{label}
 			</span>
 		</>
