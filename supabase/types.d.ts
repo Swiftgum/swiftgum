@@ -204,6 +204,8 @@ export type Database = {
 			};
 			workspace: {
 				Row: {
+					app_icon: string | null;
+					app_name: string | null;
 					created_at: string;
 					dns_name: string;
 					encrypted_api_key: string;
@@ -215,6 +217,8 @@ export type Database = {
 					workspace_id: string;
 				};
 				Insert: {
+					app_icon?: string | null;
+					app_name?: string | null;
 					created_at?: string;
 					dns_name?: string;
 					encrypted_api_key: string;
@@ -226,6 +230,8 @@ export type Database = {
 					workspace_id?: string;
 				};
 				Update: {
+					app_icon?: string | null;
+					app_name?: string | null;
 					created_at?: string;
 					dns_name?: string;
 					encrypted_api_key?: string;

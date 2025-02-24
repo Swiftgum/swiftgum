@@ -1,10 +1,18 @@
 import { z } from "zod";
 import type { integrationCredentials } from "./integration";
 
-export const providerMetadata = z.object({
+const baseProviderMetadata = z.object({
 	logo: z.string(),
-	type: z.enum(["oauth2"]),
 });
+
+const oauth2ProviderMetadata = baseProviderMetadata.extend({
+	type: z.literal("oauth2"),
+	oauth2: z.object({
+		url: z.string(),
+	}),
+});
+
+export const providerMetadata = z.discriminatedUnion("type", [oauth2ProviderMetadata]);
 
 // Check that the providerMetadata.type is strictly equal to the integrationCredentials.type
 type ProviderMetadata = z.infer<typeof providerMetadata>;

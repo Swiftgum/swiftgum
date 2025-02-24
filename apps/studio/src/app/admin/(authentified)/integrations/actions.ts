@@ -3,7 +3,7 @@
 import crypto from "node:crypto";
 import { log } from "@/utils/log";
 import { createClient, createServerOnlyClient } from "@/utils/supabase/server";
-import type { IntegrationCredentials } from "@knowledgex/shared/interfaces";
+import { type IntegrationCredentials, integrationCredentials } from "@knowledgex/shared/interfaces";
 import type {
 	DecryptedIntegration,
 	Integration,
@@ -52,17 +52,19 @@ export async function saveIntegration(params: SaveIntegrationParams): Promise<In
 	let encryptedCredentials = null;
 	let credentialsHash = null;
 	if (params.credentials) {
+		const safeCredentials = integrationCredentials.parse(params.credentials);
+
 		// Create hash of credentials
 		credentialsHash = crypto
 			.createHash("sha256")
-			.update(JSON.stringify(params.credentials))
+			.update(JSON.stringify(safeCredentials))
 			.digest("hex");
 
 		const { data: encrypted, error: encryptionError } = await supabase.rpc(
 			"encrypt_integration_credentials",
 			{
 				p_workspace_id: workspace.workspace_id,
-				p_credentials: params.credentials,
+				p_credentials: safeCredentials,
 			},
 		);
 

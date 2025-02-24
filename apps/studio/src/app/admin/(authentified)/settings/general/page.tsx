@@ -17,12 +17,13 @@ export default async function Providers() {
 	// Fetch workspace info
 	const { data: workspace, error: workspaceError } = await supabase
 		.from("workspace")
-		.select("workspace_id, label")
+		.select("workspace_id, label, app_name, app_icon")
 		.eq("owner_user_id", user.id)
 		.single();
 
-	if (workspaceError) {
+	if (workspaceError || !workspace?.workspace_id || !workspace?.label) {
 		console.error("Error fetching workspace:", workspaceError);
+		redirect("/error");
 	}
 
 	return (
@@ -30,8 +31,12 @@ export default async function Providers() {
 			<div className="mb-10">
 				<h1 className="text-2xl font-bold text-zinc-700">Project Settings</h1>
 			</div>
-			{/* Pass workspace info to GeneralPanel */}
-			<GeneralPanel workspaceId={workspace?.workspace_id ?? ""} label={workspace?.label ?? ""} />
+			<GeneralPanel
+				label={workspace.label}
+				workspaceId={workspace.workspace_id}
+				appName={workspace.app_name || undefined}
+				appIcon={workspace.app_icon || undefined}
+			/>
 		</div>
 	);
 }

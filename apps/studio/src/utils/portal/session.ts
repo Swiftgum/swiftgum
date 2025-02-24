@@ -280,8 +280,29 @@ export const getPagePortalSession = async ({
 
 	const session = await getSession({ sessionId });
 
+	// Get workspace data
+	const supabase = await createServerOnlyClient();
+	const { data: workspace, error: workspaceError } = await supabase
+		.from("workspace")
+		.select("app_name, app_icon")
+		.eq("workspace_id", session.workspace_id)
+		.single();
+
+	if (workspaceError) {
+		throw new Error("Failed to fetch workspace data");
+	}
+
+	// Enhance the session with workspace data
+	const enhancedSession = {
+		...session,
+		workspace: {
+			app_name: workspace.app_name,
+			app_icon: workspace.app_icon,
+		},
+	};
+
 	return {
-		session,
+		session: enhancedSession,
 		url: (url: string | URL) => {
 			const DUMMY_URL = "dummy://dummy.dummy/";
 

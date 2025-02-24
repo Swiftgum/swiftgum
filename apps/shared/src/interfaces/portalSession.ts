@@ -3,7 +3,6 @@ import { z } from "zod";
 export const portalSessionConfiguration = z.object({
 	userDisplay: z.string(),
 	returnUrl: z.string(),
-	appName: z.string(),
 	backgroundColor: z
 		.string()
 		.optional()

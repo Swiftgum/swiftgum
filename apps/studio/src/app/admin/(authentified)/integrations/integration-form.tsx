@@ -35,7 +35,7 @@ export function IntegrationForm({ provider, integration }: IntegrationFormProps)
 						oauth2: {
 							client_id: clientId,
 							client_secret: clientSecret,
-							url: provider.metadata?.oauth2_url as string,
+							url: provider.metadata?.oauth2?.url as string,
 						},
 					},
 				}),

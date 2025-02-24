@@ -58,6 +58,11 @@ export const destinationLogEvent = logSchema.extend({
 	name: z.enum(["configuration:changed"]),
 });
 
+export const workspaceLogEvent = logSchema.extend({
+	type: z.literal("workspace"),
+	name: z.enum(["configuration:changed"]),
+});
+
 export const exportLogEvent = logSchema.extend({
 	type: z.literal("export"),
 	name: z.enum(["started", "completed", "failed"]),
@@ -88,6 +93,7 @@ export const logEvent = z.discriminatedUnion("type", [
 	exportLogEvent,
 	queueLogEvent,
 	apiKeyLogEvent,
+	workspaceLogEvent,
 ]) satisfies z.ZodType<Database["public"]["Tables"]["logs"]["Insert"]>;
 
 export const resourceTypes = z.enum([

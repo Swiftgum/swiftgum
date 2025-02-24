@@ -3,61 +3,87 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Copy } from "lucide-react";
-import { useState } from "react";
+import { Copy, ImageIcon } from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "react-hot-toast";
+import { updateWorkspaceSettings } from "./actions";
 
-interface OAuthSettingsPanelProps {
+interface GeneralPanelProps {
 	label: string;
 	workspaceId: string;
+	appName?: string;
+	appIcon?: string;
 }
 
-export default function GeneralPanel({ label, workspaceId }: OAuthSettingsPanelProps) {
+export default function GeneralPanel({ label, workspaceId, appName, appIcon }: GeneralPanelProps) {
 	const [projectName, setProjectName] = useState(label);
+	const [appNameValue, setAppNameValue] = useState(appName || "");
+	const [appIconPreview, setAppIconPreview] = useState(appIcon);
 	const [originalProjectName, setOriginalProjectName] = useState(label);
+	const [originalAppName, setOriginalAppName] = useState(appName || "");
 	const [isSaving, setIsSaving] = useState(false);
-	const [copyText, setCopyText] = useState("Copy"); // State for copy button text
+	const [copyText, setCopyText] = useState("Copy");
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	const isModified = projectName !== originalProjectName;
+	const isModified =
+		projectName !== originalProjectName ||
+		appNameValue !== originalAppName ||
+		(fileInputRef.current?.files?.length ?? 0) > 0;
 
-	// Handle Copy to Clipboard
 	const handleCopy = () => {
 		navigator.clipboard.writeText(workspaceId);
-		setCopyText("Copied"); // Change text to Copied!
-
-		setTimeout(() => {
-			setCopyText("Copy"); // Revert back after 2 seconds
-		}, 2000);
+		setCopyText("Copied");
+		setTimeout(() => setCopyText("Copy"), 2000);
 	};
 
-	// Handle Save
+	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		if (!file.type.startsWith("image/")) {
+			toast.error("Please select an image file");
+			return;
+		}
+
+		if (file.size > 10 * 1024 * 1024) {
+			toast.error("Image must be less than 10MB");
+			return;
+		}
+
+		const reader = new FileReader();
+		reader.onloadend = () => {
+			setAppIconPreview(reader.result as string);
+		};
+		reader.readAsDataURL(file);
+	};
+
 	const handleSave = async () => {
 		setIsSaving(true);
 		try {
-			const response = await fetch("/api/workspace", {
-				method: "PUT",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ workspaceId, label: projectName }),
+			await updateWorkspaceSettings({
+				workspaceId,
+				label: projectName,
+				appName: appNameValue,
+				appIcon: appIconPreview,
 			});
 
-			if (!response.ok) throw new Error("Failed to update workspace");
-
-			// Show success toast notification
 			toast.success("Successfully saved settings!");
-
-			// Sync UI state on success
 			setOriginalProjectName(projectName);
+			setOriginalAppName(appNameValue);
+			if (fileInputRef.current) fileInputRef.current.value = "";
 		} catch (error) {
 			console.error("Error updating workspace:", error);
-			toast.error("Failed to save settings.");
+			toast.error(error instanceof Error ? error.message : "Failed to save settings.");
 		} finally {
 			setIsSaving(false);
 		}
 	};
 
-	// Handle Cancel
 	const handleCancel = () => {
 		setProjectName(originalProjectName);
+		setAppNameValue(originalAppName);
+		setAppIconPreview(appIcon);
+		if (fileInputRef.current) fileInputRef.current.value = "";
 	};
 
 	return (
@@ -72,11 +98,14 @@ export default function GeneralPanel({ label, workspaceId }: OAuthSettingsPanelP
 
 					<div className="flex flex-col w-1/2 gap-5">
 						<div>
-							<label htmlFor="clientId" className="block text-sm font-medium text-zinc-700 mb-px">
+							<label
+								htmlFor="projectName"
+								className="block text-sm font-medium text-zinc-700 mb-px"
+							>
 								Project name
 							</label>
 							<Input
-								id="clientId"
+								id="projectName"
 								value={projectName}
 								onChange={(e) => setProjectName(e.target.value)}
 								placeholder="Project name"
@@ -84,13 +113,49 @@ export default function GeneralPanel({ label, workspaceId }: OAuthSettingsPanelP
 						</div>
 
 						<div>
-							<label htmlFor="label" className="block text-sm font-medium text-zinc-700 mb-1">
+							<label htmlFor="appName" className="block text-sm font-medium text-zinc-700 mb-px">
+								App name
+							</label>
+							<Input
+								id="appName"
+								value={appNameValue}
+								onChange={(e) => setAppNameValue(e.target.value)}
+								placeholder="App name shown to users"
+							/>
+						</div>
+
+						<div>
+							<label htmlFor="appIcon" className="block text-sm font-medium text-zinc-700 mb-px">
+								App icon
+							</label>
+							<div className="flex items-center gap-4">
+								<div className="h-10 aspect-square border rounded flex items-center justify-center bg-gray-50 overflow-hidden">
+									{appIconPreview ? (
+										<img src={appIconPreview} alt="App icon" className="max-h-full w-auto" />
+									) : (
+										<ImageIcon className="w-6 h-6 text-gray-400" />
+									)}
+								</div>
+								<Input
+									id="appIcon"
+									type="file"
+									ref={fileInputRef}
+									onChange={handleFileChange}
+									accept="image/jpeg,image/png,image/svg+xml"
+									className="flex-1"
+								/>
+							</div>
+							<p className="mt-1 text-sm text-gray-500">JPEG, PNG or SVG (max. 10MB)</p>
+						</div>
+
+						<div>
+							<label htmlFor="projectId" className="block text-sm font-medium text-zinc-700 mb-1">
 								Project ID
 							</label>
 							<div className="relative">
 								<Input
 									disabled
-									id="label"
+									id="projectId"
 									value={workspaceId}
 									readOnly
 									className="bg-gray-100 !cursor-default pr-16"

@@ -2,8 +2,10 @@ import { queueForIndexing } from "@/utils/integrations/queue";
 import { claimAuthSession, getIntegrationCredentials } from "@/utils/integrations/session";
 import { saveIntegrationToken } from "@/utils/integrations/token";
 import { log } from "@/utils/log";
+import { createServerOnlyClient } from "@/utils/supabase/server";
 import type { IntegrationCredentials } from "@knowledgex/shared/interfaces";
 import { resourceUri } from "@knowledgex/shared/log";
+import type { Database } from "@knowledgex/shared/types/database-server";
 import { type NextRequest, NextResponse } from "next/server";
 import * as client from "openid-client";
 
@@ -98,14 +100,54 @@ export async function GET(request: NextRequest) {
 					},
 				};
 
-				const token = await saveIntegrationToken({
-					integration_id: session.integration_id,
-					end_user_id: session.end_user_id,
-					expires_at: tokens.expires_in
-						? new Date(Date.now() + tokens.expires_in * 1000).toISOString()
-						: undefined,
-					tokenset,
-				});
+				// Check for existing token
+				const supabase = await createServerOnlyClient();
+				const { data: existingToken } = await supabase
+					.schema("private")
+					.from("tokens")
+					.select("*")
+					.eq("integration_id", session.integration_id)
+					.eq("end_user_id", session.end_user_id)
+					.is("revoked_at", null)
+					.single();
+
+				let token: Database["private"]["Tables"]["tokens"]["Row"];
+				if (existingToken) {
+					// Update existing token
+					const encryptedTokenSet = await supabase.schema("private").rpc("encrypt_tokenset", {
+						p_workspace_id: existingToken.workspace_id,
+						p_tokenset: tokenset,
+					});
+
+					if (encryptedTokenSet.error) throw encryptedTokenSet.error;
+
+					const { data: updatedToken, error } = await supabase
+						.schema("private")
+						.from("tokens")
+						.update({
+							encrypted_tokenset: encryptedTokenSet.data,
+							expires_at: tokens.expires_in
+								? new Date(Date.now() + tokens.expires_in * 1000).toISOString()
+								: undefined,
+							refreshed_at: new Date().toISOString(),
+						})
+						.eq("token_id", existingToken.token_id)
+						.select("*")
+						.single();
+
+					if (error) throw error;
+					token = updatedToken;
+				} else {
+					// Create new token
+					token = await saveIntegrationToken({
+						integration_id: session.integration_id,
+						end_user_id: session.end_user_id,
+						expires_at: tokens.expires_in
+							? new Date(Date.now() + tokens.expires_in * 1000).toISOString()
+							: undefined,
+						tokenset,
+					});
+				}
 
 				await queueForIndexing({
 					workspaceId: token.workspace_id,
