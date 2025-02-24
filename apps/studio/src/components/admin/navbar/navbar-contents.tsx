@@ -67,10 +67,10 @@ export function NavbarContents({ onItemClick }: NavbarContentsProps) {
 			isActive: pathname.startsWith("/admin/logs"),
 		},
 		{
-			href: "/admin/settings/general",
+			href: "/admin/settings",
 			icon: <Settings size={18} />,
 			label: "Settings",
-			isActive: pathname.startsWith("/settings/general"),
+			isActive: pathname.startsWith("/admin/settings"),
 		},
 	];
 
