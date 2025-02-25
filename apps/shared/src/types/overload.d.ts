@@ -1,28 +1,27 @@
+import type { AuthIntegrationCredential, AuthIntegrationCredentials } from "@/providers/auth";
 import type {
 	AuthSession as AuthSessionPayload,
 	Destination,
-	IntegrationCredentials,
 	PortalSessionConfiguration,
 	ProviderMetadata,
-	TokenSet,
 } from "../interfaces";
 import type { Database } from "./database-server";
 
 export type DecryptedDestination = Omit<
-	Database["public"]["Views"]["destinations_with_decrypted_params"]["Row"],
+	Database["private"]["Views"]["destinations_with_decrypted_params"]["Row"],
 	"decrypted_destination_params"
 > & {
 	decrypted_destination_params: Destination;
 };
 
 export type DecryptedIntegration = Omit<
-	Database["public"]["Views"]["integrations_with_decrypted_credentials"]["Row"],
+	Database["private"]["Views"]["integrations_with_decrypted_credentials"]["Row"],
 	"decrypted_credentials"
 > & {
-	decrypted_credentials: IntegrationCredentials;
+	decrypted_credentials: AuthIntegrationCredential;
 };
 
-export type PortalSession = Database["public"]["Tables"]["portal_sessions"]["Row"] & {
+export type PortalSession = Database["private"]["Tables"]["portal_sessions"]["Row"] & {
 	configuration: PortalSessionConfiguration;
 };
 
@@ -32,10 +31,10 @@ export type Provider = Database["public"]["Tables"]["providers"]["Row"] & {
 
 export type Integration = Database["public"]["Tables"]["integrations"]["Row"];
 
-export type Token = Database["public"]["Tables"]["tokens"]["Row"];
+export type Token = Database["private"]["Tables"]["tokens"]["Row"];
 
 export type DecryptedToken = Omit<Token, "decrypted_tokenset"> & {
-	decrypted_tokenset: TokenSet;
+	decrypted_tokenset: AuthIntegrationCredentials;
 };
 
 export type AuthSession = Omit<

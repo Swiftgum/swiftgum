@@ -59,7 +59,13 @@ VALUES
     TRUE,
     public.encrypt_integration_credentials (
       '00000000-0000-0000-0000-000000000000',
-      '{"type": "oauth2", "oauth2": {"url": "https://accounts.google.com/.well-known/openid-configuration", "client_id": "565952417713-b6nksc77t71tho5fqeodc8b2djvfskr2.apps.googleusercontent.com", "client_secret": "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"}}'
+      '{
+  "data": {
+    "clientId": "565952417713-b6nksc77t71tho5fqeodc8b2djvfskr2.apps.googleusercontent.com",
+    "clientSecret": "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"
+  },
+  "providerId": "google:drive"
+}'
     )
   );
 

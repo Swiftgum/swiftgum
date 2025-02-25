@@ -3,22 +3,25 @@
 import crypto from "node:crypto";
 import { log } from "@/utils/log";
 import { createClient, createServerOnlyClient } from "@/utils/supabase/server";
-import { type IntegrationCredentials, integrationCredentials } from "@knowledgex/shared/interfaces";
+import { type AuthIntegrationCredential, getAuthProvider } from "@knowledgex/shared/providers/auth";
 import type {
 	DecryptedIntegration,
 	Integration,
 	Provider,
 } from "@knowledgex/shared/types/overload";
-
+import type { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 export type IntegrationWithProvider = {
 	provider: Provider;
 	integration: DecryptedIntegration | null;
+	authProviderSchemaShape: z.AnyZodObject["shape"];
 };
 
 export type SaveIntegrationParams = {
 	providerId: string;
+	providerIdentifier: string;
 	enabled: boolean;
-	credentials?: IntegrationCredentials;
+	credentials: AuthIntegrationCredential;
 };
 
 async function getWorkspace() {
@@ -40,6 +43,13 @@ export async function saveIntegration(params: SaveIntegrationParams): Promise<In
 	const supabase = await createServerOnlyClient();
 	const workspace = await getWorkspace();
 
+	const authProvider = getAuthProvider(params.providerIdentifier);
+
+	const safeIntegrationCredentials = authProvider.configurationSchema.parse({
+		providerId: params.providerIdentifier,
+		data: params.credentials,
+	});
+
 	// Check if integration exists
 	const { data: existingIntegration } = await supabase
 		.from("integrations")
@@ -52,19 +62,17 @@ export async function saveIntegration(params: SaveIntegrationParams): Promise<In
 	let encryptedCredentials = null;
 	let credentialsHash = null;
 	if (params.credentials) {
-		const safeCredentials = integrationCredentials.parse(params.credentials);
-
 		// Create hash of credentials
 		credentialsHash = crypto
 			.createHash("sha256")
-			.update(JSON.stringify(safeCredentials))
+			.update(JSON.stringify(safeIntegrationCredentials))
 			.digest("hex");
 
 		const { data: encrypted, error: encryptionError } = await supabase.rpc(
 			"encrypt_integration_credentials",
 			{
 				p_workspace_id: workspace.workspace_id,
-				p_credentials: safeCredentials,
+				p_credentials: safeIntegrationCredentials,
 			},
 		);
 
@@ -196,6 +204,9 @@ export async function listIntegrations(): Promise<IntegrationWithProvider[]> {
 		return {
 			provider,
 			integration: integration || null,
+			authProviderSchemaShape: zodToJsonSchema(
+				getAuthProvider(provider.identifier).configurationSchema,
+			),
 		};
 	});
 }

@@ -94,11 +94,11 @@ const refreshTokenInDB = async ({
 };
 
 export const getToken = async ({ tokenId }: { tokenId: string }) => {
-	let token = await getTokenFromDB({ tokenId });
+	const token = await getTokenFromDB({ tokenId });
 
-	if (token.expires_at < new Date(Date.now() + AUTO_REFRESH_THRESHOLD)) {
+	/** if (token.expires_at < new Date(Date.now() + AUTO_REFRESH_THRESHOLD)) {
 		token = await refreshTokenInDB({ token });
-	}
+	} */
 
 	return token;
 };

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import * as RevealInput from "@/components/ui/reveal-input";
 import { Switch } from "@/components/ui/switch";
+import type { AuthIntegrationCredential } from "@knowledgex/shared/providers/auth";
 import type { DecryptedIntegration, Provider } from "@knowledgex/shared/types/overload";
 import { useState } from "react";
 import { saveIntegration } from "./actions";
@@ -11,34 +12,42 @@ import { saveIntegration } from "./actions";
 interface IntegrationFormProps {
 	provider: Provider;
 	integration: DecryptedIntegration | null;
+	authProviderSchemaShape: {
+		properties: {
+			data: {
+				properties: {
+					[key: string]: {
+						type: string;
+						description?: string;
+					};
+				};
+			};
+		};
+	};
 }
 
-export function IntegrationForm({ provider, integration }: IntegrationFormProps) {
+export function IntegrationForm({
+	provider,
+	integration,
+	authProviderSchemaShape,
+}: IntegrationFormProps) {
 	const [isEnabled, setIsEnabled] = useState(integration?.enabled ?? false);
-	const [clientId, setClientId] = useState(
-		integration?.decrypted_credentials?.oauth2?.client_id ?? "",
-	);
-	const [clientSecret, setClientSecret] = useState(
-		integration?.decrypted_credentials?.oauth2?.client_secret ?? "",
-	);
+	const [formValues, setFormValues] = useState<{
+		[key: string]: string;
+	}>(() => ({
+		...(integration?.decrypted_credentials?.data ?? {}),
+	}));
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleSubmit = async () => {
 		try {
 			setIsLoading(true);
+
 			await saveIntegration({
 				providerId: provider.provider_id,
+				providerIdentifier: provider.identifier,
 				enabled: isEnabled,
-				...((!integration || (clientId && clientSecret)) && {
-					credentials: {
-						type: "oauth2",
-						oauth2: {
-							client_id: clientId,
-							client_secret: clientSecret,
-							url: provider.metadata?.oauth2?.url as string,
-						},
-					},
-				}),
+				credentials: formValues as unknown as AuthIntegrationCredential,
 			});
 		} catch (error) {
 			console.error("Failed to save integration:", error);
@@ -47,10 +56,7 @@ export function IntegrationForm({ provider, integration }: IntegrationFormProps)
 		}
 	};
 
-	// Only show OAuth2 form for OAuth2 providers
-	if (provider.metadata?.type !== "oauth2") {
-		return <div className="text-sm text-gray-500">This provider type is not yet supported.</div>;
-	}
+	const fields = Object.entries(authProviderSchemaShape.properties.data.properties);
 
 	return (
 		<div className="space-y-6">
@@ -65,57 +71,72 @@ export function IntegrationForm({ provider, integration }: IntegrationFormProps)
 				<Switch checked={isEnabled} onCheckedChange={setIsEnabled} disabled={isLoading} />
 			</div>
 
-			{/* OAuth2 Credentials Section */}
+			{/* Dynamic Fields Section */}
 			<div>
 				<h4 className="font-medium text-zinc-700 mb-4">OAuth2 Credentials</h4>
-				<div className="grid gap-4">
-					<div>
-						<label
-							htmlFor={`client-id-${provider.provider_id}`}
-							className="block text-sm font-medium text-gray-700 mb-1"
-						>
-							Client ID
-						</label>
-						<Input
-							id={`client-id-${provider.provider_id}`}
-							type="text"
-							placeholder={integration ? "Leave blank to keep existing" : "Enter client ID"}
-							value={clientId}
-							onChange={(e) => setClientId(e.target.value)}
-							disabled={isLoading}
-							className="font-mono"
-						/>
-						{integration?.decrypted_credentials && !clientId && (
-							<p className="text-xs text-gray-500 mt-1">Using existing client ID</p>
-						)}
-					</div>
-					<div>
-						<label
-							htmlFor={`client-secret-${provider.provider_id}`}
-							className="block text-sm font-medium text-gray-700 mb-1"
-						>
-							Client Secret
-						</label>
-						<RevealInput.Root>
-							<RevealInput.Input asChild>
-								<Input
-									id={`client-secret-${provider.provider_id}`}
-									placeholder={integration ? "Leave blank to keep existing" : "Enter client secret"}
-									value={clientSecret}
-									onChange={(e) => setClientSecret(e.target.value)}
-									disabled={isLoading}
-									className="font-mono"
-								/>
-							</RevealInput.Input>
-							<RevealInput.Reveal asChild>
-								<Button type="button" variant="outline" disabled={isLoading} />
-							</RevealInput.Reveal>
-						</RevealInput.Root>
-						{integration?.decrypted_credentials && !clientSecret && (
-							<p className="text-xs text-gray-500 mt-1">Using existing client secret</p>
-						)}
-					</div>
-				</div>
+				<form autoComplete="off" className="grid gap-4">
+					{fields.map(([fieldName, field]) => {
+						const isSecret = field.description?.includes("@secret");
+
+						const value = formValues[fieldName as keyof typeof formValues] || "";
+
+						const name = (field.description ?? fieldName).replace("@secret", "").trim();
+
+						const InputComponent = isSecret ? (
+							<RevealInput.Root key={fieldName}>
+								<RevealInput.Input asChild>
+									<Input
+										id={`field-${fieldName}`}
+										placeholder={
+											integration ? "Leave blank to keep existing" : `Enter ${fieldName}`
+										}
+										value={value}
+										onChange={(e) =>
+											setFormValues((prev) => ({
+												...prev,
+												[fieldName]: e.target.value,
+											}))
+										}
+										disabled={isLoading}
+										className="font-mono"
+										type="text"
+									/>
+								</RevealInput.Input>
+								<RevealInput.Reveal asChild>
+									<Button type="button" variant="outline" disabled={isLoading} />
+								</RevealInput.Reveal>
+							</RevealInput.Root>
+						) : (
+							<Input
+								key={fieldName}
+								id={`field-${fieldName}`}
+								type="text"
+								placeholder={integration ? "Leave blank to keep existing" : `Enter ${fieldName}`}
+								value={value}
+								onChange={(e) =>
+									setFormValues((prev) => ({
+										...prev,
+										[fieldName]: e.target.value,
+									}))
+								}
+								disabled={isLoading}
+								className="font-mono"
+							/>
+						);
+
+						return (
+							<div key={fieldName}>
+								<label
+									htmlFor={`field-${fieldName}`}
+									className="block text-sm font-medium text-gray-700 mb-1"
+								>
+									{name}
+								</label>
+								{InputComponent}
+							</div>
+						);
+					})}
+				</form>
 			</div>
 
 			{/* Actions Section */}

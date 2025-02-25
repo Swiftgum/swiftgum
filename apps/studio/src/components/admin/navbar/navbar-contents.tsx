@@ -133,10 +133,12 @@ export function NavbarContents({ onItemClick }: NavbarContentsProps) {
 				)}
 			</div>
 
+			<span className="md:mt-auto" />
+
 			{/* User Profile */}
 			{user && (
 				<>
-					<NavDivider className="md:mt-auto" />
+					<NavDivider />
 					<NavbarItem
 						as="button"
 						icon={

@@ -26,7 +26,7 @@ export const portalAuthSessionLogEvent = logSchema.extend({
 
 export const tokenLogEvent = logSchema.extend({
 	type: z.literal("token"),
-	name: z.enum(["created", "rotated", "retrieved"]),
+	name: z.enum(["created", "rotated", "retrieved", "updated"]),
 });
 
 export const adminAuthLogEvent = logSchema.extend({

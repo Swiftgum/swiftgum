@@ -2,11 +2,11 @@
 
 import { log } from "@/utils/log";
 import {
-	authSession as authSessionSchema,
-	integrationCredentials,
-} from "@knowledgex/shared/interfaces";
+	type AuthIntegrationAuthSession,
+	authIntegrationAuthSession,
+	authIntegrationCredential,
+} from "@knowledgex/shared/providers/auth";
 import type { Database } from "@knowledgex/shared/types/database-server";
-import type { AuthSession } from "@knowledgex/shared/types/overload";
 import { createServerOnlyClient } from "../supabase/server";
 
 /**
@@ -26,16 +26,33 @@ export const getIntegrationCredentials = async (integrationId: string) => {
 	if (error) throw error;
 	if (!data) throw new Error("Integration not found");
 
-	return integrationCredentials.parse(data.decrypted_credentials);
+	const { data: provider, error: providerError } = await supabase
+		.schema("public")
+		.from("providers")
+		.select("*")
+		.eq("provider_id", data.provider_id as unknown as string)
+		.single();
+
+	if (providerError) throw providerError;
+	if (!provider) throw new Error("Provider not found");
+
+	return {
+		integrationCredentials: authIntegrationCredential.parse(data.decrypted_credentials),
+		provider,
+	};
 };
 
 export const createAuthSession = async (
 	authSession: Omit<Database["private"]["Tables"]["auth_sessions"]["Insert"], "auth_session"> & {
-		auth_session: AuthSession["auth_session"];
+		auth_session: AuthIntegrationAuthSession;
 	},
 ) => {
+	console.log(authSession.auth_session);
+
 	// Verify with zod
-	const parsedAuthSession = authSessionSchema.parse(authSession.auth_session);
+	const parsedAuthSession = authIntegrationAuthSession.parse(authSession.auth_session);
+
+	console.log(authSession);
 
 	const supabase = await createServerOnlyClient();
 
@@ -52,14 +69,14 @@ export const createAuthSession = async (
 	if (error) throw error;
 
 	void log({
-		workspace_id: parsedAuthSession.workspace_id,
+		workspace_id: parsedAuthSession.context.workspaceId,
 		end_user_id: data.end_user_id,
 		level: "info",
 		type: "portal-auth-session",
 		name: "created",
 		id: {
 			auth_session: data.auth_session_id,
-			portal_session: parsedAuthSession.portal_session_id,
+			portal_session: parsedAuthSession.context.portalSessionId,
 			integration: authSession.integration_id,
 			end_user: data.end_user_id,
 		},
@@ -82,25 +99,27 @@ export const claimAuthSession = async (authSessionId: string) => {
 	if (error) throw error;
 	if (!data) throw new Error("Session not found");
 
-	const safeData = data as AuthSession;
+	console.log(data.auth_session);
+
+	const safeData = authIntegrationAuthSession.parse(data.auth_session);
 
 	void log({
-		workspace_id: safeData.auth_session.workspace_id,
-		end_user_id: safeData.end_user_id,
+		workspace_id: safeData.context.workspaceId,
+		end_user_id: safeData.context.endUserId,
 		level: "info",
 		type: "portal-auth-session",
 		name: "claimed",
 		id: {
-			auth_session: safeData.auth_session_id,
-			portal_session: safeData.auth_session.portal_session_id,
-			integration: safeData.integration_id,
-			end_user: safeData.end_user_id,
+			auth_session: data.auth_session_id as unknown as string,
+			portal_session: safeData.context.portalSessionId,
+			integration: safeData.context.integrationId,
+			end_user: safeData.context.endUserId,
 		},
 	});
 
 	return {
-		...safeData,
-		auth_session: authSessionSchema.parse(data.auth_session),
+		...data,
+		auth_session: authIntegrationAuthSession.parse(data.auth_session),
 	};
 };
 
@@ -117,24 +136,24 @@ export const __dangerous__ghostClaimSession = async (authSessionId: string) => {
 	if (error) throw error;
 	if (!data) throw new Error("Session not found");
 
-	const safeData = data as AuthSession;
+	const safeData = authIntegrationAuthSession.parse(data.auth_session);
 
 	void log({
-		workspace_id: safeData.auth_session.workspace_id,
+		workspace_id: safeData.context.workspaceId,
 		end_user_id: data.end_user_id,
 		level: "warning",
 		type: "portal-auth-session",
 		name: "ghost-claimed",
 		id: {
-			auth_session: safeData.auth_session_id,
-			portal_session: safeData.auth_session.portal_session_id,
-			integration: safeData.integration_id,
-			end_user: safeData.end_user_id,
+			auth_session: data.auth_session_id,
+			portal_session: safeData.context.portalSessionId,
+			integration: safeData.context.integrationId,
+			end_user: safeData.context.endUserId,
 		},
 	});
 
 	return {
 		...data,
-		auth_session: authSessionSchema.parse(data.auth_session),
+		auth_session: authIntegrationAuthSession.parse(data.auth_session),
 	};
 };

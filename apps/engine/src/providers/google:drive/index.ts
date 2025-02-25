@@ -42,6 +42,8 @@ const getDrive = ({
 }: {
 	accessToken: string;
 }) => {
+	console.log("retrieving drive", accessToken);
+
 	const authClient = new auth.OAuth2();
 	authClient.setCredentials({ access_token: accessToken });
 	return new drive_v3.Drive({ auth: authClient });
@@ -53,7 +55,7 @@ export const googleDriveProvider = provider({
 		const token = await getToken(task);
 
 		const drive = getDrive({
-			accessToken: token.decrypted_tokenset.oauth2.access_token,
+			accessToken: token.decrypted_tokenset.data.accessToken,
 		});
 
 		if (task.step === "pending") {
@@ -85,7 +87,7 @@ export const googleDriveProvider = provider({
 					if (targetMimeType) {
 						const response = await fetch(task.exportLinks[targetMimeType], {
 							headers: {
-								Authorization: `Bearer ${token.decrypted_tokenset.oauth2.access_token}`,
+								Authorization: `Bearer ${token.decrypted_tokenset.data.accessToken}`,
 							},
 						});
 
@@ -153,8 +155,10 @@ export const googleDriveProvider = provider({
 	indexing: async ({ task, queue }) => {
 		const token = await getToken(task);
 
+		console.log(token.decrypted_tokenset.data);
+
 		const drive = getDrive({
-			accessToken: token.decrypted_tokenset.oauth2.access_token,
+			accessToken: token.decrypted_tokenset.data.accessToken,
 		});
 
 		const files: drive_v3.Schema$File[] = [];

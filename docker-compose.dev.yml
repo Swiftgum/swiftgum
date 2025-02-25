@@ -26,6 +26,7 @@ services:
     volumes:
       - ./apps/studio/src:/app/apps/studio/src
       - ./apps/studio/public:/app/apps/studio/public
+      - ./apps/shared/src:/app/apps/shared/src
       - ./apps/interfaces:/app/apps/interfaces
     ports:
       - "3000:3000"
