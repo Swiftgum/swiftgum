@@ -3,11 +3,7 @@ title: "Introduction"
 description: "What is Swiftgum?"
 ---
 
-
-Swiftgum provides a **unified solution for sourcing, managing, and securing content for AI-powered applications**.
-{/* Whether you’re building retrieval-augmented generation (RAG) flows, role-based access control (RBAC) layers, or simply need a robust way to integrate multiple content sources, Swiftgum simplifies the process. */}
-
-
+Swiftgum provides a **unified solution for sourcing, managing, and securing content for AI-powered applications**. By acting as an **ETL for AI**, Swiftgum streamlines the process of connecting to external sources (e.g., Google Drive, Notion), extracting relevant data, and empowering you to load it into a vector database (like Supabase) for AI-driven workflows.
 
 ## Why Swiftgum?
 
@@ -18,7 +14,7 @@ Swiftgum provides a **unified solution for sourcing, managing, and securing cont
   color="#4F46E5" 
   horizontal
 >
-  <p><strong>Easily manage tokens, permissions, and roles</strong> across multiple integrations (e.g., Google Drive, Notion). This ensures consistent, secure, and straightforward permission handling in your AI apps.</p>
+  <p><strong>Easily manage tokens, permissions, and roles</strong> across multiple integrations (e.g., Google Drive, Notion). This ensures consistent, secure, and straightforward permission handling for your AI apps.</p>
 </Card>
 
 <Card 
@@ -28,7 +24,7 @@ Swiftgum provides a **unified solution for sourcing, managing, and securing cont
   color="#10B981" 
   horizontal
 >
-  <p><strong>Automatically ingest and convert</strong> files to Markdown, refresh content on a schedule, and store data in Supabase or your own Postgres. This standardizes your data flow and ensures content is always ready for AI queries.</p>
+  <p><strong>Fetch and transform</strong> files from various sources into a Markdown-ready format, ensuring your AI or LLM can access up-to-date data whenever needed. Swiftgum helps you schedule and automate ingestion for a seamless data pipeline.</p>
 </Card>
 
 <Card 
@@ -38,47 +34,18 @@ Swiftgum provides a **unified solution for sourcing, managing, and securing cont
   color="#F59E0B" 
   horizontal
 >
-  <p>Encrypted tokens, detailed audit logs, and integrated RBAC help you meet <strong>privacy regulations</strong> like GDPR or HIPAA. Swiftgum also provides advanced role-based constraints for enterprise-grade security.</p>
+  <p>Encrypted tokens, detailed audit logs, and integrated RBAC help you meet <strong>privacy regulations</strong> like GDPR or HIPAA. Swiftgum also supports role-based constraints for enterprise-grade security.</p>
 </Card>
-
-{/* <Card 
-  title="Easy Onboarding" 
-  icon="user-check" 
-  iconType="solid" 
-  color="#3B82F6" 
-  horizontal
->
-  <p><strong>Drop-in UI components</strong> let your users authorize integrations with minimal custom code. No need to reinvent login flows for every service.</p>
-</Card>
-
-<Card 
-  title="Flexible Hosting" 
-  icon="cloud" 
-  iconType="solid" 
-  color="#9333EA" 
-  horizontal
->
-  <p>Run Swiftgum <strong>locally</strong> (Docker, Next.js) or in the <strong>cloud</strong> for hands-off scalability. This flexibility lets you choose the model that best suits your infrastructure.</p>
-</Card> */}
-
 
 ## Key Features
 
 <CardGroup cols={2}>
   <Card title="Automated Policy Extraction" icon="shield-keyhole">
-    Standardize permissions from connected tools (e.g., Notion, Drive) into a common policy format.
+    Standardize permissions from connected tools (e.g., Drive, Notion) into a common policy format.
   </Card>
-
-  {/* <Card title="📊 Permissions Dashboard" icon="chart-line">
-    Visualize user/group access across all integrated services, spotting mismatches or overlaps instantly.
-  </Card>
-
-  <Card title="🤖 Policy Inference & Recommendations" icon="lightbulb-on">
-    Get AI-powered suggestions for permission patterns and role alignments, saving time on policy setups.
-  </Card> */}
 
   <Card title="Real-Time Sync" icon="arrows-rotate">
-    Keep multiple services in sync so your knowledge base never goes stale. Trigger updates on demand or via schedule.
+    Keep multiple services in sync so your knowledge base never goes stale. Trigger updates on demand or schedule them.
   </Card>
 
   <Card title="Embeddings & RAG" icon="brain">
@@ -89,16 +56,31 @@ Swiftgum provides a **unified solution for sourcing, managing, and securing cont
 ## Getting Started in 3 Steps
 
 <Steps>
-  <Step title="Install & Configure">
-    Run `npm install Swiftgum` (or similar) and set your environment variables (`Swiftgum_URL`, `Swiftgum_TOKEN`).
+  <Step title="Sign Up & Configure">
+    <ul>
+      <li>
+        <strong>Sign up</strong> on <a href="https://swiftgum.com/signup">Swiftgum Cloud</a> and obtain your <code>x-api-key</code>.
+      </li>
+      <li>
+        <strong>Admin Dashboard:</strong> Enable desired integrations (Google, Notion, etc.).
+      </li>
+    </ul>
   </Step>
 
   <Step title="Manage Integrations">
-    In the Swiftgum dashboard, set up OAuth apps (Google, Notion, etc.) and grant end users the ability to connect their accounts.
+    <p>
+      In the Swiftgum dashboard, toggle on the integrations you need. For each integration, provide OAuth details if required. 
+    </p>
+    <p>
+      Once enabled, Swiftgum can fetch files through ephemeral tokens or scheduled jobs, ensuring you have the latest content.
+    </p>
   </Step>
 
   <Step title="Leverage in AI Flows">
-    Use our built-in connectors and retrieval pipeline to incorporate real-time documents into your LLM or RAG workflows.
+    <p>
+      <strong>Pull data from Swiftgum</strong> using the provided endpoints to load your documents into a vector store (e.g., Supabase). 
+      Then <strong>run RAG queries</strong> or other AI workflows on fresh, secure data. 
+    </p>
   </Step>
 </Steps>
 
