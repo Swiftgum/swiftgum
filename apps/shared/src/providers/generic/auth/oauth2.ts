@@ -61,11 +61,11 @@ const buildOauth2Config = async ({
 			{
 				authorization_endpoint: providerConfig.authorizationUrl,
 				token_endpoint: providerConfig.tokenUrl,
-				issuer: providerConfig.issuer,
+				issuer: providerConfig.issuer ?? "",
 			},
 			configuration.clientId,
 			undefined,
-			clientSecretProvider(configuration.clientSecret),
+			clientSecretProvider ? clientSecretProvider(configuration.clientSecret) : undefined,
 		);
 	}
 
@@ -109,7 +109,7 @@ export const oauth2ProviderAuth = <ProviderID extends string>(
 			// Build the authorization URL
 			const redirectUrl = client.buildAuthorizationUrl(config, {
 				code_challenge: codeChallenge,
-				scope: providerConfig.scope,
+				scope: providerConfig.scope ?? "",
 				redirect_uri: callbackUrl.toString(),
 				state: sessionId,
 				code_challenge_method: "S256",

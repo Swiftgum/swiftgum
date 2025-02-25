@@ -2,6 +2,8 @@
 	"compilerOptions": {
 		"paths": {
 			"@/*": ["./src/*"]
-		}
+		},
+		"strict": true,
+		"strictNullChecks": true
 	}
 }

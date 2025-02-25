@@ -2,7 +2,6 @@ import { Providers } from "@/components/providers";
 import type { Metadata } from "next";
 import { DM_Mono, DM_Sans, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
-import Head from "next/head";
 
 const sansFont = DM_Sans({
 	variable: "--font-sans",
@@ -23,6 +22,18 @@ const serifFont = DM_Serif_Display({
 
 export const metadata: Metadata = {
 	title: "Swiftgum",
+	icons: {
+		icon: [
+			{ url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+			{ url: "/favicon.svg", type: "image/svg+xml" },
+			{ url: "/favicon.ico" },
+		],
+		apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+	},
+	manifest: "/site.webmanifest",
+	appleWebApp: {
+		title: "MyWebSite",
+	},
 };
 
 export default function RootLayout({
@@ -32,14 +43,6 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" className={`${sansFont.variable} ${monoFont.variable} ${serifFont.variable}`}>
-			<Head>
-				<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-				<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-				<link rel="shortcut icon" href="/favicon.ico" />
-				<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-				<meta name="apple-mobile-web-app-title" content="MyWebSite" />
-				<link rel="manifest" href="/site.webmanifest" />
-			</Head>
 			<body className="antialiased">
 				<Providers>{children}</Providers>
 			</body>
