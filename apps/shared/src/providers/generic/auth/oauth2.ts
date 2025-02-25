@@ -1,23 +1,23 @@
 import * as client from "openid-client";
 import { z } from "zod";
 import { providerAuth } from ".";
-
 const oauth2ProviderBaseParams = z.object({
 	providerId: z.string(),
 	scope: z.string().optional(),
-	tokenEndpointAuthMethod: z.enum(["client_secret_post", "client_secret_basic"]).optional(),
+	tokenEndpointAuthMethod: z
+		.enum(["client_secret_post", "client_secret_basic", "client_secret_basic_unencoded"])
+		.optional(),
+	issuer: z.string(),
 });
 
 const oauth2DirectProviderParams = oauth2ProviderBaseParams.extend({
 	method: z.literal("direct"),
 	authorizationUrl: z.string(),
 	tokenUrl: z.string(),
-	issuer: z.string().optional(),
 });
 
 const oauth2IssuerProviderParams = oauth2ProviderBaseParams.extend({
 	method: z.literal("issuer"),
-	issuer: z.string(),
 });
 
 const oauth2ProviderParams = z.discriminatedUnion("method", [
@@ -35,12 +35,22 @@ const oauth2ConfigurationSchema = z
 const oauth2AuthSessionSchema = z.object({
 	pkceCodeVerifier: z.string(),
 	state: z.string(),
+	callbackUrl: z.string(),
 });
 
 const oauth2CredentialsSchema = z.object({
 	accessToken: z.string(),
 	refreshToken: z.string().optional(),
 });
+
+const ClientBasicSecretUnencoded = (clientSecret: string): client.ClientAuth => {
+	return (_as, client, _body, headers) => {
+		const username = client.client_id;
+		const password = clientSecret;
+		const credentials = btoa(`${username}:${password}`);
+		headers.set("authorization", `Basic ${credentials}`);
+	};
+};
 
 const buildOauth2Config = async ({
 	providerConfig,
@@ -49,23 +59,34 @@ const buildOauth2Config = async ({
 	providerConfig: z.infer<typeof oauth2ProviderParams>;
 	configuration: z.infer<typeof oauth2ConfigurationSchema>;
 }) => {
-	const clientSecretProvider =
-		providerConfig.tokenEndpointAuthMethod === "client_secret_basic"
-			? client.ClientSecretBasic
-			: providerConfig.tokenEndpointAuthMethod === "client_secret_post"
-				? client.ClientSecretPost
-				: undefined;
+	let clientSecretProvider: ((clientSecret: string) => client.ClientAuth) | undefined = undefined;
+
+	switch (providerConfig.tokenEndpointAuthMethod) {
+		case "client_secret_basic":
+			clientSecretProvider = client.ClientSecretBasic;
+			break;
+		case "client_secret_basic_unencoded":
+			clientSecretProvider = ClientBasicSecretUnencoded;
+			break;
+		case "client_secret_post":
+			clientSecretProvider = client.ClientSecretPost;
+			break;
+	}
 
 	if (providerConfig.method === "direct") {
+		process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 		return new client.Configuration(
 			{
 				authorization_endpoint: providerConfig.authorizationUrl,
 				token_endpoint: providerConfig.tokenUrl,
-				issuer: providerConfig.issuer ?? "",
+				issuer: providerConfig.issuer,
 			},
 			configuration.clientId,
-			undefined,
-			clientSecretProvider ? clientSecretProvider(configuration.clientSecret) : undefined,
+			typeof clientSecretProvider === "undefined" ? configuration.clientSecret : undefined,
+			typeof clientSecretProvider === "undefined"
+				? undefined
+				: clientSecretProvider(configuration.clientSecret),
 		);
 	}
 
@@ -121,6 +142,7 @@ export const oauth2ProviderAuth = <ProviderID extends string>(
 				session: {
 					pkceCodeVerifier: codeVerifier,
 					state: sessionId,
+					callbackUrl: callbackUrl.toString(),
 				},
 				nextUrl: new URL(redirectUrl),
 			};
@@ -131,12 +153,19 @@ export const oauth2ProviderAuth = <ProviderID extends string>(
 				configuration,
 			});
 
-			console.log({ providerConfig, configuration, authSession, config });
+			console.log({ providerConfig, configuration, authSession, config: config.serverMetadata() });
 
-			const tokenSet = await client.authorizationCodeGrant(config, request, {
-				pkceCodeVerifier: authSession.pkceCodeVerifier,
-				expectedState: authSession.state,
-			});
+			const tokenSet = await client.authorizationCodeGrant(
+				config,
+				request,
+				{
+					pkceCodeVerifier: authSession.pkceCodeVerifier,
+					expectedState: authSession.state,
+				},
+				{
+					redirect_uri: authSession.callbackUrl,
+				},
+			);
 
 			return {
 				credentials: {

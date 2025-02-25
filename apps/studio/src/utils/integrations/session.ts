@@ -47,12 +47,8 @@ export const createAuthSession = async (
 		auth_session: AuthIntegrationAuthSession;
 	},
 ) => {
-	console.log(authSession.auth_session);
-
 	// Verify with zod
 	const parsedAuthSession = authIntegrationAuthSession.parse(authSession.auth_session);
-
-	console.log(authSession);
 
 	const supabase = await createServerOnlyClient();
 
@@ -98,8 +94,6 @@ export const claimAuthSession = async (authSessionId: string) => {
 
 	if (error) throw error;
 	if (!data) throw new Error("Session not found");
-
-	console.log(data.auth_session);
 
 	const safeData = authIntegrationAuthSession.parse(data.auth_session);
 

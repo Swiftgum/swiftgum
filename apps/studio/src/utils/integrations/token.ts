@@ -40,7 +40,7 @@ export const saveIntegrationToken = async ({
 		.schema("private")
 		.from("tokens")
 		.select("*")
-		.eq("workspace_id", integration.workspace_id)
+		.eq("integration_id", token.integration_id)
 		.eq("end_user_id", token.end_user_id)
 		.single();
 

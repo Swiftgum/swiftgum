@@ -5,5 +5,6 @@ export const notionAuth = oauth2ProviderAuth<"notion">({
 	method: "direct",
 	authorizationUrl: "https://api.notion.com/v1/oauth/authorize",
 	tokenUrl: "https://api.notion.com/v1/oauth/token",
-	tokenEndpointAuthMethod: "client_secret_basic",
+	tokenEndpointAuthMethod: "client_secret_basic_unencoded",
+	issuer: "https://api.notion.com",
 });

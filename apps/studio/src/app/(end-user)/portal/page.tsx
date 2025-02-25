@@ -170,7 +170,7 @@ export default async function PortalPage({
 													<span className="w-2 h-2 rounded-full bg-green-500 animate-ping absolute block top-0 left-0" />
 													<span className="block w-2 h-2 rounded-full bg-green-500" />
 												</span>
-												Active Integrations{userActiveIntegrations.length > 1 ? "s" : ""}
+												Active Integration{userActiveIntegrations.length > 1 ? "s" : ""}
 												<div className="flex items-center gap-2 group-data-[state=open]:opacity-0">
 													{userActiveIntegrations.map((integration) => {
 														const provider = providers?.find(
