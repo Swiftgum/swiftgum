@@ -1,3 +1,5 @@
+import "./instrument";
+
 import Fastify from "fastify";
 import { closePool } from "./db";
 import { sql } from "./db";
@@ -51,6 +53,10 @@ fastify.get("/queues", async function handler() {
 			},
 		},
 	};
+});
+
+fastify.get("/debug-sentry", function mainHandler(req, res) {
+	throw new Error("My first Sentry error!");
 });
 
 const start = async () => {
