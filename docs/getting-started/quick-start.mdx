@@ -52,14 +52,10 @@ This guide walks you through setting up Swiftgum in **five** simple steps.
     ```
 
     **Response (200)**:
+    The response contains a **signed URL** that the developer can directly use in the UI.  
     ```json
     {
-      "sessionId": "sess_abc123",
-      "uniqueUserId": "user-123@myapp.com",
-      "configuration": {
-        "userDisplay": "MyUser",
-        "returnUrl": "https://example.com"
-      }
+      "portalUrl": "https://api.swiftgum.com/portal/sess_abc123"
     }
     ```
   </Step>
