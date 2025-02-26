@@ -106,10 +106,7 @@ Once configured, your system can **automatically receive structured data** for s
     "mimeType": "text/markdown",
     "sgid": "notion/792e06c944c9adb7e4bfd7b5e023786aa5ede59103cb4f791dd6958ff55f491e"
   },
-  "content": "# Who Will Teach Silicon Valley to Be Ethical?
-
-I think we can all agree that Silicon Valley needs more adult supervision right about now.
-... (truncated for brevity)"
+  "content": "#is this a hot dog or Not hot dog"
 }
 ```  
 - Navigate to **Webhook Destination** in your **Swiftgum admin dashboard**.  
