@@ -129,6 +129,12 @@ export default async function PortalPage({
 								integrations you have enabled.
 							</p>
 
+							{!userActiveIntegrations.length && !userInactiveIntegrations.length && (
+								<p className="text-gray-500 bg-gray-100 rounded-lg p-4 text-balance leading-tight">
+									No integrations available.
+								</p>
+							)}
+
 							<Accordion
 								type="single"
 								defaultValue={userInactiveIntegrations.length > 0 ? "inactive" : undefined}
