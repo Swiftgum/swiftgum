@@ -1,0 +1,426 @@
+---
+description: Implementing new providers
+globs: 
+alwaysApply: false
+---
+ # Provider Implementation Guide
+
+This guide outlines the step-by-step process for implementing a new provider in the Swiftgum system. Follow these instructions to ensure all necessary components are properly implemented across the codebase.
+
+## 1. Shared Repository Components
+
+### 1.1. Define Provider Schema
+
+Create a schema definition for your provider:
+
+```typescript
+// File: apps/shared/src/interfaces/providers/[provider-name]/index.ts
+
+import { z } from "zod";
+import { providerSchema } from "../provider";
+import { storedToken } from "../shared";
+
+// Define provider-specific task schemas
+const yourProviderPendingTask = z.object({
+  step: z.literal("pending"),
+  // Add provider-specific fields (e.g., contentId, pageId, etc.)
+  tokenId: z.string(),
+  title: z.string(),
+  remoteUrl: z.string(),
+  // Other required fields
+});
+
+// Define the internal task schema (add more task types if needed)
+const yourProviderInternalTask = z.discriminatedUnion("step", [yourProviderPendingTask]);
+
+// Export the provider schema
+export const yourProviderSchema = providerSchema({
+  identifier: "your-provider" as const,
+  indexingTask: storedToken,
+  internalTask: yourProviderInternalTask,
+});
+```
+
+### 1.2. Update Provider Interfaces
+
+Add your provider schema to the shared interfaces:
+
+```typescript
+// File: apps/shared/src/interfaces/providers/index.ts
+
+import { yourProviderSchema } from "./your-provider";
+// ... existing imports
+
+// Add your schema to exports
+export { googleDriveSchema, notionSchema, yourProviderSchema };
+export const providerSchemas = { 
+  googleDriveSchema, 
+  notionSchema, 
+  yourProviderSchema 
+};
+```
+
+### 1.3. Implement Authentication
+
+Create an authentication implementation for your provider:
+
+```typescript
+// File: apps/shared/src/providers/[provider-name]/auth.ts
+
+import { oauth2ProviderAuth } from "../generic/auth/oauth2";
+
+export const yourProviderAuth = oauth2ProviderAuth<"your-provider">({
+  providerId: "your-provider",
+  method: "direct", // or "issuer" depending on the OAuth implementation
+  authorizationUrl: "https://api.yourprovider.com/oauth/authorize",
+  tokenUrl: "https://api.yourprovider.com/oauth/token",
+  tokenEndpointAuthMethod: "client_secret_basic", // or other methods as needed
+  issuer: "https://api.yourprovider.com",
+  scope: "required-scopes", // optional, provider-specific scopes
+});
+```
+
+> **Note**: If your provider doesn't use OAuth2, you may need to implement a custom authentication provider.
+
+### 1.4. Update Provider Registry
+
+Register your provider in the authentication registry:
+
+```typescript
+// File: apps/shared/src/providers/registry.ts
+
+import { yourProviderAuth } from "./your-provider/auth";
+// ... existing imports
+
+// Add to authProviders array
+export const authProviders = [
+  googleDriveAuth,
+  notionAuth,
+  yourProviderAuth,
+] as const satisfies ProviderAuthProvider[];
+
+// Add to authIntegrationCredential
+export const authIntegrationCredential = z.discriminatedUnion("providerId", [
+  // ... existing providers
+  yourProviderAuth.configurationSchema,
+]);
+
+// Add to authIntegrationAuthSession
+export const authIntegrationAuthSession = z.discriminatedUnion("providerId", [
+  // ... existing providers
+  yourProviderAuth.authSessionSchema.merge(authIntegrationAuthSessionContext),
+]);
+
+// Add to authIntegrationCredentials
+export const authIntegrationCredentials = z.discriminatedUnion("providerId", [
+  // ... existing providers
+  yourProviderAuth.credentialsSchema,
+]);
+```
+
+## 2. Engine Repository Components
+
+### 2.1. Implement Provider Logic
+
+Create the main provider implementation:
+
+```typescript
+// File: apps/engine/src/providers/[provider-name]/index.ts
+
+import { providerSchemas } from "@knowledgex/shared/interfaces";
+import { provider } from "../abstract";
+import { getToken } from "../../utils/token";
+import { makeSgid } from "../../export";
+// Import any provider-specific client libraries
+import { YourProviderClient } from "@yourprovider/client";
+
+// Initialize API client
+const getYourProviderClient = ({ accessToken }) => {
+  return new YourProviderClient({ auth: accessToken });
+};
+
+export const yourProviderProvider = provider({
+  schema: providerSchemas.yourProviderSchema,
+  
+  // Process individual content items
+  internal: async ({ task, exportFile }) => {
+    const token = await getToken(task);
+    const client = getYourProviderClient({
+      accessToken: token.decrypted_tokenset.data.accessToken,
+    });
+    
+    // Process content based on task type
+    if (task.step === "pending") {
+      try {
+        // 1. Fetch content from the provider
+        const content = await client.getContent(task.contentId);
+        
+        // 2. Convert to appropriate format (e.g., Markdown)
+        const processedContent = convertToMarkdown(content);
+        
+        // 3. Export the file
+        await exportFile({
+          workspaceId: token.workspace_id,
+          task: {
+            content: processedContent,
+            metadata: {
+              fileId: task.contentId,
+              fileName: task.title,
+              remoteUrl: task.remoteUrl,
+              provider: providerSchemas.yourProviderSchema.identifier,
+              tokenId: task.tokenId,
+              mimeType: "text/markdown", // or appropriate type
+              sgid: makeSgid({
+                contentSignature: processedContent,
+                sourceId: task.contentId,
+                providerId: providerSchemas.yourProviderSchema.identifier,
+              }),
+            },
+          },
+        });
+      } catch (error) {
+        console.error(`Error processing content from ${providerSchemas.yourProviderSchema.identifier}:`, error);
+        throw error;
+      }
+    }
+  },
+  
+  // Discover and queue content items
+  indexing: async ({ task, queue }) => {
+    const token = await getToken(task);
+    const client = getYourProviderClient({
+      accessToken: token.decrypted_tokenset.data.accessToken,
+    });
+    
+    const tasks = [];
+    
+    try {
+      // 1. Implement content discovery logic
+      const items = await client.listItems();
+      
+      // 2. For each discovered item, create a task
+      for (const item of items) {
+        tasks.push({
+          step: "pending",
+          contentId: item.id,
+          tokenId: task.tokenId,
+          title: item.title || "Untitled",
+          remoteUrl: item.url,
+          // Add other provider-specific fields
+        });
+      }
+      
+      // 3. Add tasks to the queue
+      queue.batchQueue(tasks);
+    } catch (error) {
+      console.error(`Error indexing content from ${providerSchemas.yourProviderSchema.identifier}:`, error);
+      throw error;
+    }
+  },
+});
+```
+
+### 2.2. Update Provider Registry
+
+Register your provider in the engine:
+
+```typescript
+// File: apps/engine/src/providers/index.ts
+
+import { yourProviderProvider } from "./your-provider";
+// ... existing imports
+
+export const providers = [
+  googleDriveProvider,
+  notionProvider,
+  yourProviderProvider,
+] as const;
+```
+
+### 2.3. Add Dependencies
+
+Update the engine's package.json to include any required dependencies:
+
+```json
+// File: apps/engine/package.json
+{
+  "dependencies": {
+    // ... existing dependencies
+    "@yourprovider/client": "^1.0.0",
+    "your-provider-to-md": "^1.0.0"
+  }
+}
+```
+
+## 3. Studio Repository Components
+
+### 3.1. Update Authentication Callback
+
+Update the authentication callback to handle your provider:
+
+```typescript
+// File: apps/studio/src/app/(end-user)/portal/auth/callback/route.ts
+
+// Update the provider mapping
+const providerMapping: Record<string, "google:drive" | "notion" | "your-provider"> = {
+  "google:drive": "google:drive",
+  notion: "notion",
+  "your-provider": "your-provider",
+};
+
+// Update the provider check if needed
+if (providerFromDb.identifier !== "notion" && 
+    providerFromDb.identifier !== "google:drive" && 
+    providerFromDb.identifier !== "your-provider") {
+  // Error handling
+}
+```
+
+### 3.2. Add Provider Icon (Optional)
+
+Create an icon component for your provider:
+
+```tsx
+// File: apps/studio/src/components/icons/yourprovidericon.tsx
+
+import { SVGProps } from "react";
+
+export function YourProviderIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      {/* SVG path for your provider's icon */}
+    </svg>
+  );
+}
+```
+
+## 4. Database Updates
+
+### 4.1. Create Migration
+
+Create a migration file to add your provider to the database:
+
+```sql
+-- File: supabase/migrations/YYYYMMDDHHMMSS_add_your_provider.sql
+
+INSERT INTO providers (identifier, name, description)
+VALUES (
+  'your-provider',
+  'Your Provider',
+  'Description of your provider and its capabilities.'
+);
+```
+
+## 5. Documentation
+
+### 5.1. Add Provider Documentation
+
+Create documentation for your provider:
+
+```markdown
+<!-- File: docs/providers/your-provider.mdx -->
+
+---
+title: "Your Provider"
+description: "Connect your Your Provider account to Swiftgum."
+---
+
+# Your Provider Integration
+
+To connect your Your Provider account to Swiftgum, follow this step-by-step guide.
+
+### Creating a Your Provider Integration
+
+1. **Create a Your Provider App**
+   - Go to the [Your Provider Developer Portal](https://developer.yourprovider.com)
+   - Create a new application
+   - Configure OAuth settings
+   - Add redirect URI: `https://your-swiftgum-instance.com/api/auth/callback/your-provider`
+
+2. **Configure in Swiftgum**
+   - In your Swiftgum admin panel, navigate to Integrations > Your Provider
+   - Enter your Client ID and Client Secret
+   - Save the configuration
+
+### Connecting Your Provider to Swiftgum
+
+1. **Authorize Access**
+   - Click "Connect Your Provider" in the Swiftgum interface
+   - Log in to your Your Provider account
+   - Grant the requested permissions
+
+2. **Verify Connection**
+   - Return to Swiftgum
+   - Confirm that Your Provider appears as a connected integration
+
+### Troubleshooting
+
+- Ensure your redirect URI exactly matches what's configured in the Your Provider developer portal
+- Check that you've granted all required permissions
+- Verify your Client ID and Client Secret are entered correctly
+```
+
+## 6. Testing
+
+### 6.1. Test Authentication Flow
+
+1. Test the OAuth2 flow:
+   - Verify the authorization URL is correctly generated
+   - Confirm the callback correctly processes the authorization code
+   - Check that tokens are properly stored and encrypted
+
+2. Test token refresh:
+   - Verify that expired tokens are refreshed automatically
+   - Confirm that refresh tokens are properly stored
+
+### 6.2. Test Content Discovery
+
+1. Test the indexing functionality:
+   - Verify that all content items are discovered
+   - Confirm that pagination works correctly for large content collections
+   - Check that error handling works properly
+
+### 6.3. Test Content Processing
+
+1. Test the internal task processing:
+   - Verify that content is fetched correctly
+   - Confirm that content is properly converted to the target format
+   - Check that metadata is correctly attached
+   - Verify that the SGID is generated correctly
+
+## 7. UI Integration (Optional)
+
+### 7.1. Add Provider-Specific UI Components
+
+If your provider requires specific UI components:
+
+1. Create provider-specific components in `apps/studio/src/components/providers/your-provider/`
+2. Update the provider selection UI to include your provider
+3. Add any provider-specific configuration forms or displays
+
+## Checklist
+
+Use this checklist to ensure you've completed all necessary steps:
+
+- [ ] Created provider schema in shared repository
+- [ ] Updated provider interfaces in shared repository
+- [ ] Implemented authentication in shared repository
+- [ ] Updated provider registry in shared repository
+- [ ] Implemented provider logic in engine repository
+- [ ] Updated provider registry in engine repository
+- [ ] Added dependencies to engine package.json
+- [ ] Updated authentication callback in studio repository
+- [ ] Added provider icon (optional)
+- [ ] Created database migration
+- [ ] Added provider documentation
+- [ ] Tested authentication flow
+- [ ] Tested content discovery
+- [ ] Tested content processing
+- [ ] Added UI integration (optional)

@@ -23,7 +23,7 @@ export default async function IntegrationsPage() {
 				description="Manage your integrations and connected services"
 			/>
 
-			<Accordion type="single" collapsible className="w-full space-y-4">
+			<Accordion type="multiple" className="w-full space-y-4">
 				{integrations.map(({ provider, integration, authProviderSchemaShape }) => {
 					return (
 						<AccordionItem

@@ -23,6 +23,9 @@ importers:
       '@googleapis/drive':
         specifier: ^8.14.0
         version: 8.14.0
+      '@googleapis/gmail':
+        specifier: ^12.0.0
+        version: 12.0.0
       '@knowledgex/shared':
         specifier: workspace:^
         version: link:../shared
@@ -527,6 +530,10 @@ packages:
 
   '@googleapis/drive@8.14.0':
     resolution: {integrity: sha512-AOokfpP6pCdcJXWA8khaCEgbGpWYavWTdAAhL4idbbf2VCQcJ2f7vPalAYNu6a4Sfj0Ly4Ehnd1xw9J9TixB1A==}
+    engines: {node: '>=12.0.0'}
+
+  '@googleapis/gmail@12.0.0':
+    resolution: {integrity: sha512-sMsgh7J4pRIzmgte4vPfcxBptKliquVXlc9nhIWvuDfdkEVkyP8yh5pkhAnZmStEF0I5iOI04zriAt4C98XhBw==}
     engines: {node: '>=12.0.0'}
 
   '@img/sharp-darwin-arm64@0.33.5':
@@ -3467,6 +3474,13 @@ snapshots:
       react: 19.0.0
 
   '@googleapis/drive@8.14.0':
+    dependencies:
+      googleapis-common: 7.2.0
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+
+  '@googleapis/gmail@12.0.0':
     dependencies:
       googleapis-common: 7.2.0
     transitivePeerDependencies:

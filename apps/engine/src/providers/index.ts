@@ -1,8 +1,9 @@
 import type { IndexingTaskSchema, InternalTaskSchema } from "@knowledgex/shared/interfaces";
 import { googleDriveProvider } from "./google:drive";
+import { googleGmailProvider } from "./google:gmail";
 import { notionProvider } from "./notion";
 
-export const providers = [googleDriveProvider, notionProvider] as const;
+export const providers = [googleDriveProvider, notionProvider, googleGmailProvider] as const;
 
 const getProvider = (task: IndexingTaskSchema | InternalTaskSchema) => {
 	const targetProvider = providers.find((provider) => provider.owns(task));

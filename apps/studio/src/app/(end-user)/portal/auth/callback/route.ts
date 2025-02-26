@@ -53,7 +53,11 @@ export async function GET(request: NextRequest) {
 		notion: "notion",
 	};
 
-	if (providerFromDb.identifier !== "notion" && providerFromDb.identifier !== "google:drive") {
+	if (
+		providerFromDb.identifier !== "notion" &&
+		providerFromDb.identifier !== "google:drive" &&
+		providerFromDb.identifier !== "google:gmail"
+	) {
 		throw new Error(`Provider ${providerFromDb.identifier} not supported`);
 	}
 
