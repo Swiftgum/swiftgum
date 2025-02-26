@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { type ExportTask, exportTask } from "@knowledgex/shared/interfaces";
 import { mergeResourceUris } from "@knowledgex/shared/log";
+import type { Database } from "@knowledgex/shared/types/database-server";
 import type { DecryptedDestination } from "@knowledgex/shared/types/overload";
 import { sql } from "../db";
 import { QueueError } from "../queue";
@@ -47,6 +48,19 @@ export const getDestinations = async ({
 	return destinations as unknown as DecryptedDestination[];
 };
 
+export const getEndUser = async ({
+	tokenId,
+}: {
+	tokenId: string;
+}) => {
+	const endUser = await sql`
+		SELECT public.end_users.* FROM public.end_users JOIN private.tokens ON tokens.end_user_id = end_users.end_user_id
+		WHERE tokens.token_id = ${tokenId}
+	`;
+
+	return endUser as unknown as Database["public"]["Tables"]["end_users"]["Row"];
+};
+
 export const processExport = async (task: ExportTask) => {
 	// Safeguard
 	const {
@@ -54,6 +68,7 @@ export const processExport = async (task: ExportTask) => {
 	} = exportTask.parse(task);
 
 	const destinations = await getDestinations({ tokenId: metadata.tokenId });
+	const endUser = await getEndUser({ tokenId: metadata.tokenId });
 
 	for (const destination of destinations) {
 		switch (destination.decrypted_destination_params.type) {
@@ -61,7 +76,7 @@ export const processExport = async (task: ExportTask) => {
 				try {
 					const response = await fetch(destination.decrypted_destination_params.webhook.url, {
 						method: "POST",
-						body: JSON.stringify({ metadata, content }),
+						body: JSON.stringify({ endUser, metadata, content }),
 						headers: {
 							"Content-Type": "application/json",
 						},

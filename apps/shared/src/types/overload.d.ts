@@ -7,10 +7,7 @@ import type {
 } from "../interfaces";
 import type { Database } from "./database-server";
 
-export type DecryptedDestination = Omit<
-	Database["private"]["Views"]["destinations_with_decrypted_params"]["Row"],
-	"decrypted_destination_params"
-> & {
+export type DecryptedDestination = Database["public"]["Tables"]["destinations"]["Row"] & {
 	decrypted_destination_params: Destination;
 };
 
