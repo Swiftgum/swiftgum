@@ -114,8 +114,7 @@ I think we can all agree that Silicon Valley needs more adult supervision right 
 ```  
 - Navigate to **Webhook Destination** in your **Swiftgum admin dashboard**.  
 - Specify your **Endpoint** (e.g., `https://api.yourdomain.com/swiftgum-webhook`).  
-  - Swiftgum will send **new or updated content** to this endpoint after each fetch.  
-- **Verify Delivery**: Swiftgum will send a **test POST request** to validate connectivity.  
+  - Swiftgum will send **all content** to this endpoint after each fetch. A fetch is triggered when a user connects or reconnects a data source.
 
 Once configured, your system can **automatically receive structured data** for storage, AI workflows, or additional processing.  
 
@@ -142,6 +141,14 @@ docker compose up -d
 
 # 3. Access UI at http://localhost:3000
 ```
+
+---
+
+
+## **Current Limitations**  
+
+* Currently, Swiftgum only supports Google Drive and Notion connections. More are to come!
+* Data is not refreshed on a periodic basis. Refresh is triggered only when a user connects or reconnects a data source. This will be improved in a later version.
 
 ---
 
