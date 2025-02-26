@@ -69,16 +69,12 @@ The response contains a **signed URL** that the developer can directly use in th
 	"https://api.swiftgum.com/portal/sess_abc123"
 ```
 
-### **4. Redirect User to the Portal**  
-- Use the returned `sessionId` to create a portal link:  
-  
-  `https://api.swiftgum.com/portal/<sessionId>`  
-  
-- Redirect your user to that link (e.g., from a “Manage Knowledge” button in your app).  
-- Users can **authorize Google Drive** (or any enabled integration) and set **permissions**.  
-- Once finished, they will be sent back to your specified `returnUrl`.  
+### **4. Redirect User to the Portal**
+- Use the **signed URL** returned in the API response to directly connect the end user to Swiftgum.
 
-This short-lived portal link ensures **secure user access** to Swiftgum’s integration management without exposing internal credentials.  
+- Redirect your user to that **signed URL** (e.g., from a “Manage Knowledge” button in your app).
+- Users can **authorize Google Drive** (or any enabled integration) and set **permissions**.
+- Once finished, they will be sent back to your specified `returnUrl`.
 
 ### **5. Configure a Webhook Destination**  
 - Navigate to **Webhook Destination** in your **Swiftgum admin dashboard**.  
