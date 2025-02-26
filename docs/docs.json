@@ -88,6 +88,11 @@
 					"icon": "globe"
 				},
 				{
+					"anchor": "GitHub",
+					"href": "https://github.com/swiftgum/swiftgum",
+					"icon": "github"
+				},
+				{
 					"anchor": "Community",
 					"href": "https://discord.gg/adnqxUb8",
 					"icon": "discord"
