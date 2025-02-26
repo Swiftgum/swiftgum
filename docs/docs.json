@@ -74,6 +74,10 @@
 						"pages": ["api-reference/endpoint/create"]
 					}
 				]
+			},
+			{
+				"tab": "Providers",
+				"pages": ["providers/google:drive", "providers/notion"]
 			}
 		],
 		"global": {

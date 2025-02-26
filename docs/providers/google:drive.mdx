@@ -1,0 +1,60 @@
+---
+title: "Google Drive"
+description: "Connect your Google Drive to Swiftgum."
+---
+
+## Getting Started
+
+To connect your Google Drive to Swiftgum, you'll need to create OAuth2 credentials in the Google Cloud Console. Follow this step-by-step guide to set up your credentials.
+
+### Creating OAuth2 Credentials
+
+1. **Create a Google Cloud Project**
+
+   - Go to the [Google Cloud Console](https://console.cloud.google.com/)
+   - Click on the project dropdown at the top of the page
+   - Click on "New Project"
+   - Enter a name for your project and click "Create"
+
+2. **Configure the OAuth Consent Screen**
+
+   - Go to "APIs & Services" > "OAuth consent screen"
+   - Select the appropriate user type (External or Internal)
+   - Fill in the required information:
+     - App name
+     - User support email
+     - Developer contact information
+   - Click "Save and Continue"
+   - Add the necessary scopes (at minimum, you'll need `https://www.googleapis.com/auth/drive.readonly`)
+   - Click "Save and Continue"
+   - Add test users if needed, then click "Save and Continue"
+   - Review your settings and click "Back to Dashboard"
+
+3. **Create OAuth Client ID**
+
+   - Go to "APIs & Services" > "Credentials"
+   - Click "Create Credentials" > "OAuth client ID"
+   - Select "Web application" as the application type
+   - Enter a name for your OAuth client
+   - Under "Authorized redirect URIs", add the callback URL from your Swiftgum admin panel
+     - You can find this URL in the Swiftgum admin panel under Integrations > Google Drive
+   - Click "Create"
+
+4. **Save Your Credentials**
+   - After creating the client ID, you'll be presented with your Client ID and Client Secret
+   - Save these credentials securely as you'll need to enter them in Swiftgum
+
+### Configuring Swiftgum
+
+1. Go to your Swiftgum admin panel
+2. Navigate to Integrations > Google Drive
+3. Enter the Client ID and Client Secret you obtained from Google Cloud Console
+4. Save your settings
+
+Your Google Drive integration should now be ready to use with Swiftgum.
+
+## Troubleshooting
+
+- If you encounter authentication errors, ensure that your redirect URI exactly matches what's configured in Google Cloud Console
+- For production applications, you may need to verify your app through Google's verification process
+- Make sure you've enabled the necessary scopes for your use case

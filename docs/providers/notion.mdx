@@ -1,0 +1,58 @@
+---
+title: "Notion"
+description: "Connect your Notion workspace to Swiftgum."
+---
+
+## Getting Started
+
+To connect your Notion workspace to Swiftgum, you'll need to create an integration in the Notion developer portal. Follow this step-by-step guide to set up your integration.
+
+### Creating a Notion Integration
+
+1. **Create a Notion Integration**
+
+   - Go to the [Notion Integrations](https://www.notion.so/profile/integrations) page
+   - Click on "New integration"
+   - Enter a name for your integration (e.g., "Swiftgum Integration")
+   - Select the workspace where you want to use the integration
+   - Upload an icon (optional)
+   - Click "Submit" to create your integration
+
+2. **Configure Capabilities and Authorization**
+
+   - In your integration settings, navigate to the "Capabilities" section
+   - Enable the capabilities required for your use case:
+     - Read content (required)
+     - Update content (if needed)
+     - Insert content (if needed)
+   - Under "Authorization", select "Public integration" if you plan to distribute your app
+   - For "Redirect URIs", add the callback URL from your Swiftgum admin panel
+     - You can find this URL in the Swiftgum admin panel under Integrations > Notion
+
+3. **Get Your API Credentials**
+
+   - After creating the integration, you'll be provided with an "Internal Integration Token"
+   - Copy this token as you'll need to enter it in Swiftgum
+   - If you're building a public integration, you'll also receive an "OAuth Client ID" and "Client Secret"
+
+4. **Share Pages with Your Integration**
+   - In your Notion workspace, navigate to the pages you want to connect to Swiftgum
+   - Click the "..." menu in the top-right corner of the page
+   - Select "Add connections" and choose your integration
+   - This grants your integration access to the specific pages
+
+### Configuring Swiftgum
+
+1. Go to your Swiftgum admin panel
+2. Navigate to Integrations > Notion
+3. Enter the Integration Token (for internal integrations) or Client ID and Client Secret (for public integrations)
+4. Save your settings
+
+Your Notion integration should now be ready to use with Swiftgum.
+
+## Troubleshooting
+
+- If you encounter permission errors, ensure that you've shared the necessary pages with your integration
+- For public integrations, verify that your redirect URI exactly matches what's configured in the Notion developer portal
+- Note that Notion API has rate limits that may affect performance for large workspaces
+- Make sure you've enabled the necessary capabilities for your use case

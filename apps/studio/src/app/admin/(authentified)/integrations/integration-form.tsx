@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import * as RevealInput from "@/components/ui/reveal-input";
 import { Switch } from "@/components/ui/switch";
+import { getURL } from "@/utils/helpers";
 import type { AuthIntegrationCredential } from "@knowledgex/shared/providers/auth";
 import type { DecryptedIntegration, Provider } from "@knowledgex/shared/types/overload";
 import { useState } from "react";
@@ -69,6 +70,18 @@ export function IntegrationForm({
 					</p>
 				</div>
 				<Switch checked={isEnabled} onCheckedChange={setIsEnabled} disabled={isLoading} />
+			</div>
+
+			<div className="flex flex-col gap-2">
+				<label htmlFor="callback-url" className="text-sm font-medium text-gray-700">
+					Callback URL
+				</label>
+				<Input
+					type="text"
+					className="font-mono bg-gray-100"
+					readOnly
+					value={getURL("/portal/auth/callback")}
+				/>
 			</div>
 
 			{/* Dynamic Fields Section */}
