@@ -7,19 +7,19 @@ Swiftgum is an **open-source** platform that **ingests and normalizes documents 
 
 ## **Features**  
 
-✅ **Document Ingestion & Normalization** ([Docs](#https://swiftgum.mintlify.app/usage/ingestion-processing))  
+✅ **Document Ingestion & Normalization** ([Docs](https://swiftgum.mintlify.app/usage/ingestion-processing))  
 > Extracts, cleans, and converts files from Google Drive, Notion, and more into **AI-ready Markdown**.  
 
-✅ **Multi-User RBAC** ([Docs](#https://swiftgum.mintlify.app/architecture/high-level-architecture))  
+✅ **Multi-User RBAC** ([Docs](https://swiftgum.mintlify.app/architecture/high-level-architecture))  
 > Per-user data sharing rules enforced **automatically**, eliminating permission headaches.  
 
-✅ **Webhook-Based Export** ([Docs](#https://swiftgum.mintlify.app/getting-started/quick-start))  
+✅ **Webhook-Based Export** ([Docs](https://swiftgum.mintlify.app/getting-started/quick-start))  
 > Push processed data **to any vector database, storage, or custom pipeline**—you stay in control.  
 
-✅ **OAuth-Based Authentication** ([Docs](#https://swiftgum.mintlify.app/security/rbac))  
+✅ **OAuth-Based Authentication** ([Docs](https://swiftgum.mintlify.app/security/rbac))  
 > Securely connect integrations without exposing global credentials.
 
-✅ **Self-Host or Use Swiftgum Cloud** ([Docs](#https://swiftgum.mintlify.app/getting-started/installation))  
+✅ **Self-Host or Use Swiftgum Cloud** ([Docs](https://swiftgum.mintlify.app/getting-started/installation))  
 > Run it yourself or get started instantly with **our managed cloud**.  
 
 ---
@@ -127,15 +127,6 @@ Swiftgum follows a **modular architecture** to keep things simple and extensible
 
 ---
 
-## **Community & Support**  
-
-💬 **[Community Forum](#)** – Best for discussions, feedback, and collaboration.  
-🐞 **[GitHub Issues](#)** – Report bugs, suggest features, or request enhancements.  
-📧 **[Email Support](#)** – Contact us for **enterprise support and self-hosting inquiries**.  
-👾 **[Discord](#)** – Chat with the team and share what you’re building.  
-
----
-
 ## **Contributing**  
 
 We welcome **pull requests, feature ideas, and issues**!  
@@ -154,8 +145,8 @@ Swiftgum is distributed under the **MIT License**. See the `LICENSE` file for de
 
 ---
 
-## **Stay Connected**  
+## **Community & Support**  
 
-- **Website**: [https://swiftgum.com](https://swiftgum.com)
-- **Discord Community**: [Join Here](https://discord.gg/adnqxUb8)  
-- **Email**: [support@swiftgum.com](mailto:support@swiftgum.com)  
+🐞 **[GitHub Issues](https://github.com/Titou325/knowledgex/issues)** – Report bugs, suggest features, or request enhancements.  
+📧 **[Email Support](mailto:support@swiftgum.com)** – Contact us for **enterprise support and self-hosting inquiries**.  
+👾 **[Discord](https://discord.gg/adnqxUb8)** – Chat with the team and share what you’re building.  
