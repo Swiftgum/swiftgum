@@ -5,6 +5,14 @@ const BASE_URL =
 	"http://localhost:3000";
 
 export const getURL = (path = "") => {
+	console.log({
+		NEXT_PUBLIC_VERCEL_ENV: process.env.NEXT_PUBLIC_VERCEL_ENV,
+		NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL:
+			process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL,
+		NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
+		BASE_URL: BASE_URL,
+	});
+
 	return new URL(path, BASE_URL).toString();
 };
 
