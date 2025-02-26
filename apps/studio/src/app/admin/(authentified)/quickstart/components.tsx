@@ -111,14 +111,24 @@ export async function QuickstartSteps() {
 						Learn how to integrate Swiftgum into your application with our comprehensive
 						documentation.
 					</p>
-					{canViewDocs && (
+					<div className="flex items-center gap-2">
 						<Button asChild variant="outline" className="mt-4">
-							<a href="https://docs.swiftgum.com" target="_blank" rel="noopener noreferrer">
+							<a href="https://swiftgum.mintlify.app/" target="_blank" rel="noreferrer noopener">
 								View Documentation
 								<ExternalLink className="w-4 h-4 ml-1" />
 							</a>
 						</Button>
-					)}
+						<Button asChild variant="outline" className="mt-4">
+							<a
+								href="https://github.com/swiftgum/swiftgum"
+								target="_blank"
+								rel="noreferrer noopener"
+							>
+								View GitHub
+								<ExternalLink className="w-4 h-4 ml-1" />
+							</a>
+						</Button>
+					</div>
 				</div>
 			</div>
 		</div>
