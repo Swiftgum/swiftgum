@@ -73,10 +73,47 @@ This guide walks you through setting up Swiftgum in **five** simple steps.
   <Step title="Configure a Webhook Destination">
     By default, Swiftgum functions as an ETL engine—fetching data from the enabled integrations. To receive that data in your system:
     
-    1. **Navigate to “Webhook Destination”** in your Swiftgum admin dashboard.
-    2. **Specify your Endpoint** (e.g., <code>https://api.yourdomain.com/swiftgum-webhook</code>):
-       - Swiftgum will send new or updated content to this endpoint whenever it completes a data fetch.
-    3. **Verify Delivery**: Once configured, Swiftgum will attempt a test POST request to ensure it can reach your endpoint.
+    - Navigate to **Webhook Destination** in your **Swiftgum admin dashboard**.
+    - Specify your **Endpoint** (e.g., `https://api.yourdomain.com/swiftgum-webhook`).
+    - Swiftgum will send **new or updated content** to this endpoint after each fetch.
+    - **Verify Delivery**: Swiftgum will send a **test POST request** to validate connectivity.
+
+    Once configured, your system can **automatically receive structured data** for storage, AI workflows, or additional processing.
+
+    #### **Example Webhook Response:**  
+    ```json
+    {
+      "endUser": [
+        {
+          "end_user_id": "45d3de52-2e65-4f67-b61e-6f3c768b0224",
+          "foreign_id": "titouan.launay@hotmail.com",
+          "workspace_id": "95b3acd3-d881-4cfc-b53e-4edd9f36230a",
+          "created_at": "2025-02-20T11:06:43.281Z",
+          "updated_at": "2025-02-20T11:06:43.281Z"
+        }
+      ],
+      "metadata": {
+        "tokenId": "1d31beee-8e4e-493a-a717-d7b1fbd9a9ff",
+        "fileId": "f9a9a66e-f2ad-4f61-b4a6-01921f3dfe3d",
+        "remoteUrl": "https://notion.so/f9a9a66ef2ad4f61b4a601921f3dfe3d",
+        "fileName": "Who Will Teach Silicon Valley to Be Ethical?",
+        "provider": "notion",
+        "mimeType": "text/markdown",
+        "sgid": "notion/792e06c944c9adb7e4bfd7b5e023786aa5ede59103cb4f791dd6958ff55f491e"
+      },
+      "content": "# Who Will Teach Silicon Valley to Be Ethical?
+
+    I think we can all agree that Silicon Valley needs more adult supervision right about now.
+    ... (truncated for brevity)"
+    }
+    ```  
+    - Navigate to **Webhook Destination** in your **Swiftgum admin dashboard**.  
+    - Specify your **Endpoint** (e.g., `https://api.yourdomain.com/swiftgum-webhook`).  
+      - Swiftgum will send **new or updated content** to this endpoint after each fetch.  
+    - **Verify Delivery**: Swiftgum will send a **test POST request** to validate connectivity.  
+
+    Once configured, your system can **automatically receive structured data** for storage, AI workflows, or additional processing.  
+
 
     <img src="/images/webhook.png" alt="Swiftgum Webhook UI" width="450"/>
 
