@@ -29,7 +29,7 @@ Swiftgum is an **open-source** platform that **ingests and normalizes documents 
 This guide walks you through setting up Swiftgum in five simple steps.  
 
 ### **1. Sign Up & Retrieve API Key**  
-- **Sign Up**: Visit [Swiftgum](https://swiftgum.com) and create an account.  
+- **Sign Up**: Visit [Swiftgum](https://app.swiftgum.com/) and create an account.  
 - **Reveal Your API Key**:  
   - Log into your **admin dashboard**.  
   - Access the **API Keys** section to copy your `x-api-key`.  
