@@ -13,8 +13,10 @@
 	"dependencies": {
 		"@googleapis/drive": "^8.14.0",
 		"@knowledgex/shared": "workspace:^",
+		"@notionhq/client": "^2.2.16",
 		"fastify": "^5.2.1",
 		"mime-types": "^2.1.35",
+		"notion-to-md": "^3.1.6",
 		"openid-client": "^6.1.7",
 		"postgres": "^3.4.5",
 		"tsx": "^4.19.2",

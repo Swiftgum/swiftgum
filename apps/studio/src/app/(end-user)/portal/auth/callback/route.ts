@@ -47,9 +47,19 @@ export async function GET(request: NextRequest) {
 		tokenset: data,
 	});
 
+	// Map the provider identifier to the correct provider ID for indexing
+	const providerMapping: Record<string, "google:drive" | "notion"> = {
+		google: "google:drive",
+		notion: "notion",
+	};
+
+	if (providerFromDb.identifier !== "notion" && providerFromDb.identifier !== "google:drive") {
+		throw new Error(`Provider ${providerFromDb.identifier} not supported`);
+	}
+
 	await queueForIndexing({
 		task: {
-			provider: "google:drive",
+			provider: providerFromDb.identifier,
 			payload: {
 				tokenId: token.token_id,
 			},
