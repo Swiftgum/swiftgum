@@ -1,7 +1,9 @@
 # **Swiftgum**  
 **Turn Data into LLM-Ready Markdown**  
 
-Swiftgum is an **open-source** platform that **ingests and normalizes documents from virtually any platform, making them ready for AI-powered applications**. It simplifies data ingestion, **enforces per-user RBAC**, and **exports structured data via webhooks**, so you can send AI-ready content anywhere you need.  
+Swiftgum is an **open-source** platform that **ingests and normalizes documents from virtually any platform, making them ready for AI-powered applications**. It simplifies data ingestion, **enforces per-user RBAC**, and **exports structured data via webhooks**, so you can send AI-ready content anywhere you need. 
+
+![Swiftgum Unification](./docs/images/unify.png)
 
 ---
 
