@@ -77,7 +77,7 @@
 			},
 			{
 				"tab": "Providers",
-				"pages": ["providers/google:drive", "providers/notion"]
+				"pages": ["providers/google:drive", "providers/notion", "providers/google:gmail"]
 			}
 		],
 		"global": {

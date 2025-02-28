@@ -1,17 +1,17 @@
 ---
-title: "Google Drive"
-description: "Allow users to connect their Google Drive to Swiftgum."
+title: "Gmail"
+description: "Allow users to connect their Gmail to Swiftgum."
 ---
 
 <Note>
   If you've already created an OAuth client for another Google service (like
-  Gmail), you can reuse the same client. You'll only need to ensure the Google
-  Drive API is enabled and the appropriate scopes are added.
+  Google Drive), you can reuse the same client. You'll only need to ensure the
+  Gmail API is enabled and the appropriate scopes are added.
 </Note>
 
 ## Getting Started
 
-To connect your Google Drive to Swiftgum, you'll need to create OAuth2 credentials in the Google Cloud Console. Follow this step-by-step guide to set up your credentials.
+To connect Gmail to Swiftgum, you'll need to create OAuth2 credentials in the Google Cloud Console. Follow this step-by-step guide to set up your credentials.
 
 ### Creating OAuth2 Credentials
 
@@ -38,7 +38,7 @@ To connect your Google Drive to Swiftgum, you'll need to create OAuth2 credentia
 
     - Click "Save and Continue"
 
-    - Add the necessary scopes (at minimum, you'll need `https://www.googleapis.com/auth/drive.readonly`)
+    - Add the necessary scopes (at minimum, you'll need `https://www.googleapis.com/auth/gmail.readonly`)
 
     - Click "Save and Continue"
 
@@ -57,17 +57,17 @@ To connect your Google Drive to Swiftgum, you'll need to create OAuth2 credentia
     - Enter a name for your OAuth client
 
     - Under "Authorized redirect URIs", add the callback URL from your Swiftgum admin panel
-      - You can find this URL in the Swiftgum admin panel under Integrations > Google Drive
+      - You can find this URL in the Swiftgum admin panel under Integrations > Gmail
 
     - Click "Create"
 
   </Step>
-  <Step title="Enable the Google Drive API">
-    - Navigate to [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) in the API Library
+  <Step title="Enable the Gmail API">
+    - Navigate to [Gmail API](https://console.cloud.google.com/apis/library/gmail.googleapis.com) in the API Library
 
     - Select your project
 
-    - Click "Enable" to activate the Google Drive API for your project
+    - Click "Enable" to activate the Gmail API for your project
 
     - Wait for the API to be enabled before proceeding to the next step
 
@@ -84,16 +84,14 @@ To connect your Google Drive to Swiftgum, you'll need to create OAuth2 credentia
 
 <Steps>
   <Step title="Access Admin Panel">Go to your Swiftgum admin panel</Step>
-  <Step title="Navigate to Integrations">
-    Navigate to Integrations > Google Drive
-  </Step>
+  <Step title="Navigate to Integrations">Navigate to Integrations > Gmail</Step>
   <Step title="Enter Credentials">
     Enter the Client ID and Client Secret you obtained from Google Cloud Console
   </Step>
   <Step title="Save Settings">Save your settings</Step>
 </Steps>
 
-Your Google Drive integration should now be ready to use with Swiftgum.
+Your Gmail integration should now be ready to use with Swiftgum.
 
 ## Troubleshooting
 
@@ -105,7 +103,7 @@ Your Google Drive integration should now be ready to use with Swiftgum.
 
 ## Testing Your Integration
 
-Before your Google Drive integration can be used in production, you'll need to test it with authorized users. If your app is in "Testing" mode (which is the default for new projects), only approved test users can authenticate with your application.
+Before your Gmail integration can be used in production, you'll need to test it with authorized users. If your app is in "Testing" mode (which is the default for new projects), only approved test users can authenticate with your application.
 
 <Steps>
   <Step title="Access OAuth Consent Screen">
@@ -129,11 +127,11 @@ Before your Google Drive integration can be used in production, you'll need to t
   <Step title="Test the Integration">
     - Have each test user log into Swiftgum
 
-    - Navigate to the Google Drive integration
+    - Navigate to the Gmail integration
 
-    - Attempt to connect their Google Drive account
+    - Attempt to connect their Gmail account
 
-    - Verify that they can successfully authenticate and access their files
+    - Verify that they can successfully authenticate and access their emails
 
   </Step>
   <Step title="Collect Feedback">
