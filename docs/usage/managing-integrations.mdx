@@ -4,49 +4,61 @@ description: "Set up OAuth apps (Google, Notion, etc.) and manage tokens in Swif
 icon: "link"
 ---
 
-Swiftgum simplifies the process of connecting third-party services (e.g., Google Drive, Notion) by providing an Integrations module in the admin dashboard. This allows developers/admins (who configure OAuth apps) and end users (who link personal or admin drives) to manage access securely.
-
+Swiftgum simplifies the process of connecting third-party services to your application by providing an Integrations module in the admin dashboard. This allows developers/admins (who configure OAuth apps) and end users (who link personal or admin accounts) to manage access securely.
 
 ## Prerequisites
 
 A Swiftgum admin account (Cloud).
-An API key (for creating portal sessions if you’ll be redirecting users).
+An API key (for creating portal sessions if you'll be redirecting users).
 Sufficient permissions (administrator role) to add or modify integrations.
-
 
 ## Developer Setup (Enabling a Provider)
 
 ### Step 1: Register an OAuth App with the Provider
-Each provider (e.g., Google, Notion) usually requires an OAuth application (or “Client”):
-- Provider’s Developer Console: For Google, visit https://console.cloud.google.com . For Notion, https://developers.notion.com .
-- Create an OAuth Client: Provide a name and callback URLs.
-- Redirect URIs: Typically set to the Swiftgum callback domain (e.g., https://api.swiftgum.com/oauth/callback).
-- Client ID & Secret: Copy these credentials for use in Swiftgum.
+
+Each provider requires an OAuth application (or "Client"):
+
+- Provider's Developer Console: Visit the provider's developer portal to create your application
+- Create an OAuth Client: Provide a name and callback URLs
+- Redirect URIs: You will find this in the Swiftgum admin panel under Integrations > [Provider]
+- Client ID & Secret: Copy these credentials for use in Swiftgum
+
+For provider-specific setup instructions, refer to our provider documentation:
+
+- [Notion](/providers/notion)
+- [Google Drive](/providers/google:drive)
+- [Gmail](/providers/google:gmail)
+- [Other Providers](/providers/)
 
 ### Step 2: Add Provider Credentials in Swiftgum
+
 1. Integrations Dashboard
-   Log in to the Swiftgum admin panel and navigate to Integrations. Find the provider (e.g., Google Drive) or click “Add New Integration” if available.
+   Log in to the Swiftgum admin panel and navigate to Integrations. Find the provider or click "Add New Integration" if available.
 
 2. Enter Credentials
-   Paste your Client ID and Client Secret. Some providers also require scopes (e.g., drive.readonly, notion.pages.read).
-   <img src="/images/integration-ui.png" alt="Swiftgum Integration UI" width="450"/>
+   Paste your Client ID and Client Secret. Some providers also require specific scopes (refer to the provider documentation for details).
+
+   <img
+     src="/images/integration-ui.png"
+     alt="Swiftgum Integration UI"
+     width="450"
+   />
 
 3. Enable the Integration
    Toggle the integration to Enabled. Now end users can connect their personal accounts for that service via the Swiftgum Portal.
 
-
 ## Troubleshooting Tips
 
 Invalid Redirect URI:
-Make sure the redirect URI in the provider’s console exactly matches Swiftgum’s callback URL. Small mismatches (HTTP vs HTTPS, trailing slashes) can cause errors.
+Make sure the redirect URI in the provider's console exactly matches Swiftgum's callback URL. Small mismatches (HTTP vs HTTPS, trailing slashes) can cause errors.
 
 Token Refresh Issues:
 • Some providers require manual re-auth if refresh tokens expire or scopes change.
 • Check if the user has revoked access in their provider account settings.
 
 Scopes Not Permitted:
-Certain providers limit which scopes an app can request. Ensure you only request necessary scopes (e.g., drive.readonly, notion.database.read).
-
+Certain providers limit which scopes an app can request. Ensure you only request necessary scopes as specified in the provider documentation.
 
 ## Next Steps
+
 With integrations enabled and end users connecting accounts, you can start ingesting documents and applying advanced features like RBAC or policy rules. See the Ingestion & Processing guide for details on how files are transformed and prepared for AI workflows.
