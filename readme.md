@@ -1,55 +1,65 @@
-# **Swiftgum**  
-**Turn Data into LLM-Ready Markdown**  
+# **Swiftgum**
 
-Swiftgum is an **open-source** platform that **ingests and normalizes documents from virtually any platform, making them ready for AI-powered applications**. It simplifies data ingestion, **enforces per-user RBAC**, and **exports structured data via webhooks**, so you can send AI-ready content anywhere you need. 
+**Turn Data into LLM-Ready Markdown**
+
+Swiftgum is an **open-source** platform that **ingests and normalizes documents from virtually any platform, making them ready for AI-powered applications**. It simplifies data ingestion, **enforces per-user RBAC**, and **exports structured data via webhooks**, so you can send AI-ready content anywhere you need.
 
 ![Swiftgum Unification](./docs/images/unify.png)
 
 ---
 
-## **Features**  
+## **Features**
 
-✅ **Document Ingestion & Normalization** ([Docs](https://swiftgum.mintlify.app/usage/ingestion-processing))  
-> Extracts, cleans, and converts files from Google Drive, Notion, and more into **AI-ready Markdown**.  
+✅ **Document Ingestion & Normalization** ([Docs](https://swiftgum.mintlify.app/usage/ingestion-processing))
 
-✅ **Multi-User RBAC** ([Docs](https://swiftgum.mintlify.app/architecture/high-level-architecture))  
-> Per-user data sharing rules enforced **automatically**, eliminating permission headaches.  
+> Extracts, cleans, and converts files from Google Drive, Notion, and more into **AI-ready Markdown**.
 
-✅ **Webhook-Based Export** ([Docs](https://swiftgum.mintlify.app/getting-started/quick-start))  
-> Push processed data **to any vector database, storage, or custom pipeline**—you stay in control.  
+✅ **Multi-User RBAC** ([Docs](https://swiftgum.mintlify.app/architecture/high-level-architecture))
 
-✅ **OAuth-Based Authentication** ([Docs](https://swiftgum.mintlify.app/security/rbac))  
+> Per-user data sharing rules enforced **automatically**, eliminating permission headaches.
+
+✅ **Webhook-Based Export** ([Docs](https://swiftgum.mintlify.app/getting-started/quick-start))
+
+> Push processed data **to any vector database, storage, or custom pipeline**—you stay in control.
+
+✅ **OAuth-Based Authentication** ([Docs](https://swiftgum.mintlify.app/security/rbac))
+
 > Securely connect integrations without exposing global credentials.
 
-✅ **Self-Host or Use Swiftgum Cloud** ([Docs](https://swiftgum.mintlify.app/getting-started/installation))  
-> Run it yourself or get started instantly with **our managed cloud**.  
+✅ **Self-Host or Use Swiftgum Cloud** ([Docs](https://swiftgum.mintlify.app/getting-started/installation))
+
+> Run it yourself or get started instantly with **our managed cloud**.
 
 ---
 
-## **Quick Start**  
+## **Quick Start**
 
-This guide walks you through setting up Swiftgum in five simple steps.  
+This guide walks you through setting up Swiftgum in five simple steps.
 
-### **1. Sign Up & Retrieve API Key**  
-- **Sign Up**: Visit [Swiftgum](https://app.swiftgum.com/) and create an account.  
-- **Reveal Your API Key**:  
-  - Log into your **admin dashboard**.  
-  - Access the **API Keys** section to copy your `x-api-key`.  
+### **1. Sign Up & Retrieve API Key**
 
-### **2. Activate an Integration**  
-- Navigate to **Integrations** in the Swiftgum dashboard.  
-- Enable an integration (e.g., Google Drive):  
-  - Toggle the integration status to **Enabled**.  
-  - Enter OAuth Credentials: Provide **Client ID** and **Client Secret** (or leave blank if pre-configured).  
-  - Click **Update Integration** to save changes.  
+- **Sign Up**: Visit [Swiftgum](https://app.swiftgum.com/) and create an account.
+- **Reveal Your API Key**:
+  - Log into your **admin dashboard**.
+  - Access the **API Keys** section to copy your `x-api-key`.
 
-Once enabled, end users can connect personal or team accounts via the **Swiftgum Portal**.  
+### **2. Activate an Integration**
 
-### **3. Create a Portal Session**  
-- Call the `/api/portal/session` endpoint to generate a `sessionId` for a specific user.  
-- This session allows them to manage their newly enabled integration.  
+- Navigate to **Integrations** in the Swiftgum dashboard.
+- Enable an integration (e.g., Google Drive):
+  - Toggle the integration status to **Enabled**.
+  - Enter OAuth Credentials: Provide **Client ID** and **Client Secret** (or leave blank if pre-configured).
+  - Click **Update Integration** to save changes.
 
-#### **Example Request:**  
+Once enabled, end users can connect personal or team accounts via the **Swiftgum Portal**.
+
+### **3. Create a Portal Session**
+
+- Call the `/api/portal/session` endpoint to generate a `sessionId` for a specific user.
+- This session allows them to manage their newly enabled integration.
+
+#### **Example Request:**
+
 ```bash
 POST /api/portal/session
 Host: https://api.swiftgum.com
@@ -65,20 +75,26 @@ Content-Type: application/json
 }
 ```
 
-#### **Example Response (200):**  
-The response contains a **signed URL** that the developer can directly use in the UI.  
+#### **Example Response (200):**
+
+The response contains a **signed URL** that the developer can directly use in the UI.
+
 ```text
 	"https://api.swiftgum.com/portal/sess_abc123"
 ```
 
+![Swiftgum Portal](./docs/images/portal.png)
+_The Swiftgum Portal interface where users can manage their integrations and permissions_
+
 ### **4. Redirect User to the Portal**
+
 - Use the **signed URL** returned in the API response to directly connect the end user to Swiftgum.
 
-- Redirect your user to that **signed URL** (e.g., from a “Manage Knowledge” button in your app).
+- Redirect your user to that **signed URL** (e.g., from a "Manage Knowledge" button in your app).
 - Users can **authorize Google Drive** (or any enabled integration) and set **permissions**.
 - Once finished, they will be sent back to your specified `returnUrl`.
 
-### **5. Configure a Webhook Destination**  
+### **5. Configure a Webhook Destination**
 
 - Navigate to **Webhook Destination** in your **Swiftgum admin dashboard**.
 - Specify your **Endpoint** (e.g., `https://api.yourdomain.com/swiftgum-webhook`).
@@ -87,7 +103,8 @@ The response contains a **signed URL** that the developer can directly use in th
 
 Once configured, your system can **automatically receive structured data** for storage, AI workflows, or additional processing.
 
-#### **Example Webhook Response:**  
+#### **Example Webhook Response:**
+
 ```json
 {
   "endUser": [
@@ -110,25 +127,28 @@ Once configured, your system can **automatically receive structured data** for s
   },
   "content": "#is this a hot dog or Not hot dog"
 }
-```  
-- Navigate to **Webhook Destination** in your **Swiftgum admin dashboard**.  
-- Specify your **Endpoint** (e.g., `https://api.yourdomain.com/swiftgum-webhook`).  
+```
+
+- Navigate to **Webhook Destination** in your **Swiftgum admin dashboard**.
+- Specify your **Endpoint** (e.g., `https://api.yourdomain.com/swiftgum-webhook`).
   - Swiftgum will send **all content** to this endpoint after each fetch. A fetch is triggered when a user connects or reconnects a data source.
 
-Once configured, your system can **automatically receive structured data** for storage, AI workflows, or additional processing.  
+Once configured, your system can **automatically receive structured data** for storage, AI workflows, or additional processing.
 
 ---
 
-## **Installation**  
+## **Installation**
 
-### **Swiftgum Cloud (Recommended)**  
-- No setup required—sign up at [https://swiftgum.com](https://swiftgum.com)  
-- Retrieve your **API key** and start ingesting documents instantly.  
+### **Swiftgum Cloud (Recommended)**
 
-### **Self-Hosted Deployment**  
-- Run Swiftgum **locally** or in your own cloud (Docker, Kubernetes, etc.).  
+- No setup required—sign up at [https://swiftgum.com](https://swiftgum.com)
+- Retrieve your **API key** and start ingesting documents instantly.
 
-#### **Quick Local Test via Docker**  
+### **Self-Hosted Deployment**
+
+- Run Swiftgum **locally** or in your own cloud (Docker, Kubernetes, etc.).
+
+#### **Quick Local Test via Docker**
 
 ```bash
 # 1. Clone the repo
@@ -143,51 +163,49 @@ docker compose up -d
 
 ---
 
+## **Current Limitations**
 
-## **Current Limitations**  
-
-* Currently, Swiftgum only supports Google Drive and Notion connections. More are to come!
-* Data is not refreshed on a periodic basis. Refresh is triggered only when a user connects or reconnects a data source. This will be improved in a later version.
-
----
-
-
-## **Architecture**  
-
-Swiftgum follows a **modular architecture** to keep things simple and extensible.  
-
-### **Core Components**  
-
-| Component       | Description |
-|----------------|-------------|
-| **Ingestion Engine** | Connects to Google Drive, Notion, and more to retrieve documents. |
-| **Normalization Layer** | Converts raw files into AI-ready **Markdown**. |
-| **RBAC Enforcement** | Ensures **per-user permissions** are respected. |
-| **Webhook Delivery** | Sends cleaned data to **your system of choice**. |
-| **Authentication (OAuth)** | Securely connects users without exposing credentials. |
+- Currently, Swiftgum only supports Google Drive and Notion connections. More are to come!
+- Data is not refreshed on a periodic basis. Refresh is triggered only when a user connects or reconnects a data source. This will be improved in a later version.
 
 ---
 
-## **Contributing**  
+## **Architecture**
 
-We welcome **pull requests, feature ideas, and issues**!  
+Swiftgum follows a **modular architecture** to keep things simple and extensible.
 
-1. **Fork the repo** and create a feature branch.  
-2. **Submit a PR** describing your update.  
-3. **Join our Discord** (invite link in the docs) to discuss and shape Swiftgum’s future.  
+### **Core Components**
 
-For setup instructions, see `CONTRIBUTING.md`.  
-
----
-
-## **License**  
-
-Swiftgum is distributed under the **MIT License**. See the `LICENSE` file for details.  
+| Component                  | Description                                                       |
+| -------------------------- | ----------------------------------------------------------------- |
+| **Ingestion Engine**       | Connects to Google Drive, Notion, and more to retrieve documents. |
+| **Normalization Layer**    | Converts raw files into AI-ready **Markdown**.                    |
+| **RBAC Enforcement**       | Ensures **per-user permissions** are respected.                   |
+| **Webhook Delivery**       | Sends cleaned data to **your system of choice**.                  |
+| **Authentication (OAuth)** | Securely connects users without exposing credentials.             |
 
 ---
 
-## **Community & Support**  
+## **Contributing**
 
-🐞 **[GitHub Issues](https://github.com/Titou325/knowledgex/issues)** – Report bugs, suggest features, or request enhancements.  
-📧 **[Email Support](mailto:support@swiftgum.com)** – Contact us for **enterprise support and self-hosting inquiries**.  
-👾 **[Discord](https://discord.gg/adnqxUb8)** – Chat with the team and share what you’re building.  
+We welcome **pull requests, feature ideas, and issues**!
+
+1. **Fork the repo** and create a feature branch.
+2. **Submit a PR** describing your update.
+3. **Join our Discord** (invite link in the docs) to discuss and shape Swiftgum's future.
+
+For setup instructions, see `CONTRIBUTING.md`.
+
+---
+
+## **License**
+
+Swiftgum is distributed under the **MIT License**. See the `LICENSE` file for details.
+
+---
+
+## **Community & Support**
+
+🐞 **[GitHub Issues](https://github.com/Titou325/knowledgex/issues)** – Report bugs, suggest features, or request enhancements.
+📧 **[Email Support](mailto:support@swiftgum.com)** – Contact us for **enterprise support and self-hosting inquiries**.
+👾 **[Discord](https://discord.gg/adnqxUb8)** – Chat with the team and share what you're building.
